@@ -42,6 +42,7 @@ Depois, gerar eventos benignos de validação para os IDs Sysmon 1 (criação de
 ## Observações operacionais
 
 - O clipboard bidirecional foi configurado no VirtualBox, mas ainda não foi possível confirmar a publicação da versão dos Guest Additions pelas propriedades da VM. Isso não bloqueou a instalação nem a validação do Sysmon e do FIM.
+- Uma interface host-only isolada foi adicionada às duas VMs sem alterar o NAT nem a rede interna. O WinRM HTTP do Windows responde nessa rede, mas a execução remota permanece bloqueada até haver autenticação segura; SSH ainda não está exposto no Kali.
 - Capturas locais de validação não fazem parte do repositório e permanecem não rastreadas.
 - Os modos `Health` e `Collect-Evidence` do orquestrador passaram usando somente consultas locais ao VirtualBox. A validação ponta a ponta permanece bloqueada até existir um canal de gerenciamento já autorizado e autenticado, ou até que a configuração seja comprovada no console local do Windows.
 - O orquestrador distingue uma VM em execução (`PASS`) de uma VM desligada (`FAIL`), em vez de confundir uma consulta VirtualBox bem-sucedida com uma VM saudável.

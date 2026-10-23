@@ -6,10 +6,11 @@
 Host Windows
   └─ VirtualBox
       ├─ WindowsServer (Sysmon + Wazuh Agent)
-      └─ Kali / Wazuh (manager e análise)
+      ├─ Kali / Wazuh (manager e análise)
+      └─ rede host-only isolada de administração
 ```
 
-As duas VMs usam uma combinação de NAT e rede interna. Não há port forwarding configurado e não deve ser criado para esta operação.
+As duas VMs usam NAT, rede interna e uma terceira interface host-only isolada para administração pelo host. Não há port forwarding configurado e não deve ser criado para esta operação.
 
 ## Orquestrador host
 
@@ -29,10 +30,10 @@ Set-Location 'C:\Users\rapha\Downloads\wazuh projeto'
 
 | Alvo | Estado da VM | Canal remoto autenticado | Resultado operacional |
 | --- | --- | --- | --- |
-| WindowsServer | Online | Não confirmado | `BLOCKED` para comandos remotos |
-| Kali / Wazuh | Online | Não confirmado | `BLOCKED` para comandos remotos |
+| WindowsServer | Online | WinRM HTTP responde, mas não há confiança/autenticação remota segura configurada | `BLOCKED` para comandos remotos |
+| Kali / Wazuh | Online | SSH não exposto na rede host-only | `BLOCKED` para comandos remotos |
 
-O SSH do Kali não estava acessível pela rota testada. WinRM, OpenSSH no Windows e `VBoxManage guestcontrol` não foram habilitados nem presumidos. O orquestrador marca essa condição como `BLOCKED`; ele não cria serviços, regras de firewall, port forwarding nem usa credenciais.
+O SSH do Kali não está exposto na rede host-only. O WinRM HTTP do Windows responde, mas usar IP fora de domínio exigiria `TrustedHosts`, o que reduz as garantias de autenticação e não foi aplicado. OpenSSH no Windows e `VBoxManage guestcontrol` não foram habilitados nem presumidos. O orquestrador marca essa condição como `BLOCKED`; ele não cria serviços, regras de firewall, port forwarding nem usa credenciais.
 
 ## Fluxo seguro para Sysmon → Wazuh
 

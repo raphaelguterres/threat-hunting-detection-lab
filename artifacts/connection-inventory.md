@@ -15,8 +15,8 @@ Coletado em 23/10/2026 a partir do host Windows, sem credenciais ou conteúdo se
 
 | Papel | Nome VirtualBox | UUID | Estado | Redes | Clipboard |
 | --- | --- | --- | --- | --- | --- |
-| Windows / agente Wazuh | `WindowsServer` | `db57ee0e-c884-433b-9852-41091df69403` | Executando | rede interna + NAT | Bidirecional |
-| Kali / Wazuh | `kali-linux-2025.3-virtualbox-amd64` | `f00b7093-11ce-41f5-a5ec-1d3dd5bece3f` | Executando | NAT + rede interna | Bidirecional |
+| Windows / agente Wazuh | `WindowsServer` | `db57ee0e-c884-433b-9852-41091df69403` | Executando | rede interna + NAT + host-only | Bidirecional |
+| Kali / Wazuh | `kali-linux-2025.3-virtualbox-amd64` | `f00b7093-11ce-41f5-a5ec-1d3dd5bece3f` | Executando | NAT + rede interna + host-only | Bidirecional |
 
 As duas VMs publicam endereços privados nas propriedades de convidado. Esses endereços não são versionados aqui porque podem mudar e não são necessários para operar o repositório.
 
@@ -25,9 +25,10 @@ As duas VMs publicam endereços privados nas propriedades de convidado. Esses en
 | Destino | Canal | Resultado | Decisão |
 | --- | --- | --- | --- |
 | Windows | VirtualBox status/propriedades | Sessão `Administrator` observada | Disponível para observação do host |
-| Windows | WinRM/OpenSSH/guestcontrol | Não confirmado | Não habilitar sem autorização específica e credenciais válidas |
+| Windows | WinRM HTTP | Serviço responde na rede host-only, mas não há confiança/autenticação remota configurada | Não usar `TrustedHosts` em HTTP; preferir WinRM HTTPS ou canal autenticado existente |
+| Windows | OpenSSH/guestcontrol | Não confirmado | Não habilitar sem autorização específica e credenciais válidas |
 | Kali | VirtualBox status/propriedades | Sessão `kali` observada | Disponível para observação do host |
-| Kali | SSH do host | Porta não alcançável pela rota testada | Não criar redirecionamento nem aceitar fingerprint automaticamente |
+| Kali | SSH do host | Serviço não exposto na rede host-only | Não criar redirecionamento nem aceitar fingerprint automaticamente |
 | Kali | guestcontrol | Não confirmado | Depende de Guest Additions compatíveis e credenciais válidas |
 
 ## Evidências de telemetria já observadas
@@ -40,3 +41,4 @@ As duas VMs publicam endereços privados nas propriedades de convidado. Esses en
 - O VirtualBox ainda não publicou uma versão de Guest Additions para o Windows nas propriedades consultadas; clipboard configurado não equivale a `guestcontrol` funcional.
 - Não há um transporte remoto autenticado e pré-configurado do host para executar comandos dentro das VMs sem interação local. O orquestrador deve marcar esses passos como `BLOCKED`, e não improvisar WinRM, SSH ou port forwarding.
 - O estado de energia deve ser consultado a cada operação com `automation/orchestrate.ps1 -Mode Health`; o inventário não substitui esse health check dinâmico.
+- Uma terceira interface host-only foi adicionada às duas VMs, preservando as interfaces de NAT e rede interna. Ela serve exclusivamente à administração pelo host e não foi exposta à Internet.
