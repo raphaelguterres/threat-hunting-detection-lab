@@ -1,0 +1,13 @@
+# Evidências brutas: revisar e redigir manualmente antes de publicar.
+evidencias/
+
+# Arquivos e metadados locais.
+.playwright-mcp/
+*.log
+*.tmp
+
+# Não versionar segredos ou artefatos de configuração local.
+.env
+.env.*
+*.key
+*.pem

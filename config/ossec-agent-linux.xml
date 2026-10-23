@@ -1,0 +1,10 @@
+<!-- Cole dentro de <ossec_config> no /var/ossec/etc/ossec.conf do AGENTE Linux. -->
+<localfile>
+  <location>/var/log/wazuh-lab/events.log</location>
+  <log_format>syslog</log_format>
+</localfile>
+
+<!-- Diretório criado pelo simulador. A alteração do arquivo deve gerar alerta FIM nativo. -->
+<syscheck>
+  <directories check_all="yes" realtime="yes">/opt/wazuh-lab/monitorado</directories>
+</syscheck>

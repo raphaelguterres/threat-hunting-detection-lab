@@ -1,0 +1,29 @@
+<!--
+  Regras exclusivamente para o laboratório.
+  Instale no Wazuh manager em /var/ossec/etc/rules/local_rules.xml.
+-->
+<group name="lab,wazuh_lab,">
+  <rule id="100100" level="10">
+    <match>LAB_BRUTE_FORCE</match>
+    <description>LAB: múltiplas falhas de autenticação simuladas</description>
+    <group>authentication_failed,brute_force,lab,</group>
+  </rule>
+
+  <rule id="100101" level="9">
+    <match>LAB_SUSPICIOUS_COMMAND</match>
+    <description>LAB: execução suspeita simulada no endpoint</description>
+    <group>process_monitoring,execution,lab,</group>
+  </rule>
+
+  <rule id="100102" level="12">
+    <match>LAB_DATA_EXFIL</match>
+    <description>LAB: possível exfiltração de dados simulada</description>
+    <group>data_loss,exfiltration,lab,</group>
+  </rule>
+
+  <rule id="100103" level="11">
+    <match>LAB_PRIVILEGE_ESCALATION</match>
+    <description>LAB: elevação de privilégio suspeita simulada</description>
+    <group>privilege_escalation,authentication_success,lab,</group>
+  </rule>
+</group>
