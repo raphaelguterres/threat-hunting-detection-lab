@@ -1,0 +1,8 @@
+# Local inventory may name lab assets or reference approved transport settings.
+inventory.local.json
+inventory.private.json
+
+# Runtime evidence is local until it is manually redacted and selected for publication.
+artifacts/
+logs/
+*.secret.json

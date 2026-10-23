@@ -34,3 +34,14 @@
 ## Evidências e encerramento
 
 Para cada teste, registrar resultado positivo ou negativo, consulta usada no Wazuh, captura redigida e qualquer impacto de volume. Abrir ajuste de configuração se a coleta gerar ruído desproporcional.
+
+## Registro da operação atual
+
+Em 23/10/2026, o Sysmon foi confirmado como instalado e com o serviço `Sysmon64` em execução. A coleta FIM do Windows pelo Wazuh também foi observada, sem regressão aparente. Ainda não há evidência suficiente de que os eventos Sysmon IDs 1 e 11 chegaram ao Wazuh; portanto, os dois testes continuam **pendentes** e a Issue #2 deve permanecer aberta.
+
+O orquestrador local pode ser usado para verificar o estado das VMs sem abrir rede:
+
+```powershell
+.\automation\orchestrate.ps1 -Mode Health
+.\automation\orchestrate.ps1 -Mode Validate-Sysmon -WhatIf
+```

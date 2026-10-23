@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "virtualbox": {
+    "vboxmanage_path": "C:\\Program Files\\Oracle\\VirtualBox\\VBoxManage.exe"
+  },
+  "targets": [
+    {
+      "id": "windows-server",
+      "role": "windows",
+      "vm_name": "WindowsServer",
+      "vm_uuid": "00000000-0000-0000-0000-000000000000",
+      "address": "windows-lab.example.invalid",
+      "transport": "unconfigured",
+      "timeout_seconds": 20
+    },
+    {
+      "id": "kali-wazuh",
+      "role": "wazuh",
+      "vm_name": "kali-linux-lab",
+      "vm_uuid": "00000000-0000-0000-0000-000000000001",
+      "address": "kali-lab.example.invalid",
+      "transport": "unconfigured",
+      "timeout_seconds": 20
+    }
+  ]
+}
