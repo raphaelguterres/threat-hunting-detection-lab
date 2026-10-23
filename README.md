@@ -20,7 +20,7 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 - FIM ponta a ponta validado no Windows, incluindo hashes antes/depois;
 - evidências e limitações documentadas, sem apresentar simulações como incidentes reais.
 
-Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md) e o [catálogo de detecções](docs/detection-catalog.md).
+Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md) e a [cobertura MITRE ATT&CK](docs/mitre-coverage.md).
 
 ## Arquitetura
 
