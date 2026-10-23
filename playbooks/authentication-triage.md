@@ -15,3 +15,5 @@ Várias falhas para a mesma conta ou origem em uma janela curta.
 ## Resposta recomendada
 
 Em incidente confirmado, preservar eventos, aplicar controles previstos pela organização (por exemplo, bloqueio temporário ou redefinição de credencial) somente com aprovação humana e registrar o rollback.
+
+Consulte a [governança de resposta](response-governance.md) antes de qualquer contenção.

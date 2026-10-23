@@ -15,3 +15,5 @@ Evento PowerShell fora do padrão do ativo ou alerta relacionado a scripting.
 ## Resposta recomendada
 
 Em caso suspeito, preservar os logs e recomendar bloqueio/isolamento apenas após aprovação humana. Não apagar scripts nem eventos antes da coleta de evidências.
+
+Consulte a [governança de resposta](response-governance.md) antes de qualquer contenção.

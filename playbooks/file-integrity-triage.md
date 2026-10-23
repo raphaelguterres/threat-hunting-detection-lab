@@ -15,3 +15,5 @@ Alerta FIM com caminho, tipo de mudança e hashes antes/depois.
 ## Resposta
 
 Não modificar ou remover o arquivo automaticamente. Para uma alteração suspeita, recomendar isolamento e coleta forense somente após aprovação humana, conforme procedimento da organização. Registrar toda decisão e o plano de rollback.
+
+Consulte a [governança de resposta](response-governance.md) antes de qualquer contenção.
