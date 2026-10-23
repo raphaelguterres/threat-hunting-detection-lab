@@ -13,4 +13,4 @@
 
 ## Lacunas e próxima validação
 
-Sysmon ainda não está instalado. Antes de criar detecções baseadas em árvore de processos ou conexões de rede no Windows, instalar Sysmon no endpoint do laboratório, habilitar a coleta de `Microsoft-Windows-Sysmon/Operational` e validar um evento inofensivo de cada tipo necessário.
+Sysmon ainda não está instalado. A configuração e o procedimento seguro estão em [sysmon-deployment.md](sysmon-deployment.md). Antes de criar detecções baseadas em árvore de processos ou conexões de rede no Windows, habilitar a coleta de `Microsoft-Windows-Sysmon/Operational` e validar um evento inofensivo de cada tipo necessário.

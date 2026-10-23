@@ -1,0 +1,9 @@
+<!--
+  Adicione este bloco dentro de <ossec_config> no ossec.conf do agente Windows
+  ou distribua-o por configuração centralizada para o grupo de laboratório.
+-->
+<localfile>
+  <location>Microsoft-Windows-Sysmon/Operational</location>
+  <log_format>eventchannel</log_format>
+  <only-future-events>yes</only-future-events>
+</localfile>

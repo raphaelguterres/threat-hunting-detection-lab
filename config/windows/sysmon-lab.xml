@@ -1,0 +1,19 @@
+<!--
+  Sysmon mínimo para o endpoint Windows isolado deste laboratório.
+  Confirme a compatibilidade da versão instalada com: Sysmon64.exe -s
+  A configuração privilegia visibilidade para validação inicial; revise o volume
+  de eventos antes de qualquer uso fora do laboratório.
+-->
+<Sysmon schemaversion="4.90">
+  <HashAlgorithms>SHA256</HashAlgorithms>
+  <EventFiltering>
+    <!-- Event ID 1: processo, linha de comando e processo-pai. -->
+    <ProcessCreate onmatch="exclude" />
+
+    <!-- Event ID 3: conexões TCP/UDP associadas a processo. -->
+    <NetworkConnect onmatch="exclude" />
+
+    <!-- Event ID 11: criação de arquivo para uma linha do tempo simples. -->
+    <FileCreate onmatch="exclude" />
+  </EventFiltering>
+</Sysmon>
