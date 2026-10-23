@@ -6,8 +6,8 @@ Atualizado em 23/10/2026.
 
 | Componente | Estado | Evidência |
 | --- | --- | --- |
-| VM Windows Server | Última sessão observada: `Administrator`; estado atual: desligada | Verificação pelo VirtualBox após reinício controlado e health check posterior |
-| VM Kali / Wazuh | Última sessão observada: `kali`; estado atual: desligada | Console exibiu eventos recebidos pelo Wazuh e health check posterior |
+| VM Windows Server | Online; sessão `Administrator` observada | Verificação pelo VirtualBox no health check mais recente |
+| VM Kali / Wazuh | Online; sessão `kali` observada | Verificação pelo VirtualBox no health check mais recente |
 | Sysmon no Windows | Instalado e ativo | `Sysmon64` com estado `Running` |
 | Configuração Sysmon | Aplicada | Arquivo de configuração validado pelo Sysmon (schema 4.90) |
 | FIM Windows → Wazuh | Funcionando | Evento `syscheck_integrity_changed` recebido no Kali para o arquivo de teste |
@@ -44,4 +44,4 @@ Depois, gerar eventos benignos de validação para os IDs Sysmon 1 (criação de
 - O clipboard bidirecional foi configurado no VirtualBox, mas ainda não foi possível confirmar a publicação da versão dos Guest Additions pelas propriedades da VM. Isso não bloqueou a instalação nem a validação do Sysmon e do FIM.
 - Capturas locais de validação não fazem parte do repositório e permanecem não rastreadas.
 - Os modos `Health` e `Collect-Evidence` do orquestrador passaram usando somente consultas locais ao VirtualBox. A validação ponta a ponta permanece bloqueada até existir um canal de gerenciamento já autorizado e autenticado, ou até que a configuração seja comprovada no console local do Windows.
-- O health check mais recente encontrou ambas as VMs desligadas. O orquestrador agora reporta esse estado como `FAIL`, em vez de confundir uma consulta VirtualBox bem-sucedida com uma VM saudável.
+- O orquestrador distingue uma VM em execução (`PASS`) de uma VM desligada (`FAIL`), em vez de confundir uma consulta VirtualBox bem-sucedida com uma VM saudável.

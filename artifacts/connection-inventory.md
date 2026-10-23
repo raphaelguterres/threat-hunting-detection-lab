@@ -39,4 +39,4 @@ As duas VMs publicam endereços privados nas propriedades de convidado. Esses en
 
 - O VirtualBox ainda não publicou uma versão de Guest Additions para o Windows nas propriedades consultadas; clipboard configurado não equivale a `guestcontrol` funcional.
 - Não há um transporte remoto autenticado e pré-configurado do host para executar comandos dentro das VMs sem interação local. O orquestrador deve marcar esses passos como `BLOCKED`, e não improvisar WinRM, SSH ou port forwarding.
-- Na verificação de saúde mais recente, ambas as VMs estavam desligadas. Nenhuma tentativa de inicialização foi feita, pois iniciar/reiniciar VM exige aprovação específica.
+- O estado de energia deve ser consultado a cada operação com `automation/orchestrate.ps1 -Mode Health`; o inventário não substitui esse health check dinâmico.
