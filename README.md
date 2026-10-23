@@ -18,9 +18,11 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 - agente Linux ativo com quatro alertas de regras locais validados;
 - agente Windows Server ativo, com coleta de Event Channels configurada;
 - FIM ponta a ponta validado no Windows, incluindo hashes antes/depois;
+- Sysmon instalado no Windows; a validação de ingestão dos IDs 1 e 11 no Wazuh permanece pendente;
+- rede host-only isolada para gerenciamento das VMs, sem port forwarding público;
 - evidências e limitações documentadas, sem apresentar simulações como incidentes reais.
 
-Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md) e a [cobertura MITRE ATT&CK](docs/mitre-coverage.md).
+Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), a [cobertura MITRE ATT&CK](docs/mitre-coverage.md) e as [operações dual-VM](docs/remote-dual-vm-operations.md).
 
 ## Arquitetura
 
@@ -59,6 +61,8 @@ O ambiente implantado inclui os dois endpoints. Endereços, nomes de host e dema
 5. Execute `scripts/simular_eventos_linux.sh` como administrador no endpoint Linux.
 6. No Dashboard, filtre por `rule.groups: lab` ou pelos IDs `100100` a `100103`.
 7. Siga e preencha [docs/registro-de-investigacao.md](docs/registro-de-investigacao.md). O roteiro de fala está em [docs/roteiro-de-apresentacao.md](docs/roteiro-de-apresentacao.md).
+
+Para validações reproduzíveis, use os roteiros de [Sysmon no Windows](tests/windows-sysmon-validation.md), [FIM Linux](tests/linux-fim-validation.md) e o [checklist de qualidade de detecção](tests/detection-quality-gate.md).
 
 ## Cenários demonstrados
 
