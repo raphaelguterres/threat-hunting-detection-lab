@@ -5,4 +5,5 @@ inventory.private.json
 # Runtime evidence is local until it is manually redacted and selected for publication.
 artifacts/
 logs/
+.keys/
 *.secret.json
