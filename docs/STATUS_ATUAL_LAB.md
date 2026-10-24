@@ -1,6 +1,6 @@
 # Status atual — Threat Hunting Detection Lab
 
-Atualizado em 23/10/2026.
+Atualizado em 24/10/2026.
 
 ## Ambiente validado
 
@@ -10,6 +10,8 @@ Atualizado em 23/10/2026.
 | VM Kali / Wazuh | Online; sessão `kali` observada | Verificação pelo VirtualBox no health check mais recente |
 | Sysmon no Windows | Instalado e ativo | `Sysmon64` com estado `Running` |
 | Configuração Sysmon | Aplicada | Arquivo de configuração validado pelo Sysmon (schema 4.90) |
+| Coleta Sysmon no agente Wazuh | Configurada e agente online | Canal `Microsoft-Windows-Sysmon/Operational` presente no `ossec.conf`; agente conectou ao Manager após a reinicialização |
+| Evento Sysmon de validação local | Gerado | Sysmon Event ID 11 confirmou criação de arquivo pelo `wazuh-agent.exe` após ativar a coleta |
 | FIM Windows → Wazuh | Funcionando | Evento `syscheck_integrity_changed` recebido no Kali para o arquivo de teste |
 | Guest Additions | Instalados nas duas VMs | Propriedades do VirtualBox confirmam os componentes e versões instalados |
 
@@ -26,9 +28,9 @@ Atualizado em 23/10/2026.
 
 ## Ponto pendente para encerrar a etapa atual
 
-O Sysmon já gera telemetria localmente, mas ainda falta confirmar a ingestão de seus eventos pelo Wazuh.
+O Sysmon gera telemetria localmente e o coletor foi adicionado ao `ossec.conf`; o agente Windows voltou a ficar online no Manager. Ainda falta obter a evidência no lado do Manager (arquivo de eventos/alertas ou dashboard) que correlacione um ID 1 e um ID 11 ao endpoint.
 
-O ajuste necessário é adicionar ao `ossec.conf` do agente Windows o bloco abaixo, dentro de `<ossec_config>`, e reiniciar somente o serviço `WazuhSvc`:
+O bloco ativo no agente é:
 
 ```xml
 <localfile>
@@ -38,7 +40,7 @@ O ajuste necessário é adicionar ao `ossec.conf` do agente Windows o bloco abai
 </localfile>
 ```
 
-Depois, gerar eventos benignos de validação para os IDs Sysmon 1 (criação de processo) e 11 (criação de arquivo), e confirmar sua chegada ao Wazuh. Somente após essa evidência a Issue #2 deve ser fechada.
+O ID 11 já foi gerado e confirmado localmente. Gerar um ID 1 benigno e confirmar ambos no Wazuh antes de fechar a Issue #2.
 
 ## Observações operacionais
 

@@ -6,4 +6,5 @@ inventory.private.json
 artifacts/
 logs/
 .keys/
+transfer/
 *.secret.json
