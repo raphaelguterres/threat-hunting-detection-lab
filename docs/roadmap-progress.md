@@ -29,7 +29,7 @@ Atualizado em 24/10/2026. Este painel consolida o estado confirmado do ambiente;
 
 ## Ponto atual e bloqueio real
 
-O trabalho está no fechamento da **Fase 2**, especificamente na Issue #2. A rede de gerenciamento isolada entre host e VMs está disponível, mas não há uma sessão remota autenticada de forma segura para alterar ou verificar o agente Wazuh nas VMs. O projeto deliberadamente não reduz a segurança do WinRM com `TrustedHosts` nem expõe SSH sem autenticação.
+O trabalho está no fechamento da **Fase 2**, especificamente na Issue #2. A rede de gerenciamento isolada entre host e VMs está disponível, e os Guest Additions estão instalados. Ainda não há uma sessão remota autenticada de forma segura para alterar ou verificar o agente Wazuh nas VMs. O projeto deliberadamente não reduz a segurança do WinRM com `TrustedHosts` nem expõe SSH sem autenticação.
 
 ## Próxima sequência ao disponibilizar acesso autenticado
 

@@ -11,6 +11,7 @@ Atualizado em 23/10/2026.
 | Sysmon no Windows | Instalado e ativo | `Sysmon64` com estado `Running` |
 | Configuração Sysmon | Aplicada | Arquivo de configuração validado pelo Sysmon (schema 4.90) |
 | FIM Windows → Wazuh | Funcionando | Evento `syscheck_integrity_changed` recebido no Kali para o arquivo de teste |
+| Guest Additions | Instalados nas duas VMs | Propriedades do VirtualBox confirmam os componentes e versões instalados |
 
 ## Entregas concluídas no repositório
 
@@ -41,7 +42,7 @@ Depois, gerar eventos benignos de validação para os IDs Sysmon 1 (criação de
 
 ## Observações operacionais
 
-- O clipboard bidirecional foi configurado no VirtualBox, mas ainda não foi possível confirmar a publicação da versão dos Guest Additions pelas propriedades da VM. Isso não bloqueou a instalação nem a validação do Sysmon e do FIM.
+- Os Guest Additions foram confirmados pelas propriedades das duas VMs. O clipboard bidirecional permanece um recurso auxiliar, não um requisito de coleta ou validação.
 - Uma interface host-only isolada foi adicionada às duas VMs sem alterar o NAT nem a rede interna. O WinRM HTTP do Windows responde nessa rede, mas a execução remota permanece bloqueada até haver autenticação segura; SSH ainda não está exposto no Kali.
 - Capturas locais de validação não fazem parte do repositório e permanecem não rastreadas.
 - Os modos `Health` e `Collect-Evidence` do orquestrador passaram usando somente consultas locais ao VirtualBox. A validação ponta a ponta permanece bloqueada até existir um canal de gerenciamento já autorizado e autenticado, ou até que a configuração seja comprovada no console local do Windows.
