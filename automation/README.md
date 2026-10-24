@@ -19,7 +19,7 @@ Set-Location 'C:\Users\rapha\Downloads\wazuh projeto'
 .\automation\orchestrate.ps1 -Mode Validate-Sysmon -WhatIf
 ```
 
-`Health` consulta as VMs locais em paralelo quando o PowerShell oferece jobs. `Discover` vincula cada alvo pelo UUID. `Collect-Evidence` lê apenas propriedades publicadas pelo VirtualBox (por exemplo, Guest Additions e sessão informada), sem executar comandos no convidado. Cada execução produz JSON e um sumário Markdown em `automation/artifacts/`.
+`Health` consulta as VMs locais em paralelo quando o PowerShell oferece jobs e registra a prontidão dos Guest Additions a partir de propriedades somente-leitura. `Discover` vincula cada alvo pelo UUID. `Collect-Evidence` lê apenas propriedades publicadas pelo VirtualBox (por exemplo, Guest Additions e sessão informada), sem executar comandos no convidado. Cada execução produz JSON e um sumário Markdown em `automation/artifacts/`.
 
 ## Limite deliberado de transporte
 

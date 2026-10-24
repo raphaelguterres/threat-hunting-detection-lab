@@ -92,6 +92,12 @@ try {
                 $results.Add((New-Result -Target $target.id -Phase 'Health-VirtualBox' -Status $status -ExitCode $info.exit_code -EvidencePath $path -Message $message))
             }
         }
+        foreach ($target in $targets) {
+            $properties = Get-VBoxGuestProperties -VBoxManage $vbox -Vm $target.vm_uuid
+            $path = Write-JsonEvidence -Data $properties -Directory $OutputDirectory -Name "guest-additions-$($target.id)-$runId"
+            $guestAdditions = Get-VBoxGuestAdditionsStatus -GuestProperties $properties
+            $results.Add((New-Result -Target $target.id -Phase 'Health-GuestAdditions' -Status $guestAdditions.status -ExitCode $properties.exit_code -EvidencePath $path -Message $guestAdditions.message))
+        }
         foreach ($target in $targets) { $results.Add((Get-TransportReadiness -Target $target -Phase 'Health-Transport')) }
     } elseif ($Mode -eq 'Collect-Evidence') {
         foreach ($target in @($inventory.targets)) {
