@@ -18,7 +18,7 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 - agente Linux ativo com quatro alertas de regras locais validados;
 - agente Windows Server ativo, com coleta de Event Channels configurada;
 - FIM ponta a ponta validado no Windows, incluindo hashes antes/depois;
-- Sysmon instalado no Windows; a validação de ingestão dos IDs 1 e 11 no Wazuh permanece pendente;
+- Sysmon instalado no Windows; ingestão dos IDs 1 e 11 validada no Wazuh;
 - rede host-only isolada para gerenciamento das VMs, sem port forwarding público;
 - evidências e limitações documentadas, sem apresentar simulações como incidentes reais.
 

@@ -12,7 +12,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 
 ## Fase 2 — Telemetria e visibilidade
 
-- [ ] **[Roadmap] Validar telemetria Windows e preparar coleta Sysmon**
+- [x] **[Roadmap] Validar telemetria Windows e preparar coleta Sysmon**
   - Critério: `Security`, `System`, `Application`, PowerShell e Sysmon documentados; pelo menos um evento inofensivo por fonte relevante confirmado no Wazuh.
   - Dependência: Sysmon somente no Windows Server isolado.
 

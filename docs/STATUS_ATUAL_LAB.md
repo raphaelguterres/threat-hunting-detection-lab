@@ -26,9 +26,9 @@ Atualizado em 24/10/2026.
 - Orquestrador local para inventário, saúde e coleta de evidências: `automation/orchestrate.ps1`.
 - Inventário saneado das conexões: `artifacts/connection-inventory.md`.
 
-## Ponto pendente para encerrar a etapa atual
+## Etapa Windows / Sysmon concluída
 
-O Sysmon gera telemetria localmente e o coletor foi adicionado ao `ossec.conf`; o agente Windows voltou a ficar online no Manager. Ainda falta obter a evidência no lado do Manager (arquivo de eventos/alertas ou dashboard) que correlacione um ID 1 e um ID 11 ao endpoint.
+O Sysmon gera telemetria localmente, o coletor foi adicionado ao `ossec.conf` e o agente Windows está online no Manager. O Manager registrou 36 alertas do canal `Microsoft-Windows-Sysmon/Operational` para o agente `004`, incluindo IDs 1 e 11. A evidência foi consultada em `alerts.json` em 24/10/2026.
 
 O bloco ativo no agente é:
 
@@ -40,7 +40,7 @@ O bloco ativo no agente é:
 </localfile>
 ```
 
-O ID 11 já foi gerado e confirmado localmente. Gerar um ID 1 benigno e confirmar ambos no Wazuh antes de fechar a Issue #2.
+O ID 11 foi confirmado localmente e no Manager; o ID 1 também foi recebido no Manager. A Issue #2 pode ser encerrada. A próxima etapa do roadmap é validar FIM Linux fora do filesystem de contêiner.
 
 ## Observações operacionais
 
