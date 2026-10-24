@@ -44,7 +44,8 @@ foreach ($relativePath in @(
     'tests/linux-fim-validation.md',
     'tests/detection-quality-gate.md',
     'playbooks/response-governance.md',
-    'docs/remote-dual-vm-operations.md'
+    'docs/remote-dual-vm-operations.md',
+    'docs/roadmap-progress.md'
 )) {
     Assert-LabCondition (Test-Path -LiteralPath (Join-Path $ProjectRoot $relativePath) -PathType Leaf) "Artefato obrigatório existe: $relativePath"
 }

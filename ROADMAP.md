@@ -2,6 +2,8 @@
 
 Este documento espelha os tópicos que devem ser acompanhados como GitHub Issues. Uma etapa só é encerrada com evidência reproduzível e documentação atualizada.
 
+O retrato operacional mais recente está no [painel de progresso](docs/roadmap-progress.md).
+
 ## Fase 1 — Base do laboratório
 
 - [x] **[Roadmap] Documentar arquitetura, inventário e limites de segurança**
