@@ -23,7 +23,7 @@ Atualizado em 25/10/2026.
 - Bloco de coleta de eventos Sysmon para o Wazuh: `config/windows/wazuh-sysmon-eventchannel.xml`.
 - Plano de implantação e roteiro de validação: `docs/sysmon-deployment.md` e `tests/windows-sysmon-validation.md`.
 - Matriz de cobertura MITRE ATT&CK: `docs/mitre-coverage.md`.
-- Roadmap e issues do GitHub criados; a etapa atual é a Issue #2, **Windows telemetry / Sysmon**.
+- Roadmap e issues do GitHub criados; as Issues #2 e #3 foram concluídas e a etapa atual é a Issue #4, **casos de detecção**.
 - Orquestrador local para inventário, saúde e coleta de evidências: `automation/orchestrate.ps1`.
 - Inventário saneado das conexões: `artifacts/connection-inventory.md`.
 
@@ -46,7 +46,7 @@ O ID 11 foi confirmado localmente e no Manager; o ID 1 também foi recebido no M
 ## Observações operacionais
 
 - Os Guest Additions foram confirmados pelas propriedades das duas VMs. O clipboard bidirecional permanece um recurso auxiliar, não um requisito de coleta ou validação.
-- Uma interface host-only isolada foi adicionada às duas VMs sem alterar o NAT nem a rede interna. O WinRM HTTP do Windows responde nessa rede, mas a execução remota permanece bloqueada até haver autenticação segura; SSH ainda não está exposto no Kali.
+- Uma interface host-only isolada foi adicionada às duas VMs sem alterar o NAT nem a rede interna. O WinRM HTTP do Windows responde nessa rede, mas a execução remota permanece bloqueada até haver autenticação segura. O Kali dispõe de SSH autenticado e validado na rede host-only para administração do Manager e do agente nativo.
 - Capturas locais de validação não fazem parte do repositório e permanecem não rastreadas.
-- Os modos `Health` e `Collect-Evidence` do orquestrador passaram usando somente consultas locais ao VirtualBox. A validação ponta a ponta permanece bloqueada até existir um canal de gerenciamento já autorizado e autenticado, ou até que a configuração seja comprovada no console local do Windows.
+- Os modos `Health` e `Collect-Evidence` do orquestrador passaram usando somente consultas locais ao VirtualBox. A validação ponta a ponta do Kali ocorre por SSH autenticado; ações no Windows continuam dependentes de uma sessão autenticada ou do console local.
 - O orquestrador distingue uma VM em execução (`PASS`) de uma VM desligada (`FAIL`), em vez de confundir uma consulta VirtualBox bem-sucedida com uma VM saudável.

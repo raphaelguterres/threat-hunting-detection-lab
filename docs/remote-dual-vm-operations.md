@@ -31,9 +31,9 @@ Set-Location 'C:\Users\rapha\Downloads\wazuh projeto'
 | Alvo | Estado da VM | Canal remoto autenticado | Resultado operacional |
 | --- | --- | --- | --- |
 | WindowsServer | Online | WinRM HTTP responde, mas não há confiança/autenticação remota segura configurada | `BLOCKED` para comandos remotos |
-| Kali / Wazuh | Online | SSH não exposto na rede host-only | `BLOCKED` para comandos remotos |
+| Kali / Wazuh | Online | SSH autenticado por chave de laboratório, com validação da chave do host | `AVAILABLE` para administração do Kali e do Manager em contêiner |
 
-O SSH do Kali não está exposto na rede host-only. O WinRM HTTP do Windows responde, mas usar IP fora de domínio exigiria `TrustedHosts`, o que reduz as garantias de autenticação e não foi aplicado. OpenSSH no Windows e `VBoxManage guestcontrol` não foram habilitados nem presumidos. O orquestrador marca essa condição como `BLOCKED`; ele não cria serviços, regras de firewall, port forwarding nem usa credenciais.
+O SSH do Kali está restrito à rede host-only e usa chave de laboratório com validação de identidade do host. O WinRM HTTP do Windows responde, mas usar IP fora de domínio exigiria `TrustedHosts`, o que reduz as garantias de autenticação e não foi aplicado. OpenSSH no Windows e `VBoxManage guestcontrol` não foram habilitados nem presumidos. O orquestrador não cria port forwarding nem reduz garantias de autenticação.
 
 ## Fluxo seguro para Sysmon → Wazuh
 

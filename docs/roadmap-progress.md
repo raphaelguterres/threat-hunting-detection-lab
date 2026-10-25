@@ -1,11 +1,11 @@
 # Painel de progresso do laboratório
 
-Atualizado em 24/10/2026. Este painel consolida o estado confirmado do ambiente; não substitui os critérios de aceite definidos no [roadmap](../ROADMAP.md).
+Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente; não substitui os critérios de aceite definidos no [roadmap](../ROADMAP.md).
 
 ```text
 [concluída] Base do laboratório
-      -> [em execução] Telemetria e visibilidade
-      -> [preparada] Engenharia de detecção
+      -> [concluída] Telemetria e visibilidade
+      -> [em execução] Engenharia de detecção
       -> [estruturada] Investigação
       -> [estruturada] Resposta segura
       -> [em preparação] Portfólio e publicação
@@ -14,8 +14,8 @@ Atualizado em 24/10/2026. Este painel consolida o estado confirmado do ambiente;
 | Fase | Estado | Situação verificável | Issue |
 | --- | --- | --- | --- |
 | 1. Base | Concluída | Arquitetura, inventário e limites documentados. | #1 fechada |
-| 2. Telemetria | **Em execução** | VMs ativas; Sysmon instalado e executando no Windows; FIM Windows para Wazuh observado. Falta confirmar eventos Sysmon no Wazuh e validar FIM no endpoint Linux. | #2 e #3 abertas |
-| 3. Detecção | Preparada, sem validação ponta a ponta | Regras, matriz MITRE e casos documentados; ainda faltam evidências positiva e negativa para encerrar os casos. | #4 e #5 abertas |
+| 2. Telemetria | **Concluída** | Sysmon IDs 1 e 11 recebidos no Manager; FIM Linux validado no agente Kali nativo com controle negativo. | #2 e #3 fechadas |
+| 3. Detecção | Em execução | Quatro regras sintéticas foram revalidadas no agente nativo com controle negativo; o caso FIM nativo está completo. Casos nativos de login, conta, PowerShell e rede ainda dependem de evidência própria. | #4 e #5 abertas |
 | 4. Investigação | Estruturada | Casos e critérios de qualidade existem; linhas do tempo dependem da telemetria validada. | #6 aberta |
 | 5. Resposta | Estruturada | Playbooks e governança de aprovação humana foram definidos. | #7 aberta |
 | 6. Portfólio | Em preparação | README e documentação redigida estão em evolução; publicação depende das evidências das fases anteriores. | #8 aberta |
@@ -24,18 +24,21 @@ Atualizado em 24/10/2026. Este painel consolida o estado confirmado do ambiente;
 
 - Windows Server e Kali/Wazuh estão em execução, conforme o health check local do VirtualBox.
 - O serviço `Sysmon64` está em execução no Windows e a configuração foi aceita pelo Sysmon.
-- Um evento de integridade de arquivo do Windows chegou ao Wazuh (`syscheck_integrity_changed`).
+- O Manager registrou 36 alertas do canal Sysmon Windows, incluindo IDs 1 e 11, para o agente Windows ativo.
+- O agente Kali nativo `kali-native-fim` foi registrado, teve FIM ativado em diretório do filesystem do convidado e gerou regras 554 (criação) e 550 (mudança de checksum).
+- O controle FIM fora do escopo monitorado gerou zero alertas.
+- Os quatro marcadores sintéticos `100100`–`100103` geraram exatamente quatro alertas no agente Kali nativo; uma linha de controle sem assinatura gerou zero alertas.
 - As regras e arquivos de configuração versionados passam em `scripts/validate_lab_config.ps1`.
 
 ## Ponto atual e bloqueio real
 
-O trabalho está no fechamento da **Fase 2**, especificamente na Issue #2. A rede de gerenciamento isolada entre host e VMs está disponível, e os Guest Additions estão instalados. Ainda não há uma sessão remota autenticada de forma segura para alterar ou verificar o agente Wazuh nas VMs. O projeto deliberadamente não reduz a segurança do WinRM com `TrustedHosts` nem expõe SSH sem autenticação.
+O trabalho está na **Fase 3**, Issue #4. O Kali possui acesso SSH autenticado com validação de host; o Windows continua sem um canal de administração remota autenticado, e o projeto não reduz a segurança do WinRM com `TrustedHosts`. Essa limitação impede afirmar como concluídos os cenários nativos de PowerShell e conexão de rede até que a evidência específica seja consultada no Manager.
 
 ## Próxima sequência ao disponibilizar acesso autenticado
 
-1. Inspecionar e preservar uma cópia da configuração atual do agente Windows.
-2. Confirmar ou aplicar o coletor de `Microsoft-Windows-Sysmon/Operational` e reiniciar apenas `WazuhSvc` se houver alteração.
-3. Gerar eventos benignos e identificáveis do Sysmon (IDs 1 e 11).
-4. Confirmar a chegada ao Wazuh, anexar a evidência redigida e encerrar a Issue #2; então validar o FIM Linux da Issue #3.
+1. Validar falha de login e alteração de conta com telemetria nativa e controles negativos seguros.
+2. Gerar e correlacionar um PowerShell benigno e uma conexão privada autorizada no Windows.
+3. Completar as consultas, linhas do tempo e justificativas de severidade dos cinco casos.
+4. Registrar falsos positivos esperados e revisão MITRE antes de encerrar as Issues #4 e #5.
 
 Consulte também o [status operacional](STATUS_ATUAL_LAB.md), o [roteiro de validação do Sysmon](../tests/windows-sysmon-validation.md) e as [operações seguras entre as VMs](remote-dual-vm-operations.md).

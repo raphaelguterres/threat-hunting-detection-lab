@@ -9,7 +9,7 @@ Use este checklist antes de marcar qualquer um dos cinco casos como concluído. 
 | Falhas de login | Autenticação nativa ou marcador sintético identificado | Evento com conta, origem e horário | Atividade sem repetição não deve receber a mesma classificação | Pipeline sintético validado; telemetria nativa pendente |
 | Alteração de conta | Auditoria nativa de identidade | Mudança autorizada em conta de teste | Consulta sem mudança não deve gerar alerta | Pendente |
 | PowerShell benigno | PowerShell Operational e/ou Sysmon ID 1 | Comando administrativo inofensivo correlacionado | Processo sem PowerShell não deve ser rotulado como PowerShell | Pendente no Wazuh |
-| Integridade de arquivo | Wazuh FIM | Alteração de arquivo monitorado com hash e horário | Leitura/listagem sem escrita | FIM Windows observado; consolidar evidência redigida |
+| Integridade de arquivo | Wazuh FIM | Alteração de arquivo monitorado com hash e horário | Arquivo fora do escopo não deve gerar alerta | FIM Kali nativo validado ponta a ponta |
 | Conexão de rede | Sysmon ID 3 ou telemetria equivalente | Conexão única para destino privado autorizado | Sem conexão não deve produzir evento | Pendente no Wazuh |
 
 ## Artefato mínimo de aprovação
@@ -23,6 +23,8 @@ Para cada caso, registrar:
 - justificativa de severidade e hipótese de triagem;
 - resultado do teste negativo;
 - captura ou saída redigida, sem credenciais, endereços privados desnecessários ou logs brutos.
+- classificação explícita da evidência como `nativa` ou `marcador sintético`.
+- referência ao registro de falso positivo, ou declaração explícita de que não houve falso positivo observado.
 
 ## Regra de encerramento
 

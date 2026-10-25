@@ -80,4 +80,4 @@ Foi removido exclusivamente o índice vazio de interface e o container do dashbo
 
 ## Próxima etapa do case study
 
-O núcleo do case study está concluído: os agentes Linux e Windows estão ativos, eventos controlados foram coletados, as regras locais geraram alertas e os documentos foram indexados. A próxima expansão é gerar eventos nativos do Windows Event Channel e demonstrar investigação ponta a ponta.
+O núcleo do case study está concluído: os agentes Linux e Windows estão ativos, eventos controlados foram coletados, as regras locais geraram alertas e os documentos foram indexados. Sysmon IDs 1 e 11 já foram confirmados no Manager e o FIM foi validado no Kali nativo com controle negativo. A próxima expansão é completar os casos nativos de autenticação, alteração de conta, PowerShell e rede, além das respectivas investigações ponta a ponta.
