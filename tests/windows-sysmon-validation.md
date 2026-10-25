@@ -9,11 +9,11 @@
 
 ## Teste 1 — Criação de processo
 
-1. Abrir uma nova janela PowerShell no endpoint e executar um comando inofensivo, como `Get-Date`.
+1. Abrir uma nova janela PowerShell no endpoint e executar `Write-Output WAZUH-LAB-PS`.
 2. Confirmar localmente um evento Sysmon ID 1.
 3. Localizar no Wazuh o evento do canal Sysmon e registrar horário, imagem, linha de comando e processo-pai.
 
-**Aprovação:** o evento no Wazuh corresponde ao evento local e não é tratado como alerta malicioso apenas pela existência de PowerShell.
+**Aprovação:** a regra 100106 do Wazuh contém imagem, linha de comando, usuário e processo-pai. O marcador é inofensivo e não deve ser classificado como malicioso.
 
 ## Teste 2 — Criação de arquivo
 
@@ -37,7 +37,7 @@ Para cada teste, registrar resultado positivo ou negativo, consulta usada no Waz
 
 ## Registro da operação atual
 
-Em 23/10/2026, o Sysmon foi confirmado como instalado e com o serviço `Sysmon64` em execução. A coleta FIM do Windows pelo Wazuh também foi observada, sem regressão aparente. Ainda não há evidência suficiente de que os eventos Sysmon IDs 1 e 11 chegaram ao Wazuh; portanto, os dois testes continuam **pendentes** e a Issue #2 deve permanecer aberta.
+O Sysmon foi confirmado instalado e em execução no Windows. Os IDs 1 e 11 chegaram ao Manager e a conexão controlada do Edge validou o ID 3 em 25/10/2026. O único teste pendente desta matriz é a execução PowerShell identificada pelo marcador `WAZUH-LAB-PS`.
 
 O orquestrador local pode ser usado para verificar o estado das VMs sem abrir rede:
 
