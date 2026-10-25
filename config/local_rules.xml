@@ -26,4 +26,11 @@
     <description>LAB: elevação de privilégio suspeita simulada</description>
     <group>privilege_escalation,authentication_success,lab,</group>
   </rule>
+
+  <rule id="100104" level="8">
+    <if_sid>80700</if_sid>
+    <field name="audit.key">^wazuh_lab_account_change$</field>
+    <description>LAB: alteração de conta monitorada por auditd</description>
+    <group>account_changed,audit,lab,</group>
+  </rule>
 </group>

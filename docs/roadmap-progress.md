@@ -15,7 +15,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
 | --- | --- | --- | --- |
 | 1. Base | Concluída | Arquitetura, inventário e limites documentados. | #1 fechada |
 | 2. Telemetria | **Concluída** | Sysmon IDs 1 e 11 recebidos no Manager; FIM Linux validado no agente Kali nativo com controle negativo. | #2 e #3 fechadas |
-| 3. Detecção | Em execução | Quatro regras sintéticas foram revalidadas no agente nativo com controle negativo; o caso FIM nativo está completo. Casos nativos de login, conta, PowerShell e rede ainda dependem de evidência própria. | #4 e #5 abertas |
+| 3. Detecção | Em execução | FIM, login inválido e alteração de conta foram validados com telemetria nativa no Kali; marcadores sintéticos foram revalidados com controle negativo. PowerShell e rede ainda dependem de evidência própria no Windows. | #4 e #5 abertas |
 | 4. Investigação | Estruturada | Casos e critérios de qualidade existem; linhas do tempo dependem da telemetria validada. | #6 aberta |
 | 5. Resposta | Estruturada | Playbooks e governança de aprovação humana foram definidos. | #7 aberta |
 | 6. Portfólio | Em preparação | README e documentação redigida estão em evolução; publicação depende das evidências das fases anteriores. | #8 aberta |

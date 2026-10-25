@@ -9,6 +9,9 @@ Este registro resume validações feitas no laboratório sem publicar endereços
 | 25/10/2026 | Kali nativo / FIM | Criar arquivo fora do escopo FIM | Zero alertas | Controle negativo validado |
 | 25/10/2026 | Regras locais | Emitir os quatro marcadores `100100`–`100103` | Um alerta por regra no agente Kali nativo | Pipeline sintético validado |
 | 25/10/2026 | Regras locais | Emitir linha sem assinatura de regra | Zero alertas | Controle negativo validado |
+| 25/10/2026 | Kali / SSH | Uma tentativa de login com usuário inexistente | Regra nativa 5710, nível 5 | Telemetria nativa validada |
+| 25/10/2026 | Kali / auditd | Criar e remover conta de serviço sem login | Regra local 100104, nível 8; 16 eventos de auditoria correlatos | Telemetria nativa validada |
+| 25/10/2026 | Kali / auditd | Consultar identidade sem alterar conta | Contagem da regra 100104 permaneceu inalterada | Controle negativo validado |
 
 ## Limites atuais
 

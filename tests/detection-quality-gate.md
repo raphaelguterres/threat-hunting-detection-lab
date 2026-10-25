@@ -6,8 +6,8 @@ Use este checklist antes de marcar qualquer um dos cinco casos como concluído. 
 
 | Caso | Fonte necessária | Teste positivo | Teste negativo | Estado atual |
 | --- | --- | --- | --- | --- |
-| Falhas de login | Autenticação nativa ou marcador sintético identificado | Evento com conta, origem e horário | Atividade sem repetição não deve receber a mesma classificação | Pipeline sintético validado; telemetria nativa pendente |
-| Alteração de conta | Auditoria nativa de identidade | Mudança autorizada em conta de teste | Consulta sem mudança não deve gerar alerta | Pendente |
+| Falhas de login | Autenticação nativa ou marcador sintético identificado | Tentativa única com usuário inexistente, regra 5710 | Não classificar o marcador sintético como login nativo | Telemetria nativa validada; correlação de repetição permanece pendente |
+| Alteração de conta | Auditoria nativa de identidade | Criar/remover conta de serviço, regra 100104 | Consulta de identidade sem mudança não deve gerar alerta | Validado no Kali |
 | PowerShell benigno | PowerShell Operational e/ou Sysmon ID 1 | Comando administrativo inofensivo correlacionado | Processo sem PowerShell não deve ser rotulado como PowerShell | Pendente no Wazuh |
 | Integridade de arquivo | Wazuh FIM | Alteração de arquivo monitorado com hash e horário | Arquivo fora do escopo não deve gerar alerta | FIM Kali nativo validado ponta a ponta |
 | Conexão de rede | Sysmon ID 3 ou telemetria equivalente | Conexão única para destino privado autorizado | Sem conexão não deve produzir evento | Pendente no Wazuh |
