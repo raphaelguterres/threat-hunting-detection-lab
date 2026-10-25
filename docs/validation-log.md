@@ -12,10 +12,11 @@ Este registro resume validações feitas no laboratório sem publicar endereços
 | 25/10/2026 | Kali / SSH | Uma tentativa de login com usuário inexistente | Regra nativa 5710, nível 5 | Telemetria nativa validada |
 | 25/10/2026 | Kali / auditd | Criar e remover conta de serviço sem login | Regra local 100104, nível 8; 16 eventos de auditoria correlatos | Telemetria nativa validada |
 | 25/10/2026 | Kali / auditd | Consultar identidade sem alterar conta | Contagem da regra 100104 permaneceu inalterada | Controle negativo validado |
+| 25/10/2026 | Saúde operacional | Consultar Manager após retomada das VMs | Agentes Windows e Kali nativo ativos | Pronto para os cenários restantes |
 
 ## Limites atuais
 
 - Os marcadores `LAB_*` são simulações autorizadas e não comprovam a execução de técnica ATT&CK.
 - O cenário de PowerShell ainda requer um teste benigno específico com contexto de usuário, comando e processo-pai.
 - O cenário de rede ainda requer uma conexão privada autorizada que produza telemetria apropriada.
-- Alterações de conta e falhas de login requerem eventos nativos de auditoria antes de serem declaradas coberturas validadas.
+- Falhas de login e alterações de conta já possuem telemetria nativa no Kali; sua correlação com técnicas ATT&CK continua tratada como hipótese até haver contexto suficiente de produção.

@@ -41,4 +41,6 @@ O trabalho está na **Fase 3**, Issue #4. O Kali possui acesso SSH autenticado c
 3. Completar as consultas, linhas do tempo e justificativas de severidade dos cinco casos.
 4. Registrar falsos positivos esperados e revisão MITRE antes de encerrar as Issues #4 e #5.
 
+O roteiro detalhado dos dois cenários Windows pendentes está em [windows-pending-validation.md](windows-pending-validation.md).
+
 Consulte também o [status operacional](STATUS_ATUAL_LAB.md), o [roteiro de validação do Sysmon](../tests/windows-sysmon-validation.md) e as [operações seguras entre as VMs](remote-dual-vm-operations.md).
