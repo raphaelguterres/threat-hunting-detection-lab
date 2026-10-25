@@ -28,17 +28,17 @@ Comprovar que um agente Linux instalado no sistema convidado — e não dentro d
 
 ## Teste negativo
 
-1. Acessar ou listar o arquivo sem modificá-lo.
-2. Verificar que isso não é registrado como alteração FIM.
+1. Criar um arquivo de controle em `/opt/wazuh-lab/fora-do-escopo`, fora do diretório configurado no `syscheck`.
+2. Verificar no Manager que o caminho de controle não gerou alerta FIM.
 
 ## Critério de aceite
 
-- [ ] O evento aponta para o agente Linux correto, não para filesystem de contêiner.
-- [ ] O caminho coincide com `/opt/wazuh-lab/monitorado`.
-- [ ] A mudança positiva possui horário e hashes coerentes.
-- [ ] O teste negativo não produz alteração FIM.
-- [ ] A evidência é redigida antes de ser adicionada ao repositório.
+- [x] O evento aponta para o agente Linux correto, não para filesystem de contêiner.
+- [x] O caminho coincide com `/opt/wazuh-lab/monitorado`.
+- [x] A mudança positiva possui horário e hashes coerentes.
+- [x] O teste negativo não produz alteração FIM.
+- [x] A evidência é redigida antes de ser adicionada ao repositório.
 
 ## Estado
 
-**Pendente.** Nenhum item deste roteiro deve ser marcado como aprovado sem a confirmação no manager.
+**Validado em 25/10/2026.** O agente nativo `kali-native-fim` gerou a regra 554 para criação e a regra 550 para mudança de checksum no arquivo de teste. O controle em `/opt/wazuh-lab/fora-do-escopo` gerou zero alertas.

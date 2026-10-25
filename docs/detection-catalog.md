@@ -8,6 +8,7 @@ Este catálogo separa o que foi validado do que é apenas mapeamento planejado. 
 | `100101` — comando suspeito | Log de laboratório Linux | 9 | Validado | Confirmar usuário, processo e legitimidade do comando. | T1059 — Command and Scripting Interpreter |
 | `100102` — possível exfiltração | Log de laboratório Linux | 12 | Validado | Confirmar destino, volume, protocolo e classificação dos dados. | T1041 — Exfiltration Over C2 Channel, se aplicável |
 | `100103` — elevação de privilégio | Log de laboratório Linux | 11 | Validado | Validar solicitação aprovada, usuário e contexto. | T1548 — Abuse Elevation Control |
+| FIM Linux nativo | Wazuh FIM | 5 / 7 | Validado positivo e negativo | Confirmar caminho, hashes antes/depois, processo de mudança e aprovação. | Sem mapeamento automático; depende do contexto da alteração |
 | Alteração de arquivo monitorado | FIM Windows | Nativo | Validado | Identificar arquivo, hashes antes/depois, usuário e mudança aprovada. | Sem mapeamento automático; depende do contexto da alteração |
 | PowerShell de laboratório | PowerShell Operational / Windows | A validar no Manager | Execução local confirmada | Validar comando, usuário, processo-pai e alertas correlatos. | T1059.001 — PowerShell |
 
