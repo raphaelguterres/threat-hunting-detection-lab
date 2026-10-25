@@ -9,13 +9,14 @@ Validar o alerta local `100100` e exercitar uma triagem de possível tentativa d
 - Fonte: `/var/log/wazuh-lab/events.log` no agente Linux.
 - Regra: `100100` — `LAB_BRUTE_FORCE`.
 - Captura: `../evidencias/alerta-bruteforce-confirmado.png`.
+- Telemetria nativa adicional: tentativa única com usuário inexistente no Kali gerou a regra `5710` (nível 5) no Manager.
 
 ## Linha do tempo de investigação
 
 | Horário | Evidência | Interpretação | Próxima ação |
 |---|---|---|---|
-| Preencher na execução | Alerta `100100` indexado | Marcador de simulação autorizado recebido. | Conferir `full_log` e agente. |
-| Preencher na execução | Usuário, origem e janela de tempo | Dados declarados pelo simulador, não por uma autenticação real. | Registrar como simulação. |
+| 25/10/2026 | Regra 5710 para usuário inexistente no Kali | Tentativa nativa única, sem senha e sem repetição. | Não classificar como brute force isolado. |
+| 25/10/2026 | Marcador `100100` indexado | Simulação autorizada do pipeline. | Registrar como marcador sintético. |
 
 ## Conclusão
 

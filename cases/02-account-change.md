@@ -2,16 +2,24 @@
 
 ## Estado
 
-Planejado. A fonte nativa de auditoria ainda precisa ser validada com um evento autorizado no endpoint Windows ou Linux não conteinerizado.
+Validado no Kali nativo em 25/10/2026. O `auditd` registrou a criação e remoção de uma conta de serviço sem login; a regra local `100104` gerou alertas de nível 8 no Manager. Uma consulta de identidade sem alteração manteve a contagem de alertas inalterada.
 
 ## Hipótese
 
 Uma conta criada ou alterada fora do processo de mudança pode indicar abuso de privilégios ou persistência. O alerta precisa conter, no mínimo, conta afetada, ator, ativo e horário.
 
-## Execução segura prevista
+## Execução segura realizada
 
-Criar e remover uma conta de teste exclusivamente na VM do laboratório, registrar o ticket/nota de mudança e confirmar a chegada do evento nativo ao Wazuh. Não usar contas existentes nem serviços expostos.
+Foi criada e removida uma conta de serviço sem login, exclusivamente no Kali de laboratório. O `auditd` monitorou os arquivos de identidade e a regra usa a chave de auditoria `wazuh_lab_account_change`. Nenhuma conta existente ou serviço exposto foi alterado.
 
 ## Critério de conclusão
 
-Registrar evidência positiva e negativa, a regra ou consulta utilizada e a linha do tempo completa: evento → alerta → triagem → encerramento.
+| Etapa | Evidência | Interpretação | Ação |
+|---|---|---|---|
+| Criação e remoção | Auditd registrou `useradd` e `userdel` | Mudança autorizada em conta temporária. | Conferir ator e conta afetada. |
+| Alerta | Regra `100104`, nível 8, no agente Kali nativo | Mudança de identidade detectada pelo Manager. | Correlacionar com aprovação. |
+| Controle negativo | Consulta de identidade sem mudança | Nenhum aumento na regra `100104`. | Não criar supressão. |
+
+## Conclusão
+
+O evento é uma simulação autorizada. Em produção, a mesma evidência exige confirmar o solicitante, a conta afetada e a aprovação antes de classificar como incidente.
