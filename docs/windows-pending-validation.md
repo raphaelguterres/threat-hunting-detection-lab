@@ -3,7 +3,7 @@
 ## Estado confirmado em 25/10/2026
 
 - O agente Windows está ativo no Manager.
-- O canal Sysmon foi coletado e os IDs 1 e 11 já foram observados no Manager.
+- O canal Sysmon foi coletado e os IDs 1, 3 e 11 já foram observados no Manager.
 - A rede host-only e o Guest Additions estão operacionais.
 - WinRM HTTP responde na rede isolada, mas não há um canal de administração remota autenticado configurado.
 
@@ -19,7 +19,7 @@
 
 **Objetivo:** produzir uma única conexão para serviço privado autorizado e correlacionar processo, destino, porta e Sysmon ID 3.
 
-**Aceite:** um evento ID 3 no agente Windows e ausência de alerta para um período de controle sem conexão de teste.
+**Estado:** concluído em 25/10/2026. A recarga autorizada do painel HTTPS privado gerou eventos ID 3 do Edge, classificados pela regra 100105 no Manager. Após a navegação, a contagem permaneceu inalterada durante 20 segundos sem nova ação.
 
 **Limite:** não usar destino público, transferência de dados, varredura, força bruta ou conteúdo sensível. A conexão deve ser de laboratório e autorizada.
 

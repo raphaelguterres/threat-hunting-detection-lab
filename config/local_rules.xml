@@ -33,4 +33,14 @@
     <description>LAB: alteração de conta monitorada por auditd</description>
     <group>account_changed,audit,lab,</group>
   </rule>
+
+  <!-- Regra de validação: Edge em HTTPS no laboratório Windows.
+       Não infere malícia; fornece contexto mínimo para a investigação do ID 3. -->
+  <rule id="100105" level="3">
+    <if_sid>92101,61605</if_sid>
+    <field name="win.eventdata.image" type="pcre2">(?i)\\msedge\.exe$</field>
+    <field name="win.eventdata.destinationPort">^443$</field>
+    <description>LAB: conexão HTTPS do Edge observada por Sysmon</description>
+    <group>sysmon_event3,network_connection,lab,</group>
+  </rule>
 </group>

@@ -10,7 +10,7 @@ Use este checklist antes de marcar qualquer um dos cinco casos como concluído. 
 | Alteração de conta | Auditoria nativa de identidade | Criar/remover conta de serviço, regra 100104 | Consulta de identidade sem mudança não deve gerar alerta | Validado no Kali |
 | PowerShell benigno | PowerShell Operational e/ou Sysmon ID 1 | Comando administrativo inofensivo correlacionado | Processo sem PowerShell não deve ser rotulado como PowerShell | Pendente no Wazuh |
 | Integridade de arquivo | Wazuh FIM | Alteração de arquivo monitorado com hash e horário | Arquivo fora do escopo não deve gerar alerta | FIM Kali nativo validado ponta a ponta |
-| Conexão de rede | Sysmon ID 3 ou telemetria equivalente | Conexão única para destino privado autorizado | Sem conexão não deve produzir evento | Pendente no Wazuh |
+| Conexão de rede | Sysmon ID 3 | Navegação autorizada do Edge para painel privado, regra 100105 | Período ocioso de 20 segundos sem novos eventos | Validado no Windows; múltiplas conexões na mesma navegação são falso positivo esperado |
 
 ## Artefato mínimo de aprovação
 

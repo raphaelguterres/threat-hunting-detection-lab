@@ -11,6 +11,7 @@ Este catálogo separa o que foi validado do que é apenas mapeamento planejado. 
 | `100104` — alteração de conta | Auditd no Kali | 8 | Positivo e negativo validados | Criação ou remoção aprovada de conta de serviço | Confirmar ator, comando, conta e aprovação da mudança. | T1098 — hipótese |
 | FIM Linux nativo | Wazuh FIM | 5 / 7 | Positivo e negativo validados | Mudança aprovada no diretório monitorado | Confirmar caminho, hashes antes/depois, processo de mudança e aprovação. | Sem mapeamento automático |
 | Alteração de arquivo monitorado | FIM Windows | Nativo | Validado | Mudança aprovada no caminho monitorado | Identificar arquivo, hashes antes/depois, usuário e mudança aprovada. | Sem mapeamento automático |
+| `100105` — conexão HTTPS do Edge | Sysmon ID 3 / Windows | 3 | Positivo e negativo validados | Navegação autorizada do Edge para serviço interno HTTPS | Confirmar processo, destino aprovado, porta, horário e contexto da navegação. | Técnica definida após contexto |
 | PowerShell de laboratório | PowerShell Operational / Windows | A validar em caso específico | Canal Sysmon confirmado; caso pendente | Administração aprovada em janela de manutenção | Validar comando, usuário, processo-pai e alertas correlatos. | T1059.001 — hipótese |
 
 ## Critério de qualidade para novas detecções
