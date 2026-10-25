@@ -19,7 +19,7 @@ O projeto já demonstra implantação, engenharia de detecção, gestão de agen
 | Wazuh Indexer | Operacional | OpenSearch em estado `green` |
 | Wazuh Dashboard | Operacional | HTTPS local com certificado autoassinado |
 | Agente Linux | Operacional | Agente ativo no Manager |
-| FIM Linux | Configurado e validado no agente | Diretório `/opt/wazuh-lab/monitorado` em tempo real; alerta ponta a ponta pendente por estar em filesystem de contêiner |
+| FIM Linux | Validado ponta a ponta no Kali nativo | Agente `kali-native-fim` monitorando `/opt/wazuh-lab/monitorado`; regras 554 e 550 recebidas no Manager |
 | SCA Linux | Executado | Política `sca_amazon_linux_2023.yml`, avaliação concluída em 4 segundos |
 | Endpoint Windows Server 2022 | Operacional | Agente ativo; cadastro histórico sem conexão preservado apenas para troubleshooting |
 

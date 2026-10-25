@@ -1,6 +1,6 @@
 # Status atual — Threat Hunting Detection Lab
 
-Atualizado em 24/10/2026.
+Atualizado em 25/10/2026.
 
 ## Ambiente validado
 
@@ -13,6 +13,7 @@ Atualizado em 24/10/2026.
 | Coleta Sysmon no agente Wazuh | Configurada e agente online | Canal `Microsoft-Windows-Sysmon/Operational` presente no `ossec.conf`; agente conectou ao Manager após a reinicialização |
 | Evento Sysmon de validação local | Gerado | Sysmon Event ID 11 confirmou criação de arquivo pelo `wazuh-agent.exe` após ativar a coleta |
 | FIM Windows → Wazuh | Funcionando | Evento `syscheck_integrity_changed` recebido no Kali para o arquivo de teste |
+| FIM Linux nativo → Wazuh | Funcionando | Agente `kali-native-fim` registrou criação (554) e alteração de checksum (550) para o arquivo de validação |
 | Guest Additions | Instalados nas duas VMs | Propriedades do VirtualBox confirmam os componentes e versões instalados |
 
 ## Entregas concluídas no repositório
@@ -40,7 +41,7 @@ O bloco ativo no agente é:
 </localfile>
 ```
 
-O ID 11 foi confirmado localmente e no Manager; o ID 1 também foi recebido no Manager. A Issue #2 pode ser encerrada. A próxima etapa do roadmap é validar FIM Linux fora do filesystem de contêiner.
+O ID 11 foi confirmado localmente e no Manager; o ID 1 também foi recebido no Manager. O FIM Linux foi validado fora de contêiner no endpoint nativo `kali-native-fim`: o Manager recebeu as regras 554 e 550 para a criação e a mudança controlada do arquivo monitorado. As Issues #2 e #3 podem ser encerradas. A próxima etapa do roadmap é construir e validar detecções locais.
 
 ## Observações operacionais
 

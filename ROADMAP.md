@@ -16,7 +16,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
   - Critério: `Security`, `System`, `Application`, PowerShell e Sysmon documentados; pelo menos um evento inofensivo por fonte relevante confirmado no Wazuh.
   - Dependência: Sysmon somente no Windows Server isolado.
 
-- [ ] **[Roadmap] Validar FIM Linux fora de filesystem de contêiner**
+- [x] **[Roadmap] Validar FIM Linux fora de filesystem de contêiner**
   - Critério: criar e alterar arquivo em endpoint Linux não conteinerizado e registrar alerta com hashes no Manager.
 
 ## Fase 3 — Engenharia de detecção
