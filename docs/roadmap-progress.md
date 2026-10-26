@@ -6,7 +6,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
 [concluída] Base do laboratório
       -> [concluída] Telemetria e visibilidade
       -> [em execução] Engenharia de detecção
-      -> [estruturada] Investigação
+      -> [concluída] Investigação
       -> [estruturada] Resposta segura
       -> [em preparação] Portfólio e publicação
 ```
@@ -16,7 +16,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
 | 1. Base | Concluída | Arquitetura, inventário e limites documentados. | #1 fechada |
 | 2. Telemetria | **Concluída** | Sysmon IDs 1 e 11 recebidos no Manager; FIM Linux validado no agente Kali nativo com controle negativo. | #2 e #3 fechadas |
 | 3. Detecção | Concluída | Os cinco casos possuem evidência apropriada; PowerShell e conexão privada foram validados no Windows, e os demais no Kali. | #4 pronta para encerramento; #5 fechada |
-| 4. Investigação | Estruturada | Casos e critérios de qualidade existem; linhas do tempo dependem da telemetria validada. | #6 aberta |
+| 4. Investigação | Concluída | Cinco linhas do tempo redigidas respondem evento, ativo, evidência, classificação e ação recomendada. | #6 pronta para encerramento |
 | 5. Resposta | Estruturada | Playbooks e governança de aprovação humana foram definidos. | #7 aberta |
 | 6. Portfólio | Em preparação | README e documentação redigida estão em evolução; publicação depende das evidências das fases anteriores. | #8 aberta |
 
@@ -45,3 +45,5 @@ O trabalho de detecção da **Fase 3** foi concluído em termos técnicos. O Kal
 O roteiro detalhado dos dois cenários Windows pendentes está em [windows-pending-validation.md](windows-pending-validation.md).
 
 Consulte também o [status operacional](STATUS_ATUAL_LAB.md), o [roteiro de validação do Sysmon](../tests/windows-sysmon-validation.md) e as [operações seguras entre as VMs](remote-dual-vm-operations.md).
+
+As linhas do tempo de investigação estão em [case-study-timelines.md](case-study-timelines.md).

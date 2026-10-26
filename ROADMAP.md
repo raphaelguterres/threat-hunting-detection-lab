@@ -30,7 +30,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 
 ## Fase 4 — Investigação
 
-- [ ] **[Roadmap] Concluir cinco estudos de caso com linha do tempo**
+- [x] **[Roadmap] Concluir cinco estudos de caso com linha do tempo**
   - Critério: cada caso responde o que aconteceu, ativo/usuário, evidência, classificação e ação recomendada.
 
 ## Fase 5 — Resposta segura
