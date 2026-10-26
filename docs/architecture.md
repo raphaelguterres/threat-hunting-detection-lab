@@ -29,4 +29,4 @@
 
 ## Limitação conhecida
 
-O teste FIM do endpoint Linux foi feito em filesystem sobreposto de contêiner. O agente indicou monitoramento, mas não houve alerta no Manager durante a janela de validação. Esse resultado é tratado como evidência negativa; o FIM validado ponta a ponta é o do Windows Server.
+O primeiro teste FIM em filesystem sobreposto de contêiner foi mantido como evidência negativa e não é usado como prova de detecção. A validação ponta a ponta posterior ocorreu no agente Kali nativo, fora de contêiner, com eventos de criação e alteração e hashes antes/depois.

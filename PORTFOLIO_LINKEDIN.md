@@ -1,7 +1,5 @@
 # Case study — Laboratório de Monitoramento de Segurança com Wazuh
 
-![Capa do projeto — Laboratório SOC com Wazuh](evidencias/capa-laboratorio-wazuh.png)
-
 ## Visão geral
 
 Desenvolvi um laboratório de Security Operations (SOC) com Wazuh para simular, detectar e investigar eventos de segurança em endpoints. O objetivo foi demonstrar um fluxo prático de monitoração: **coleta → detecção → triagem → investigação → recomendação**.
@@ -35,11 +33,11 @@ Ter logs não é suficiente: uma equipe de segurança precisa identificar evento
 - Central Wazuh (manager, indexação e dashboard);
 - agente Linux com monitoramento de log customizado;
 - File Integrity Monitoring (FIM) em diretório de configuração;
-- quatro regras locais, com níveis de severidade entre 9 e 12;
+- regras locais de laboratório e telemetria nativa validada;
 - script de simulação segura e repetível;
 - playbook de investigação com linha do tempo e recomendações.
-- endpoint Windows Server ativo (agente `004`) com coleta de `Security`, `System`, `Application` e `PowerShell Operational`;
-- evento System real (ID 501, fonte `WazuhLab`) e alteração controlada de arquivo em diretório FIM do Windows.
+- endpoint Windows Server ativo com coleta de `Security`, `System`, `Application`, PowerShell e Sysmon;
+- Sysmon IDs 1, 3 e 11 e FIM Windows/Kali validados de ponta a ponta.
 
 ### Evidência de implantação
 
@@ -58,31 +56,7 @@ O ambiente foi implantado de fato em uma VM Kali Linux usando o stack oficial Wa
 
 ## Evidências visuais
 
-As três primeiras evidências abaixo foram capturadas no ambiente real. Antes de publicar, oculte IPs públicos, nomes de usuários reais, tokens e identificadores sensíveis.
-
-### 1. Agente ativo
-
-![Agente Wazuh ativo](evidencias/agente-limpo-ativo.png)
-
-*Legenda: o agente do endpoint está conectado e apto a enviar telemetria.*
-
-### 2. Detecções no dashboard
-
-![Alertas personalizados indexados](evidencias/contagem-alertas-personalizados.png)
-
-*Legenda: alertas locais criados para o laboratório, priorizados por nível de risco.*
-
-### 3. Investigação de um alerta
-
-![Detalhe do alerta de brute force simulado](evidencias/alerta-bruteforce-confirmado.png)
-
-*Legenda: análise do alerta usando timestamp, endpoint, usuário, regra e log original.*
-
-### 4. FIM e postura do endpoint
-
-![FIM configurado e SCA executado no agente](evidencias/fim-log-agente.png)
-
-*Legenda: o agente confirma FIM em tempo real; no Windows Server, a alteração controlada gerou alerta com hashes antes/depois no Manager.*
+Use somente capturas redigidas selecionadas pela [checklist de publicação](docs/publication-checklist.md). O repositório evita incorporar capturas brutas para reduzir o risco de expor dados do laboratório.
 
 ## Resultado e aprendizados
 
@@ -96,4 +70,4 @@ Meu principal aprendizado foi que uma boa detecção precisa de contexto operaci
 
 ## Repositório e demonstração
 
-Inclua aqui o link do repositório público depois de remover arquivos sensíveis e inserir as capturas. Para reproduzir o laboratório, consulte o [README.md](README.md).
+Repositório: [threat-hunting-detection-lab](https://github.com/raphaelguterres/threat-hunting-detection-lab). Para reproduzir o laboratório, consulte o [README.md](README.md).

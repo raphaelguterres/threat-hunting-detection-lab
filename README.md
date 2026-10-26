@@ -15,14 +15,16 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 ## Estado atual
 
 - Wazuh Manager, Indexer e Dashboard operacionais em Docker;
-- agente Linux ativo com quatro alertas de regras locais validados;
+- agente Linux ativo, com telemetria nativa de autenticação, auditoria e FIM validada;
 - agente Windows Server ativo, com coleta de Event Channels configurada;
 - FIM ponta a ponta validado no Windows, incluindo hashes antes/depois;
-- Sysmon instalado no Windows; ingestão dos IDs 1 e 11 validada no Wazuh;
+- Sysmon instalado no Windows; ingestão dos IDs 1, 3 e 11 validada no Wazuh;
+- cinco estudos de caso com linhas do tempo e controles negativos documentados;
+- playbooks de autenticação, PowerShell, FIM e rede com aprovação humana e rollback;
 - rede host-only isolada para gerenciamento das VMs, sem port forwarding público;
 - evidências e limitações documentadas, sem apresentar simulações como incidentes reais.
 
-Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), a [cobertura MITRE ATT&CK](docs/mitre-coverage.md) e as [operações dual-VM](docs/remote-dual-vm-operations.md).
+Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), os [estudos de caso](docs/case-study-timelines.md), os [playbooks](playbooks/) e a [checklist de publicação](docs/publication-checklist.md).
 
 ## Arquitetura
 
@@ -68,21 +70,15 @@ Para validações reproduzíveis, use os roteiros de [Sysmon no Windows](tests/w
 
 | Cenário | Evidência coletada | Alerta | Valor demonstrado |
 |---|---|---:|---|
-| Tentativas repetidas de login | linha de log simulada | 100100 / nível 10 | exercício de triagem de autenticação |
-| Execução suspeita | linha de log simulada | 100101 / nível 9 | detecção e contexto de processo/comando |
-| Alteração de arquivo crítico | FIM em diretório monitorado | nativo do Wazuh | integridade e trilha de auditoria |
-| Indicador de exfiltração | linha de log simulada | 100102 / nível 12 | exercício de priorização de incidente |
-| Elevação indevida | linha de log simulada | 100103 / nível 11 | detecção de abuso de privilégio |
+| Autenticação | SSH nativo no Kali | 5710 / nível 5 | separar tentativa isolada de brute force |
+| Alteração de conta | Auditd no Kali | 100104 / nível 8 | correlacionar mudança e aprovação |
+| PowerShell benigno | Sysmon ID 1 no Windows | 92027 / nível 4 | analisar comando e processo-pai |
+| Integridade de arquivo | FIM nativo no Kali | 554 e 550 | preservar hashes antes/depois |
+| Conexão privada autorizada | Sysmon ID 3 no Windows | 100105 / nível 3 | validar processo, porta e destino aprovado |
 
-## Evidências para a entrega
+## Evidências para portfólio
 
-Capture uma tela por item, sem expor IPs públicos, senhas ou tokens:
-
-1. Agente como **Active** no Wazuh.
-2. Regra local carregada (alerta com `rule.id` e `rule.description`).
-3. Detalhe do alerta: timestamp, agente, severidade e `full_log`.
-4. Evento de integridade mostrando arquivo antes/depois (ou hash, se habilitado).
-5. O registro de investigação preenchido, incluindo decisão e recomendação.
+O repositório não versiona capturas brutas. Antes de publicar, selecione capturas redigidas conforme a [checklist de publicação](docs/publication-checklist.md): agente ativo, um alerta Sysmon, uma alteração FIM com hashes e uma linha do tempo concluída.
 
 ## Critério de sucesso
 

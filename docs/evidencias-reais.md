@@ -78,6 +78,6 @@ Foi removido exclusivamente o índice vazio de interface e o container do dashbo
 | `evidencias/windows-evidence-fim-event.png` | Evento System 501 confirmado pelo `Get-WinEvent` e operações de criação/alteração do arquivo FIM |
 | `evidencias/kali-alerts-agent004.png` | Manager registrando o alerta FIM do agente Windows 004 com hashes antes/depois |
 
-## Próxima etapa do case study
+## Estado do case study
 
-O núcleo do case study está concluído: os agentes Linux e Windows estão ativos, eventos controlados foram coletados, as regras locais geraram alertas e os documentos foram indexados. Sysmon IDs 1 e 11 já foram confirmados no Manager e o FIM foi validado no Kali nativo com controle negativo. A próxima expansão é completar os casos nativos de autenticação, alteração de conta, PowerShell e rede, além das respectivas investigações ponta a ponta.
+O núcleo e as investigações foram concluídos: agentes Linux e Windows ativos, FIM nativo no Kali, Sysmon IDs 1, 3 e 11 no Windows e cinco estudos de caso redigidos. A etapa restante é editorial: selecionar capturas realmente redigidas para uma publicação externa, conforme a [checklist de publicação](publication-checklist.md).
