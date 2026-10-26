@@ -5,6 +5,7 @@ Esta matriz descreve hipóteses de detecção do laboratório, não uma alegaç�
 | Cenário | Técnica ATT&CK | Fonte pretendida | Tipo de evidência | Status ATT&CK | Próxima validação |
 |---|---|---|---|---|---|
 | Falhas repetidas de login | [T1110 — Brute Force](https://attack.mitre.org/techniques/T1110/) | Eventos nativos de autenticação Windows/Linux | Marcador sintético `100100` | Não reivindicado como cobertura | Gerar falhas controladas em conta de teste e correlacionar com sucesso posterior. |
+| Acesso SSH administrativo | [T1078 — Valid Accounts](https://attack.mitre.org/techniques/T1078/) + [T1021 — Remote Services](https://attack.mitre.org/techniques/T1021/) | Eventos SSH nativos do Kali | Eventos visualizados no Dashboard MITRE em 26/10/2026 | Telemetria observada; não classificada como incidente | Validar conta, origem, janela aprovada e sequência de eventos antes de decidir pela contenção. |
 | Alteração de conta | [T1098 — Account Manipulation](https://attack.mitre.org/techniques/T1098/) quando aplicável | Auditoria de conta Windows/Linux | Planejado | Hipótese | Criar e remover conta de teste e confirmar evento nativo. |
 | PowerShell benigno | [T1059.001 — PowerShell](https://attack.mitre.org/techniques/T1059/001/) | Sysmon ID 1 | Comando benigno controlado recebido pela regra 92027, com usuário e processo-pai | Hipótese | A telemetria foi validada; não inferir intenção maliciosa a partir de PowerShell isolado. |
 | Alteração de arquivo | Sem mapeamento automático | Wazuh FIM + Sysmon ID 11 | FIM Windows e Kali nativo validados | Não aplicável; alteração não prova intenção | Correlacionar arquivo, processo e mudança aprovada. |
@@ -18,5 +19,5 @@ Esta matriz descreve hipóteses de detecção do laboratório, não uma alegaç�
 1. Uma técnica só passa a “validada” quando há evento nativo ou telemetria de processo/rede correspondente no Wazuh.
 2. Um evento isolado não prova intenção maliciosa; a triagem requer contexto, ativo, usuário, horário e mudança aprovada.
 3. Severidade não é herdada diretamente da técnica ATT&CK. Ela depende do impacto, confiança e escopo observados.
-4. IDs Sysmon 1 e 11 já foram observados no Manager; o ID 3 e a correlação de um PowerShell benigno continuam pendentes.
+4. IDs Sysmon 1, 3 e 11 já foram observados no Manager; um PowerShell benigno também foi correlacionado pela regra nativa 92027. Isso valida a telemetria, não uma intenção maliciosa.
 5. Consulte o [registro de falsos positivos](false-positive-register.md) antes de criar qualquer exceção ou supressão.
