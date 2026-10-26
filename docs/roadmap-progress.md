@@ -7,7 +7,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
       -> [concluída] Telemetria e visibilidade
       -> [em execução] Engenharia de detecção
       -> [concluída] Investigação
-      -> [estruturada] Resposta segura
+      -> [concluída] Resposta segura
       -> [em preparação] Portfólio e publicação
 ```
 
@@ -17,7 +17,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
 | 2. Telemetria | **Concluída** | Sysmon IDs 1 e 11 recebidos no Manager; FIM Linux validado no agente Kali nativo com controle negativo. | #2 e #3 fechadas |
 | 3. Detecção | Concluída | Os cinco casos possuem evidência apropriada; PowerShell e conexão privada foram validados no Windows, e os demais no Kali. | #4 pronta para encerramento; #5 fechada |
 | 4. Investigação | Concluída | Cinco linhas do tempo redigidas respondem evento, ativo, evidência, classificação e ação recomendada. | #6 pronta para encerramento |
-| 5. Resposta | Estruturada | Playbooks e governança de aprovação humana foram definidos. | #7 aberta |
+| 5. Resposta | Concluída | Playbooks de autenticação, PowerShell, FIM e rede exigem preservação de evidências, aprovação humana e rollback. | #7 pronta para encerramento |
 | 6. Portfólio | Em preparação | README e documentação redigida estão em evolução; publicação depende das evidências das fases anteriores. | #8 aberta |
 
 ## Evidências confirmadas agora

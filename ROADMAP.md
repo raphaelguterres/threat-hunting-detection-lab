@@ -35,7 +35,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 
 ## Fase 5 — Resposta segura
 
-- [ ] **[Roadmap] Criar playbooks de triagem com aprovação humana**
+- [x] **[Roadmap] Criar playbooks de triagem com aprovação humana**
   - Critério: cada playbook preserva evidências, prevê contenção segura e rollback; nenhuma ação destrutiva automática.
 
 ## Fase 6 — Portfólio e publicação

@@ -27,6 +27,16 @@ As ações abaixo exigem aprovação explícita de responsável autorizado:
 3. Executar somente a ação aprovada e observar o resultado.
 4. Se o efeito divergir do esperado, interromper novas ações e reavaliar.
 
+## Registro mínimo de decisão
+
+| Campo | Registro obrigatório |
+| --- | --- |
+| Evidência que motivou a ação | Regra, ativo, horário e resumo redigido |
+| Responsável pela aprovação | Nome ou função, conforme política local |
+| Escopo e prazo | Ativo, controle aplicado e duração |
+| Critério de sucesso | Resultado observável esperado |
+| Rollback | Passo reversível, responsável e condição de acionamento |
+
 ## Encerramento
 
 - Registrar resultado, limitações e reversão executada ou não necessária.

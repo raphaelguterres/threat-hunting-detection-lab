@@ -17,3 +17,4 @@ Playbooks disponíveis:
 - [Falhas de autenticação](../playbooks/authentication-triage.md)
 - [PowerShell](../playbooks/powershell-triage.md)
 - [Alteração de integridade](../playbooks/file-integrity-triage.md)
+- [Conexão de rede](../playbooks/network-triage.md)
