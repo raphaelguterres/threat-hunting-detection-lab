@@ -1,0 +1,23 @@
+name: Validate lab configuration
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Wazuh lab artifacts
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate rules and required artifacts
+        shell: pwsh
+        run: ./scripts/validate_lab_config.ps1
