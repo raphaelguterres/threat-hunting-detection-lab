@@ -39,3 +39,18 @@ Não use somente o ID MITRE, o nome do processo ou a porta 22 como base para sil
 ## Relação com a telemetria do lab
 
 O Dashboard mantém esses eventos pesquisáveis por técnica e agente. A análise deve abrir o evento original e correlacionar campos de autenticação, usuário, origem e histórico de alertas antes de qualquer conclusão ou resposta.
+
+## Triagem remota executada em 26/10/2026
+
+Foi feita uma triagem somente leitura no Manager para um alerta SSH `5715` mapeado para `T1078` e `T1021`.
+
+| Critério | Evidência verificada | Resultado |
+| --- | --- | --- |
+| Conta | `root` autenticado por chave pública. | Conta de administração do lab; exige acompanhamento reforçado, mas não indica comprometimento por si só. |
+| Origem | Conexão vinda da rede host-only de gerenciamento. | Origem esperada para o orquestrador das VMs. |
+| Autenticidade | A impressão digital registrada no `sshd` coincidiu com a chave `wazuh-lab-orchestrator`. | Acesso atribuído à automação administrativa autorizada. |
+| Horário | Alertas foram gerados durante esta sessão de manutenção documentada. | Compatível com a atividade aprovada. |
+| Volume | 36 autenticações com esse padrão estavam no arquivo atual de alertas. | Volume explicável pelas verificações e automações; manter baseline para detectar desvios. |
+| Eventos seguintes | Sequência observada: autenticação bem-sucedida, abertura PAM e encerramento de sessão. | Nenhuma evidência correlata de persistência, transferência de dados ou mudança de privilégio foi encontrada nesta sequência revisada. |
+
+**Decisão:** benigno esperado / atividade administrativa autorizada. Os alertas permanecem pesquisáveis; não foi criada supressão por técnica, porta, usuário ou IP. Uma nova triagem é necessária se a conta, a origem, a chave, a janela de mudança ou a sequência de ações mudar.
