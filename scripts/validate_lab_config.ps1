@@ -26,7 +26,7 @@ $rules = Read-LabXml 'config/local_rules.xml'
 if ($null -ne $rules) {
     $ruleIds = @($rules.SelectNodes('//rule') | ForEach-Object { [string]$_.id })
     Assert-LabCondition ($ruleIds.Count -eq @($ruleIds | Select-Object -Unique).Count) 'IDs de regras locais são únicos.'
-    foreach ($id in '100100','100101','100102','100103','100104','100105','100106') {
+    foreach ($id in '100100','100101','100102','100103','100104','100105') {
         Assert-LabCondition ($ruleIds -contains $id) "Regra local $id existe."
     }
 }

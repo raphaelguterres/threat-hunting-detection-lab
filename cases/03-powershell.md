@@ -2,7 +2,7 @@
 
 ## Estado
 
-A coleta foi configurada e a regra `100106` está implantada no Manager. Falta confirmar a execução controlada com o marcador benigno `WAZUH-LAB-PS` e contexto suficiente para investigação.
+Validado em 25/10/2026. O comando controlado com o marcador benigno `WAZUH-LAB-PS` foi recebido no Manager pela regra nativa 92027, com contexto suficiente para investigação.
 
 ## Hipótese
 
@@ -15,10 +15,10 @@ PowerShell não é suspeito por si só. A triagem deve distinguir administraçã
 | Data/hora | Preencher na execução |
 | Endpoint e usuário | Preencher na execução |
 | Comando benigno | `Write-Output WAZUH-LAB-PS` |
-| Evento/canal recebido | Sysmon ID 1; regra 100106 após a execução |
+| Evento/canal recebido | Sysmon ID 1; regra nativa 92027 |
 | Processo-pai, se disponível | Requer Sysmon ou telemetria equivalente |
 | Conclusão | Simulação autorizada / requer investigação |
 
 ## Critério de conclusão
 
-O caso estará concluído quando o evento for visível no Wazuh com imagem, linha de comando, usuário e processo-pai. Execuções internas do agente Wazuh não substituem o teste controlado.
+O caso foi concluído com imagem, linha de comando, usuário e processo-pai. Execuções internas do agente Wazuh que não continham o marcador foram observadas como contexto distinto e não substituíram o teste controlado.

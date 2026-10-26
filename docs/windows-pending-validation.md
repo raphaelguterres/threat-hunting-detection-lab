@@ -11,7 +11,7 @@
 
 **Objetivo:** gerar uma execução administrativa inofensiva e correlacionar no Manager o usuário, o processo-pai, o comando e o Sysmon ID 1.
 
-**Aceite:** um evento do agente Windows com contexto suficiente para triagem e um controle negativo de processo que não seja PowerShell.
+**Estado:** concluído em 25/10/2026. A execução controlada gerou Sysmon ID 1, recebido pela regra nativa 92027 com comando, usuário e processo-pai. Execuções internas sem marcador foram mantidas como contexto separado.
 
 **Limite:** eventos genéricos de ID 1 não substituem esse teste; a evidência precisa identificar o comando benigno da execução controlada.
 

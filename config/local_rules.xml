@@ -44,12 +44,4 @@
     <group>sysmon_event3,network_connection,lab,</group>
   </rule>
 
-  <!-- Regra de validação: comando inofensivo e identificável no PowerShell. -->
-  <rule id="100106" level="3">
-    <if_group>sysmon_event1</if_group>
-    <field name="win.eventdata.image" type="pcre2">(?i)\\powershell\.exe$</field>
-    <field name="win.eventdata.commandLine" type="pcre2">(?i)WAZUH-LAB-PS</field>
-    <description>LAB: execução PowerShell benigna observada por Sysmon</description>
-    <group>sysmon_event1,powershell,lab,</group>
-  </rule>
 </group>

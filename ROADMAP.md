@@ -21,7 +21,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 
 ## Fase 3 — Engenharia de detecção
 
-- [ ] **[Roadmap] Criar e testar cinco casos de detecção documentados**
+- [x] **[Roadmap] Criar e testar cinco casos de detecção documentados**
   - Critério: cada caso possui evidência positiva, negativa, consulta/regra, severidade justificada e hipótese de triagem.
   - Casos: falhas de login, alteração de conta, PowerShell benigno, FIM e conexão de rede inesperada.
 

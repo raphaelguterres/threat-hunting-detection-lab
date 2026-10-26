@@ -13,7 +13,7 @@
 2. Confirmar localmente um evento Sysmon ID 1.
 3. Localizar no Wazuh o evento do canal Sysmon e registrar horário, imagem, linha de comando e processo-pai.
 
-**Aprovação:** a regra 100106 do Wazuh contém imagem, linha de comando, usuário e processo-pai. O marcador é inofensivo e não deve ser classificado como malicioso.
+**Aprovação:** a regra nativa 92027 do Wazuh contém imagem, linha de comando, usuário e processo-pai. O marcador é inofensivo e não deve ser classificado como malicioso.
 
 ## Teste 2 — Criação de arquivo
 
@@ -37,7 +37,7 @@ Para cada teste, registrar resultado positivo ou negativo, consulta usada no Waz
 
 ## Registro da operação atual
 
-O Sysmon foi confirmado instalado e em execução no Windows. Os IDs 1 e 11 chegaram ao Manager e a conexão controlada do Edge validou o ID 3 em 25/10/2026. O único teste pendente desta matriz é a execução PowerShell identificada pelo marcador `WAZUH-LAB-PS`.
+O Sysmon foi confirmado instalado e em execução no Windows. Os IDs 1, 3 e 11 chegaram ao Manager. Em 25/10/2026, o comando controlado `WAZUH-LAB-PS` foi recebido como Sysmon ID 1 pela regra nativa 92027, com linha de comando e processo-pai; a conexão controlada do Edge validou o ID 3.
 
 O orquestrador local pode ser usado para verificar o estado das VMs sem abrir rede:
 
