@@ -17,6 +17,7 @@ Este registro resume validações feitas no laboratório sem publicar endereços
 | 25/10/2026 | Windows / Sysmon | PowerShell filho com marcador benigno | Quatro eventos ID 1 pela regra nativa 92027, com comando, usuário e processo-pai | Telemetria nativa validada |
 | 25/10/2026 | Windows / Sysmon | Execuções internas do agente sem marcador de laboratório | Eventos separados, sem o marcador controlado | Controle de contexto validado |
 | 25/10/2026 | Saúde operacional | Consultar Manager após retomada das VMs | Agentes Windows e Kali nativo ativos | Pronto para os cenários restantes |
+| 26/10/2026 | Saúde operacional | Verificação pós-roadmap do Manager e agentes | Serviços centrais em execução; agentes Windows e Kali nativo ativos | Pronto para demonstração |
 
 ## Limites atuais
 

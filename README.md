@@ -26,7 +26,7 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 - rede host-only isolada para gerenciamento das VMs, sem port forwarding público;
 - evidências e limitações documentadas, sem apresentar simulações como incidentes reais.
 
-Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), os [estudos de caso](docs/case-study-timelines.md), os [playbooks](playbooks/) e a [checklist de publicação](docs/publication-checklist.md).
+Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), os [estudos de caso](docs/case-study-timelines.md), os [playbooks](playbooks/), a [checklist de publicação](docs/publication-checklist.md) e a [saúde operacional](docs/operational-health.md).
 
 ## Arquitetura
 
