@@ -8,7 +8,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
       -> [em execução] Engenharia de detecção
       -> [concluída] Investigação
       -> [concluída] Resposta segura
-      -> [em preparação] Portfólio e publicação
+      -> [concluída] Portfólio e publicação
 ```
 
 | Fase | Estado | Situação verificável | Issue |
@@ -18,7 +18,7 @@ Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente;
 | 3. Detecção | Concluída | Os cinco casos possuem evidência apropriada; PowerShell e conexão privada foram validados no Windows, e os demais no Kali. | #4 pronta para encerramento; #5 fechada |
 | 4. Investigação | Concluída | Cinco linhas do tempo redigidas respondem evento, ativo, evidência, classificação e ação recomendada. | #6 pronta para encerramento |
 | 5. Resposta | Concluída | Playbooks de autenticação, PowerShell, FIM e rede exigem preservação de evidências, aprovação humana e rollback. | #7 pronta para encerramento |
-| 6. Portfólio | Em preparação | README, diagrama textual e documentação foram saneados; falta selecionar capturas redigidas para publicação externa. | #8 aberta |
+| 6. Portfólio | Concluída | README, diagrama textual, documentação e duas capturas redigidas foram revisados para publicação externa. | #8 pronta para encerramento |
 
 ## Evidências confirmadas agora
 

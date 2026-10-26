@@ -80,6 +80,11 @@ Para validações reproduzíveis, use os roteiros de [Sysmon no Windows](tests/w
 
 O repositório não versiona capturas brutas. Antes de publicar, selecione capturas redigidas conforme a [checklist de publicação](docs/publication-checklist.md): agente ativo, um alerta Sysmon, uma alteração FIM com hashes e uma linha do tempo concluída.
 
+| Evidência redigida | Finalidade |
+| --- | --- |
+| ![Evento FIM redigido](screenshots/redacted/kali-fim-redacted.png) | Demonstrar que o fluxo FIM chegou ao ambiente de monitoramento sem publicar hashes, usuários ou caminhos completos. |
+| ![Sysmon redigido](screenshots/redacted/windows-sysmon-redacted.png) | Demonstrar a instalação e o serviço Sysmon ativo no endpoint Windows isolado. |
+
 ## Critério de sucesso
 
 O laboratório está pronto para apresentação quando os quatro alertas de regra local aparecem no dashboard, o FIM registra a mudança de `configuracao.conf` e você consegue responder: **o que ocorreu, em qual ativo, qual a criticidade, que evidência sustenta a conclusão e qual ação é recomendada**.

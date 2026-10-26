@@ -5,8 +5,8 @@ Use esta lista antes de anexar qualquer captura ao README, portfólio ou rede so
 ## Seleção mínima
 
 - [ ] Tela do Wazuh mostrando agente ativo, sem nome de usuário pessoal, endereço interno ou identificador desnecessário.
-- [ ] Evento Sysmon com processo e severidade, sem linha de comando sensível.
-- [ ] Evento FIM com caminho de laboratório e hashes, sem dados de produção.
+- [x] Confirmação Sysmon redigida, sem prompt, caminhos ou nomes de arquivos locais.
+- [x] Evidência FIM redigida, sem hashes completos, usuários ou caminhos absolutos.
 - [ ] Linha do tempo de um estudo de caso, usando somente os documentos redigidos deste repositório.
 - [ ] Diagrama da arquitetura sem IPs, chaves, credenciais, tokens ou nomes pessoais.
 

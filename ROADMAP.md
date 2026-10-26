@@ -40,7 +40,7 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 
 ## Fase 6 — Portfólio e publicação
 
-- [ ] **[Roadmap] Publicar versão redigida e demonstrável do laboratório**
+- [x] **[Roadmap] Publicar versão redigida e demonstrável do laboratório**
   - Critério: README profissional, diagramas e capturas redigidas; nenhuma credencial, IP público, token ou evidência bruta exposta.
 
 ## Convenções de Issues
