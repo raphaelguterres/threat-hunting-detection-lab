@@ -6,6 +6,12 @@ Laboratório prático de **monitoramento, engenharia de detecção e investigaç
 
 > Todos os eventos deste projeto são simulações inofensivas. Não há exploração, malware ou tentativa de acesso a sistemas de terceiros.
 
+## Projeto principal: Segurança Defensiva
+
+Este é o projeto principal deste repositório para demonstrar competências em **Security Operations (SOC)**, threat hunting, engenharia de detecção e resposta orientada por evidências. Ele conecta telemetria real de endpoints Windows e Linux ao Wazuh, mapeia comportamentos ao MITRE ATT&CK e documenta o processo analítico — da coleta à decisão de triagem.
+
+O foco não é gerar alertas em massa: é provar que cada alerta pode ser investigado com contexto, hipótese, evidência, decisão e próximos passos reproduzíveis.
+
 ## O que este laboratório demonstra
 
 - Arquitetura manager + agentes Linux/Windows reais;
