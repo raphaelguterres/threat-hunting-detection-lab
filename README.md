@@ -12,6 +12,12 @@ Este é o projeto principal deste repositório para demonstrar competências em 
 
 O foco não é gerar alertas em massa: é provar que cada alerta pode ser investigado com contexto, hipótese, evidência, decisão e próximos passos reproduzíveis.
 
+## M1 — Evolução de Threat Hunting (02/11/2026)
+
+Foi iniciado um incremento **separado dos cinco casos históricos**, com [três hipóteses de investigação](docs/m1-three-hunting-hypotheses.md): PowerShell seguido de tarefa agendada, criação de conta seguida de sessão privilegiada e alteração FIM seguida da execução do artefato. O [correlacionador Python offline](scripts/hunt_correlations.py) testa sequências com janelas temporais, chaves pseudonimizadas e controles negativos. Os testes em [fixtures sintéticas](tests/fixtures/m1-synthetic.jsonl) não representam detecções reais nem incidentes.
+
+**Estado: implementação e validação sintética; análises com novas evidências reais ainda pendentes.** [Issue de acompanhamento](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9). Nenhuma nova simulação nas VMs ou alteração no Wazuh foi necessária.
+
 ## O que este laboratório demonstra
 
 - Arquitetura manager + agentes Linux/Windows reais;
