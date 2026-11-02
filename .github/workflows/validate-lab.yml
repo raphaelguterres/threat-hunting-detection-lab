@@ -40,6 +40,10 @@ jobs:
         run: python -m unittest discover -s tests -p test_hunt_correlations.py -v
       - name: Verify fixture stays synthetic
         run: python scripts/hunt_correlations.py --input tests/fixtures/m1-synthetic.jsonl --fixture
+      - name: Check centralized FIM OS scope example (synthetic only)
+        run: python scripts/validate_fim_os_scope.py --input tests/fixtures/m1-agent-conf-os-scope-synthetic.xml
+      - name: Run offline FIM OS scope guard tests
+        run: python -m unittest discover -s tests -p test_fim_os_scope.py -v
       - name: Test bounded H01 retrospective audit
         run: python -m unittest discover -s tests -p test_audit_h01_existing_evidence.py -v
       - name: Run H01 audit on synthetic six-event projection
