@@ -13,9 +13,11 @@ echo.
 where python >nul 2>&1
 if errorlevel 1 (
  echo ERRO: Python nao encontrado no PATH do Windows.
+ if /I "%~1"=="--synthetic" exit /b 2
  pause
  exit /b 2
 )
+if /I "%~1"=="--synthetic" goto synthetic
 :menu
 echo.
 echo  [1] Executar 20 testes e demonstracao SINTETICA
@@ -41,12 +43,13 @@ if errorlevel 1 (
 )
 python scripts\hunt_correlations.py --input tests\fixtures\m1-synthetic.jsonl --fixture
 if errorlevel 1 (
- echo FALHA: fixture sintética invalida.
+ echo FALHA: fixture sintetica invalida.
  pause
  exit /b 4
 )
 echo.
 echo SINTETICO_OK: o programa funcionou; M1 real permanece pendente.
+if /I "%~1"=="--synthetic" exit /b 0
 pause
 exit /b 0
 
