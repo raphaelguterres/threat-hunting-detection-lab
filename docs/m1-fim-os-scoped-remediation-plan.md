@@ -58,7 +58,7 @@ Antes de modificar qualquer arquivo, foi executado pelo Windows Remote e SSH aut
 
 **Escopo exato desse resultado:** confirma sintaxe aceita para o `agent.conf` **que já está em uso** no grupo `default`. **Não prova** que a diretiva Unix de FIM funcione no Windows Server 004, que os caminhos locais tenham deixado de funcionar, que a proposta com seletor de OS esteja correta ou que o sistema esteja isento de erros de detecção.
 
-**A proposta OS-scoped ainda não foi entregue ao verificador oficial.** Para isso, continuam obrigatórios inventário dos quatro agentes, autorização, backup privado, revisão do diff mínimo e preparo de cópia temporária de proposta no Manager, conforme etapas anteriores. Essa verificação **não criou arquivos temporários, não escreveu configurações nem reiniciou serviços**.
+**Naquele checkpoint inicial**, a proposta OS-scoped ainda não havia sido submetida ao verificador oficial. Posteriormente, **com autorização específica para uma cópia temporária isolada**, a proposta foi validada no Manager sem implantação (resultado documentado na seção de atualização abaixo). A baseline original não foi alterada.
 
 [Verificador oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/tools/verify-agent-conf.html) · [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
 
@@ -97,3 +97,32 @@ Com cópias previamente coletadas e autorizadas do original e da proposta dentro
 A aprovação desse comparador **não autoriza deploy**. Ainda são exigidos inventário dos agentes afetados, revisão humana do diff, backup/rollback e verificação pelo **verify-agent-conf oficial** sobre cópia temporária autorizada antes da mudança agendada.
 
 **Limite:** verifica apenas estrutura XML, não a seleção efetiva de OS, prioridade entre grupos, funcionamento da FIM ou aceitação de regras pelo Wazuh. Não foram usadas configurações originais do Manager nos testes públicos.
+
+## Atualização: proposta validada oficialmente em cópia temporária isolada — 02/11/2026
+
+**Autorização recebida:** o operador autorizou expressamente preparar uma cópia temporária da configuração no Manager, executar o `verify-agent-conf` sobre essa cópia e apagá-la ao terminar. **Não houve autorização de implantação, reinício de serviços, alteração de grupos ou ativação de auditoria 4698.**
+
+Procedimento executado no Manager via Windows Remote/SSH autorizado:
+
+1. Confirmar que o SHA-256 do `/var/ossec/etc/shared/default/agent.conf` ativo corresponde à baseline privada já coletada do Windows; rejeitar diferenças antes de qualquer escrita.
+2. Confirmar um único bloco `agent_config` originalmente sem atributo `os`, com caminhos Unix de FIM/log, sem entradas de caminho Windows; verificar tamanho de baseline de 221 bytes.
+3. Produzir em memória cópia que **somente** muda a abertura `<agent_config>` para `<agent_config os="^Linux">`; confirmar substituição inversa idêntica ao original e XML parseável, sem alterar caminhos, fontes de log nem atributos internos.
+4. Gravar a cópia em **`/tmp` dentro do container**, com permissões restritas. `/tmp` está fora de `/var/ossec/etc/shared`, o diretório de distribuição de configurações aos agentes.
+5. Executar **`/var/ossec/bin/verify-agent-conf -f <arquivo_temporario_isolado>`** e conferir retorno do verificador oficial.
+6. Excluir a cópia em bloco de limpeza garantida (`finally`) mesmo se a verificação falhar; comparar novamente o SHA-256 do **arquivo ativo original** com a baseline.
+
+| Critério de aceite desse gate | Resultado observado |
+| --- | --- |
+| SHA-256 do original corresponde à baseline privada | **PASS** |
+| Proposta altera apenas o seletor do bloco Linux | **PASS** |
+| Verificador **oficial** da cópia temporária | **PASS** |
+| Original ativo preservado | **True** |
+| Cópia temporária removida | **True** |
+| Implantação em agentes | **False** |
+| Código de saída do teste controlado | **0** |
+
+**Conclusão permitida:** a proposta mínima de adicionar `os="^Linux"` é **sintaticamente aceita pelo Wazuh**, quando validada em uma cópia temporária isolada da configuração original. **Não** prova que a proposta foi distribuída, que o agente Windows 004 deixou de receber a diretiva Linux, que a telemetria FIM funciona ou que os outros membros do grupo serão preservados após uma alteração real.
+
+**Próximo gate não concluído:** inventário autorizado dos demais agentes no `default`, análise do impacto por sistema operacional, backup/restauração da configuração ativa, aprovação explícita para **aplicar** a mudança, publicação em janela controlada e validação efetiva de Windows/Linux. A [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) permanece aberta.
+
+**Fonte oficial sobre o uso de `-f` em arquivo temporário:** [Wazuh centralized configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html). Evidência operacional detalhada permanece apenas no diretório privado `.lab/`; sem publicação de caminhos reais, arquivo integral, credenciais ou hash.
