@@ -40,3 +40,7 @@ jobs:
         run: python -m unittest discover -s tests -p test_hunt_correlations.py -v
       - name: Verify fixture stays synthetic
         run: python scripts/hunt_correlations.py --input tests/fixtures/m1-synthetic.jsonl --fixture
+      - name: Smoke-test Windows one-click BAT (synthetic only)
+        if: runner.os == 'Windows'
+        shell: cmd
+        run: scripts\M1_THREAT_HUNTING.bat --synthetic
