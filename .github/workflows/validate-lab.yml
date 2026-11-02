@@ -40,6 +40,10 @@ jobs:
         run: python -m unittest discover -s tests -p test_hunt_correlations.py -v
       - name: Verify fixture stays synthetic
         run: python scripts/hunt_correlations.py --input tests/fixtures/m1-synthetic.jsonl --fixture
+      - name: Test bounded H01 retrospective audit
+        run: python -m unittest discover -s tests -p test_audit_h01_existing_evidence.py -v
+      - name: Run H01 audit on synthetic six-event projection
+        run: python scripts/audit_h01_existing_evidence.py --input tests/fixtures/m1-phase3-h01-synthetic.jsonl --fixture
       - name: Smoke-test Windows one-click BAT (synthetic only)
         if: runner.os == 'Windows'
         shell: cmd
