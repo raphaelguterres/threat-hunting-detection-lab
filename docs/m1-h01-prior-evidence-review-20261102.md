@@ -13,7 +13,7 @@ Usei somente os seis eventos originais de identidade (ID do alerta, regra, agent
 
 **Intervalo: 3.743,199 segundos (1h02min23s).** O evento associado a schtasks ocorre **antes** do PowerShell, e não depois dentro de 15 minutos, como exigiria H01.
 
-**Conclusão específica:** os dois alertas observados não podem compor **um par temporal H01**. Isso **não** prova inexistência de outros pares, ausência de ataque nem tarefa criada: a regra de schtasks pode registrar mais do que uma criação efetiva; os eventos resumidos não identificam ator, processo pai, ação nem autorização.
+**Conclusão específica:** os dois alertas observados não podem compor **um par temporal H01**. Isso **não** prova inexistência de outros pares, ausência de ataque nem tarefa criada: a regra 110120 registra a execução de `schtasks.exe /create`, **não** comprova que a tarefa tenha sido efetivamente criada; os registros resumidos não identificam ator, processo pai, resultado da tentativa nem autorização.
 
 ## Distinção entre as três hipóteses
 
