@@ -48,6 +48,20 @@ Comandos de laboratório, executáveis sem conexão de rede nem credenciais:
 7. **Rollback:** restaurar apenas o backup do default/agent.conf no Manager se houver falha, com registro de aprovação/horário e nova verificação dos quatro agentes. Não apagar dados FIM, trocar grupos por adivinhação ou fazer alterações de TLS.
 8. **Documentar o resultado:** evidência sanitizada, impacto e limites, sem dados brutos. Encerrar a Issue #17 somente após validação efetiva.
 
+## Verificação oficial da baseline ATUAL — 02/11/2026
+
+Antes de modificar qualquer arquivo, foi executado pelo Windows Remote e SSH autorizado, **somente leitura**, o verificador oficial Wazuh 4.x sobre a **configuração original ativa** no Manager:
+
+    docker exec single-node-wazuh.manager-1 /var/ossec/bin/verify-agent-conf -f /var/ossec/etc/shared/default/agent.conf
+
+**Resultado observado:** `verify-agent-conf: OK` com **exit code 0**.
+
+**Escopo exato desse resultado:** confirma sintaxe aceita para o `agent.conf` **que já está em uso** no grupo `default`. **Não prova** que a diretiva Unix de FIM funcione no Windows Server 004, que os caminhos locais tenham deixado de funcionar, que a proposta com seletor de OS esteja correta ou que o sistema esteja isento de erros de detecção.
+
+**A proposta OS-scoped ainda não foi entregue ao verificador oficial.** Para isso, continuam obrigatórios inventário dos quatro agentes, autorização, backup privado, revisão do diff mínimo e preparo de cópia temporária de proposta no Manager, conforme etapas anteriores. Essa verificação **não criou arquivos temporários, não escreveu configurações nem reiniciou serviços**.
+
+[Verificador oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/tools/verify-agent-conf.html) · [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
+
 ## Independência da auditoria 4698
 
 A [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) é um change request distinto. Security tem retenção Circular de 20 MB e duas fontes eventchannel locais, sendo uma filtrada por exclusões e outra sem filtro; o 4698 não aparece explicitamente bloqueado. Isso **não prova ingestão**; o auditpol continua sem habilitação de Other Object Access Events, aguardando autorização.
