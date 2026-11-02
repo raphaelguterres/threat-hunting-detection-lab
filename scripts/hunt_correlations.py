@@ -125,6 +125,8 @@ def correlate(events: list[Event]) -> dict:
                        for field in hypothesis.join_on):
                     continue
                 pairs.append((start.event_ref, end.event_ref))
+                if len(pairs) > MAX_CANDIDATES:
+                    raise ValueError("candidate limit exceeded")
         results[hypothesis.name] = {
             "candidate_pairs": _unique_pairs(pairs),
             "window_minutes": hypothesis.minutes,
@@ -167,15 +169,17 @@ def load_events(path: Path) -> list[Event]:
 
 
 def allowed_input(path: Path, repository: Path, fixture: bool) -> bool:
-    resolved = path.resolve()
-    private = (repository / ".lab").resolve()
-    fixture_dir = (repository / "tests" / "fixtures").resolve()
-    if private not in resolved.parents and resolved != private:
-        if not fixture or fixture_dir not in resolved.parents:
-            return False
+    private_root = repository / ".lab"
+    fixture_root = repository / "tests" / "fixtures"
     if path.is_symlink():
         return False
-    return True
+    if fixture:
+        if fixture_root.is_symlink():
+            return False
+        return fixture_root.resolve() in path.resolve().parents
+    if private_root.is_symlink():
+        return False
+    return private_root.resolve() in path.resolve().parents
 
 
 def main(argv=None) -> int:
