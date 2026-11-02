@@ -1,0 +1,12 @@
+{"timestamp":"2026-11-02T12:00:00Z","kind":"powershell_process","source":"sysmon_eid1","event_ref":"lab-syn-001","asset_key":"win-01","actor_key":"actor-a","object_key":"script-pwsh"}
+{"timestamp":"2026-11-02T12:07:00+00:00","kind":"task_created","source":"security_eid4698","event_ref":"lab-syn-002","asset_key":"win-01","actor_key":"actor-a","object_key":"task-01"}
+{"timestamp":"2026-11-02T12:10:00Z","kind":"account_created","source":"security_eid4720","event_ref":"lab-syn-003","asset_key":"win-01","actor_key":"admin-a","object_key":"account-01"}
+{"timestamp":"2026-11-02T12:20:00+0000","kind":"privileged_logon","source":"security_eid4672","event_ref":"lab-syn-004","asset_key":"win-01","actor_key":"admin-a","object_key":"account-01"}
+{"timestamp":"2026-11-02T12:25:00Z","kind":"file_change","source":"wazuh_fim","event_ref":"lab-syn-005","asset_key":"win-01","actor_key":"actor-c","object_key":"file-01"}
+{"timestamp":"2026-11-02T12:30:00Z","kind":"file_execution","source":"sysmon_eid1","event_ref":"lab-syn-006","asset_key":"win-01","actor_key":"actor-c","object_key":"file-01"}
+{"timestamp":"2026-11-02T13:00:00Z","kind":"powershell_process","source":"sysmon_eid1","event_ref":"lab-syn-007","asset_key":"win-02","actor_key":"actor-x","object_key":"script-b"}
+{"timestamp":"2026-11-02T13:05:00Z","kind":"task_created","source":"security_eid4698","event_ref":"lab-syn-008","asset_key":"win-02","actor_key":"actor-y","object_key":"task-b"}
+{"timestamp":"2026-11-02T13:10:00Z","kind":"account_created","source":"security_eid4720","event_ref":"lab-syn-009","asset_key":"win-02","actor_key":"actor-x","object_key":"account-b"}
+{"timestamp":"2026-11-02T13:20:00Z","kind":"privileged_logon","source":"security_eid4672","event_ref":"lab-syn-010","asset_key":"win-02","actor_key":"actor-x","object_key":"account-c"}
+{"timestamp":"2026-11-02T13:30:00Z","kind":"file_change","source":"wazuh_fim","event_ref":"lab-syn-011","asset_key":"win-02","actor_key":"actor-x","object_key":"file-b"}
+{"timestamp":"2026-11-02T13:36:00Z","kind":"file_execution","source":"sysmon_eid1","event_ref":"lab-syn-012","asset_key":"win-02","actor_key":"actor-x","object_key":"file-c"}

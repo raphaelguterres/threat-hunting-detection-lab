@@ -21,3 +21,22 @@ jobs:
       - name: Validate rules and required artifacts
         shell: pwsh
         run: ./scripts/validate_lab_config.ps1
+
+  m1-offline-hunting:
+    name: M1 synthetic hunting contracts (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run synthetic M1 offline tests
+        run: python -m unittest discover -s tests -p test_hunt_correlations.py -v
+      - name: Verify fixture stays synthetic
+        run: python scripts/hunt_correlations.py --input tests/fixtures/m1-synthetic.jsonl --fixture

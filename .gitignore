@@ -11,3 +11,8 @@ evidencias/
 .env.*
 *.key
 *.pem
+
+# Artefatos locais de hunting e evidencias de origem (NUNCA versionar).
+.lab/
+__pycache__/
+*.pyc
