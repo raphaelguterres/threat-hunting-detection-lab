@@ -1,0 +1,6 @@
+{"id":"synthetic-1","rule":{"id":"110120"},"agent":{"id":"004"},"timestamp":"2026-11-01T23:19:52.407+0000"}
+{"id":"synthetic-2","rule":{"id":"110100"},"agent":{"id":"004"},"timestamp":"2026-11-02T00:22:15.606Z"}
+{"id":"synthetic-3","rule":{"id":"110140"},"agent":{"id":"004"},"timestamp":"2026-11-01T21:11:05.997Z"}
+{"id":"synthetic-4","rule":{"id":"110140"},"agent":{"id":"004"},"timestamp":"2026-11-01T21:11:05.931Z"}
+{"id":"synthetic-5","rule":{"id":"110130"},"agent":{"id":"004"},"timestamp":"2026-11-01T21:10:26.157Z"}
+{"id":"synthetic-6","rule":{"id":"110110"},"agent":{"id":"004"},"timestamp":"2026-11-01T23:19:45.738Z"}
