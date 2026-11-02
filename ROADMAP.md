@@ -66,7 +66,8 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [x] Conferir read-only Security circular 20 MB, dois coletores Security eventchannel e arquivo central recebido; identificar [diretiva FIM central Unix incompatível](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17), sem publicar paths.
 - [x] Identificar grupo distribuidor do `agent.conf`: **`default` (4 agentes)**, hash igual entre Manager e agente `004`, sincronização confirmada.
 - [x] Revisar estruturalmente os dois coletores Security: **um sem filtro**, outro com **exclusões por EventID**; sem bloqueio explícito do `4698`.
-- [ ] Confirmar possível duplicidade Security e a **cobertura FIM efetiva** do agente 004; propor segregação por SO antes de alterar grupo compartilhado.
+- [x] Preparar [proposta de segmentação FIM por OS](docs/m1-fim-os-scoped-remediation-plan.md) e testes offline sintéticos para impedir caminhos Linux em blocos Windows.
+- [ ] Confirmar inventário/OS dos demais agentes, possível duplicidade Security e a **cobertura FIM efetiva** do agente 004 antes de solicitar alteração no grupo compartilhado.
 - [ ] **Aprovar, executar e validar** a mudança 4698 (ainda não aplicada), somente após avaliar retenção e confirmar ingestão Wazuh.
 
 **Acompanhamento:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) · [Três hipóteses M1](docs/m1-three-hunting-hypotheses.md).
