@@ -83,3 +83,34 @@ Ações read-only para completar a revisão:
 **Pronto:** inventário read-only, verificação de paths existentes, riscos levantados, script de ativação com proteção e script de rollback preparados **somente no host**. **Pendente:** aprovação humana, aplicação da auditoria, teste de criação real de tarefa, confirmação de ingestão Wazuh, inspeção de `agent.conf` efetivo e eventual validação de H03.
 
 **Status:** a [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) permanece aberta até essas decisões; M1 [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) não está concluído.
+
+
+## 4. Segundo pré-check: retenção e recebimento de configuração centralizada (02/11/2026)
+
+**Verificações executadas no WindowsServer, exclusivamente read-only, após o inventário inicial:**
+
+| Verificação | Resultado | Limite da interpretação |
+| --- | --- | --- |
+| Modo do log `Security` | **Circular** | Há sobrescrita quando chega ao limite; não assumir retenção futura constante |
+| Capacidade / quantidade de registros | **20 MB / 11.378 registros** | Fotografia de um instante, sem medição de crescimento após ativar auditoria |
+| Evento Security mais antigo / mais recente disponíveis | **2026-10-22 00:27:59Z / 2026-11-02 20:54:00Z** | Cobertura observada do arquivo atual; **não** constitui garantia de onze dias de retenção |
+| `localfile` no `ossec.conf` | **9 entradas**, incluindo **2 Security** em `eventchannel` e **1 Sysmon** em `eventchannel` | Confirmar sobreposição de Security e compatibilidade dos filtros antes de considerar ingestão 4698 comprovada |
+| Security com cláusula `query` local | **1 de 2** entradas | O scanner não detectou menção explícita a `4698`, mas não provou equivalência semântica do filtro |
+| Configuração distribuída ao agente | `shared/agent.conf` e `shared/merged.mg` **presentes** | Presença não atesta que cada parâmetro central foi aplicado como esperado |
+| `agent.conf` central | **1 `agent_config`**, com **1 `syscheck`**, **1 diretiva de diretório realtime**, **1 `localfile` syslog** | A fonte syslog central não equivale a um novo coletor Security; não foram publicados paths brutos |
+
+### Achado relevante: diretiva central FIM com formato Unix no agente Windows
+
+A diretiva **`<directories realtime="yes">`** no `shared/agent.conf` usa **caminho de estilo Unix/Linux**. Após expansão de variáveis de ambiente no WindowsServer, esse caminho **não existe** e **não coincide** com nenhum dos seis caminhos locais que foram comprovados existentes. A comparação de paths foi feita no próprio endpoint **sem exportar os nomes ou conteúdo integral do arquivo**. Não havia `whodata` nem diretivas centralizadas de registry.
+
+**O que está comprovado:** existe uma configuração central FIM incompatível com um caminho existente na VM Windows. Ela representa uma **lacuna potencial de escopo/distribuição** para o WindowsServer. **Não está comprovado** que os seis diretórios locais deixaram de ser monitorados, nem qual grupo do Manager distribuiu essa configuração, nem que essa diretiva explica o zero de alertas FIM na janela recente.
+
+**Follow-up específico:** [Issue #17 — revisar configuração FIM central com diretiva Unix](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17). A correção central deverá ter change request **separado** e escopo por sistema/grupo; **não** editar o arquivo recebido no endpoint, não sobrescrever `agent.conf` manualmente e não reiniciar serviços sem necessidade.
+
+### Gate de autorização permanece inalterado
+
+A observação de dois coletores Security locais e de um caminho FIM Unix **não autoriza** a ativação da auditoria. Antes da mudança 4698, verificar a origem e a sobreposição dos filtros Security, avaliar a retenção de 20 MB, registrar uma janela com rollback autorizado e confirmar o caminho de ingestão para Security 4698. A ação `auditpol /set` **não foi executada**.
+
+**Evidência privada agregada no Windows:** `.lab/m1-change-prep/M1_4698_PIPELINE_PRIVATE.txt`, `M1_CENTRAL_CONFIG_PRIVATE.txt`, `M1_CENTRAL_EFFECTIVE_PRIVATE.txt` e `M1_CENTRAL_PATH_CLASS_V2.txt`. O primeiro teste do classificador de caminho falhou por erro de sintaxe do coletor e **não foi usado como evidência**; o classificador V2 executou e validou o formato Unix com sucesso. Os hashes de configuração, nomes de caminhos, dados de agente e registros brutos não são publicados.
+
+**Fontes oficiais:** [Microsoft: Audit Other Object Access Events](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/audit-other-object-access-events) · [Wazuh: `localfile` eventchannel](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html) · [Wazuh: centralized configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html).
