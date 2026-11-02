@@ -71,7 +71,7 @@ Cada consulta foi executada **separadamente**. Esses números se referem aos **�
 
 ## Próximas decisões, sem mudança automática de configuração
 
-1. **H01:** avaliar em ambiente de teste a habilitação de **Audit Other Object Access Events** para observar `4698`; exigir aprovação e plano de rollback antes de alterar GPO/`auditpol`. Confirmar a semântica da regra Wazuh `110120` (consulta/execução não equivale necessariamente a criação).
+1. **H01:** avaliar em ambiente de teste a habilitação de **Audit Other Object Access Events** para observar `4698`; exigir aprovação e plano de rollback antes de alterar GPO/`auditpol`. A regra Wazuh `110120` exige `schtasks.exe /create` no comando Sysmon 1: identifica **tentativa de criação**, não consulta `/query` nem confirmação de sucesso. O correlacionador M1 exige Security `4698` para `task_created` e classifica `110120` apenas como `task_creation_attempt`.
 2. **H02:** revisar eventos da conta criada **fora** dos 30 minutos, inclusive grupos atribuídos, tipo de logon e origem autorizada, mantendo o material identificável apenas em ambiente privado. Se não houver continuidade ou integridade da coleta, classificar como **inconclusivo**.
 3. **H03:** verificar o escopo do monitoramento FIM em Windows, políticas de coleta, latência e retenção de alertas. Reabrir a caça quando houver evidência FIM e Sysmon 1 para **o mesmo caminho/hash e ativo**, sem criar eventos de teste desnecessários.
 4. Preparar três **estudos de caso** com hipóteses benignas e controles negativos depois da validação operacional. **Não fechar [M1 Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)** só por contagens, ausência de candidatos ou CI verde.
