@@ -4,6 +4,10 @@
 
 O laboratório já contém cinco estudos de caso históricos, Sysmon IDs 1, 3 e 11, auditoria Windows e FIM Linux/Windows. Este M1 cria hipóteses **adicionais**, em vez de renomear os estudos antigos.
 
+## Atualização read-only do ambiente — 02/11/2026
+
+A [auditoria de visibilidade do Windows Server e Wazuh FIM](m1-native-windows-wazuh-visibility-review-20261102.md) encontrou **0 eventos Security 4698** e `Other Object Access Events = No Auditing`, **1 evento 4720** sem logons `4624/4672` associados ao mesmo SID nos 30 minutos seguintes e **0 documentos FIM do agente 004** na janela recente, embora existam **102 documentos FIM históricos** desse agente. Esses são **limites do recorte e da instrumentação**: não permitem confirmar nem descartar integralmente H01/H02/H03.
+
 ## Modelo de entrada: registros normalizados e pseudonimizados
 
 O correlacionador em [scripts/hunt_correlations.py](../scripts/hunt_correlations.py) executa **somente operações offline**, sem acessar VMs ou consultar Wazuh. O analista precisa normalizar fielmente cada evento e fornecer **exatamente sete campos**:
