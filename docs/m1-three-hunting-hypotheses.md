@@ -34,6 +34,12 @@ O correlacionador em [scripts/hunt_correlations.py](../scripts/hunt_correlations
 
 **Limite:** proximidade de eventos não prova relação causal nem intenção maliciosa.
 
+### Revisão retrospectiva H01 — 02/11/2026
+
+Já foi analisada uma amostra **real delimitada** de seis identidades de alertas do laboratório, guardada privadamente no projeto irmão. O evento da regra **110120 (schtasks)** ocorreu **1h02min23s antes** do alerta **110100 (PowerShell)**. Portanto **não corresponde** à sequência PowerShell → tarefa de H01, nem à janela de 15 minutos.
+
+Isso é somente a **avaliação temporal de dois registros**; não significa que a hipótese esteja descartada no ambiente, nem confirma criação da tarefa ou correspondência de usuário. A auditoria é reproduzível em modo read-only e sem divulgar IDs. Veja o [relatório retrospectivo sanitizado](m1-h01-prior-evidence-review-20261102.md).
+
 ## H02 — Criação de conta local seguida de sessão privilegiada
 
 **Hipótese:** uma conta recém-criada que aparece em logon com privilégios deve ser triada quanto a aprovação, origem e contexto.
