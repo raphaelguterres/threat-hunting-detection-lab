@@ -48,3 +48,17 @@ O retrato operacional mais recente está no [painel de progresso](docs/roadmap-p
 - Labels: `roadmap`, `telemetry`, `detection`, `investigation`, `playbook`, `documentation` e `portfolio`.
 - Em cada Issue: objetivo, escopo seguro, critérios de aceite, comandos/testes autorizados, evidências e limitações.
 - Fechar uma Issue somente após anexar ou referenciar a evidência redigida correspondente.
+
+## M1 — Threat Hunting orientado a hipóteses (iniciado 02/11/2026)
+
+Este M1 é um **incremento novo**, separado das seis fases históricas concluídas deste laboratório.
+
+- [x] Formular três hipóteses adicionais com fontes, junção temporal, riscos e controles negativos.
+- [x] Implementar correlacionador Python offline sobre dados **normalizados e pseudonimizados**.
+- [x] Criar fixtures sintéticas e testes de contrato em GitHub Actions Linux/Windows (**sujeito a confirmação do CI no PR**).
+- [ ] Investigar as três hipóteses sobre **telemetria real** de maneira autorizada e somente leitura.
+- [ ] Registrar estudos de caso adicionais com timelines e decisões documentadas.
+- [ ] Revisar tuning, falsos positivos e cobertura ATT&CK com evidência por hipótese.
+- [ ] Encerrar o M1 somente com revisão independente e evidência sanitizada, sem confundir simulação com operação.
+
+**Acompanhamento:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) · [Três hipóteses M1](docs/m1-three-hunting-hypotheses.md).
