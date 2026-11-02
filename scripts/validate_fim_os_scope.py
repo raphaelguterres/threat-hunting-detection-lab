@@ -61,7 +61,8 @@ def validate(text: str) -> dict[str, object]:
                 kind = classify_path(item)
                 if kind == "network":
                     raise ValueError("network path is not supported in this example")
-                if kind.lower() != os_family.lower():
+                expected_kind = "unix" if os_family == "Linux" else "windows"
+                if kind != expected_kind:
                     raise ValueError("FIM directory does not match its OS scope")
                 dirs[os_family] += 1
         for node in block.findall("./localfile/location"):
