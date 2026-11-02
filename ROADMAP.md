@@ -62,4 +62,7 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [ ] Revisar tuning, falsos positivos e cobertura ATT&CK com evidência por hipótese.
 - [ ] Encerrar o M1 somente com revisão independente e evidência sanitizada, sem confundir simulação com operação.
 
+- [x] Elaborar [change control do 4698 e revisão FIM 004](docs/m1-change-control-4698-fim-agent004.md), com baseline read-only, riscos de retenção, scripts privados de dry-run e rollback.
+- [ ] **Aprovar, executar e validar** a mudança 4698 (ainda não aplicada); verificar ingestão Wazuh e configuração centralizada FIM antes de alterar cobertura.
+
 **Acompanhamento:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) · [Três hipóteses M1](docs/m1-three-hunting-hypotheses.md).
