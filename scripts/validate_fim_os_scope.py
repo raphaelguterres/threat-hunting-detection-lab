@@ -68,7 +68,8 @@ def validate(text: str) -> dict[str, object]:
         for node in block.findall("./localfile/location"):
             location = (node.text or "").strip()
             kind = classify_path(location)
-            if kind.lower() != os_family.lower():
+            expected_kind = "unix" if os_family == "Linux" else "windows"
+            if kind != expected_kind:
                 raise ValueError("log location does not match its OS scope")
             logs[os_family] += 1
     return {
