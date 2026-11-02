@@ -68,6 +68,7 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [x] Revisar estruturalmente os dois coletores Security: **um sem filtro**, outro com **exclusões por EventID**; sem bloqueio explícito do `4698`.
 - [x] Preparar [proposta de segmentação FIM por OS](docs/m1-fim-os-scoped-remediation-plan.md) e testes offline sintéticos para impedir caminhos Linux em blocos Windows.
 - [x] Adicionar gate offline de **diff mínimo** para permitir apenas inclusão de escopo Linux em agent.conf proposto; impedir alterações inadvertidas de caminhos, fontes, regras FIM ou comentários.
+- [x] Validar oficialmente no Manager uma proposta mínima `os="^Linux"` em **cópia isolada fora do diretório distribuído**; `verify-agent-conf` aprovado, original inalterado e cópia removida.
 - [ ] Confirmar inventário/OS dos demais agentes, possível duplicidade Security e a **cobertura FIM efetiva** do agente 004 antes de solicitar alteração no grupo compartilhado.
 - [ ] **Aprovar, executar e validar** a mudança 4698 (ainda não aplicada), somente após avaliar retenção e confirmar ingestão Wazuh.
 
