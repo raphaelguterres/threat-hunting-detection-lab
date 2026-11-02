@@ -64,7 +64,9 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 
 - [x] Elaborar [change control do 4698 e revisão FIM 004](docs/m1-change-control-4698-fim-agent004.md), com baseline read-only, riscos de retenção, scripts privados de dry-run e rollback.
 - [x] Conferir read-only Security circular 20 MB, dois coletores Security eventchannel e arquivo central recebido; identificar [diretiva FIM central Unix incompatível](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17), sem publicar paths.
-- [ ] Revisar sobreposição/filtro dos dois coletores Security, grupo que distribui `agent.conf` e o escopo FIM efetivo do agente 004.
+- [x] Identificar grupo distribuidor do `agent.conf`: **`default` (4 agentes)**, hash igual entre Manager e agente `004`, sincronização confirmada.
+- [x] Revisar estruturalmente os dois coletores Security: **um sem filtro**, outro com **exclusões por EventID**; sem bloqueio explícito do `4698`.
+- [ ] Confirmar possível duplicidade Security e a **cobertura FIM efetiva** do agente 004; propor segregação por SO antes de alterar grupo compartilhado.
 - [ ] **Aprovar, executar e validar** a mudança 4698 (ainda não aplicada), somente após avaliar retenção e confirmar ingestão Wazuh.
 
 **Acompanhamento:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) · [Três hipóteses M1](docs/m1-three-hunting-hypotheses.md).

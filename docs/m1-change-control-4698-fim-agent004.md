@@ -103,14 +103,40 @@ Ações read-only para completar a revisão:
 
 A diretiva **`<directories realtime="yes">`** no `shared/agent.conf` usa **caminho de estilo Unix/Linux**. Após expansão de variáveis de ambiente no WindowsServer, esse caminho **não existe** e **não coincide** com nenhum dos seis caminhos locais que foram comprovados existentes. A comparação de paths foi feita no próprio endpoint **sem exportar os nomes ou conteúdo integral do arquivo**. Não havia `whodata` nem diretivas centralizadas de registry.
 
-**O que está comprovado:** existe uma configuração central FIM incompatível com um caminho existente na VM Windows. Ela representa uma **lacuna potencial de escopo/distribuição** para o WindowsServer. **Não está comprovado** que os seis diretórios locais deixaram de ser monitorados, nem qual grupo do Manager distribuiu essa configuração, nem que essa diretiva explica o zero de alertas FIM na janela recente.
+**O que estava comprovado neste primeiro pré-check:** existe uma diretiva central FIM com caminho de estilo Unix inexistente na VM Windows. A fonte do grupo Manager ainda não havia sido verificada **nesta etapa inicial**. A validação adicional e sua proveniência estão registradas na seção 5. Não está comprovado que os seis diretórios locais deixaram de funcionar, nem que a diretiva explique ausência recente de alertas.
 
 **Follow-up específico:** [Issue #17 — revisar configuração FIM central com diretiva Unix](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17). A correção central deverá ter change request **separado** e escopo por sistema/grupo; **não** editar o arquivo recebido no endpoint, não sobrescrever `agent.conf` manualmente e não reiniciar serviços sem necessidade.
 
 ### Gate de autorização permanece inalterado
 
-A observação de dois coletores Security locais e de um caminho FIM Unix **não autoriza** a ativação da auditoria. Antes da mudança 4698, verificar a origem e a sobreposição dos filtros Security, avaliar a retenção de 20 MB, registrar uma janela com rollback autorizado e confirmar o caminho de ingestão para Security 4698. A ação `auditpol /set` **não foi executada**.
+A observação de dois coletores Security locais e de um caminho FIM Unix **não autoriza** a ativação da auditoria. Antes da mudança 4698, conferir a possibilidade de sobreposição dos dois coletores Security e medir retenção dos 20 MB, registrar uma janela com rollback autorizado e confirmar a ingestão real do Security 4698 após teste benigno aprovado. A seção 5 já registra a análise estrutural dos filtros, mas não prova entrega end-to-end. A ação `auditpol /set` **não foi executada**.
 
 **Evidência privada agregada no Windows:** `.lab/m1-change-prep/M1_4698_PIPELINE_PRIVATE.txt`, `M1_CENTRAL_CONFIG_PRIVATE.txt`, `M1_CENTRAL_EFFECTIVE_PRIVATE.txt` e `M1_CENTRAL_PATH_CLASS_V2.txt`. O primeiro teste do classificador de caminho falhou por erro de sintaxe do coletor e **não foi usado como evidência**; o classificador V2 executou e validou o formato Unix com sucesso. Os hashes de configuração, nomes de caminhos, dados de agente e registros brutos não são publicados.
 
 **Fontes oficiais:** [Microsoft: Audit Other Object Access Events](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/audit-other-object-access-events) · [Wazuh: `localfile` eventchannel](https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/localfile.html) · [Wazuh: centralized configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html).
+
+## 5. Identificação do grupo de origem e revisão dos filtros Security — 02/11/2026
+
+Este complemento foi realizado **somente leitura**, usando SSH autorizado com chave existente do Windows host para a VM Kali e os comandos informativos do container Wazuh Manager, além de uma análise **local** sem divulgar o texto de filtros do WindowsServer.
+
+| Checagem | Resultado observado | Critério de interpretação |
+| --- | --- | --- |
+| `agent_groups -l` | **1 grupo no Manager: `default`**, contendo **4 agentes** | A distribuição centralizada atual não está segmentada por SO |
+| `agent_groups -s -i 004` | **Agente 004 pertence somente ao `default`** | Origem do grupo atribuída diretamente |
+| `agent_groups -S -i 004` | **`Agent '004' is synchronized`** | Sincronização do grupo confirmada, mas não prova a eficácia de toda diretiva FIM |
+| `sha256sum /var/ossec/etc/shared/default/agent.conf` | **Hash idêntico ao `shared/agent.conf` recebido no WindowsServer**; **221 bytes em ambas as pontas** | Confirma distribuição **desse mesmo arquivo** por parte do Manager, sem publicar seu conteúdo |
+| Security local | **2 entradas `eventchannel`**, **1 sem cláusula `query`** | Uma entrada é ampla; avaliar risco de coleta sobreposta |
+| Security filtrado | **1 cláusula `query` baseada somente em negações de EventID** | Um filtro de exclusões, não um whitelist de eventos conhecidos |
+| Restrição a `4698` | **Nenhuma menção nem negação explícita ao EventID 4698 encontrada nos dois blocos Security locais** | Condição de configuração **favorável, mas insuficiente para comprovar ingestão real** |
+
+**Conclusão confirmada:** o `agent.conf` com diretiva FIM de formato Unix não se originou de um grupo Windows especializado; foi recebido do único grupo `default`, e o hash corresponde exatamente ao arquivo desse grupo no Manager. A diretiva não encontra o caminho esperado neste endpoint Windows. Não está provado que os seis caminhos locais do `ossec.conf` tenham parado de ser monitorados; a revisão do FIM efetivo e os efeitos de sobreposição ainda precisam de validação apropriada.
+
+### Estratégia de correção proposta (não executada)
+
+1. Criar **planejamento de segregação por sistema operacional** e aprovar escopo separado da mudança 4698. Analisar quais dos quatro agentes do `default` usam Linux/Windows **sem publicar identificadores**.
+2. Preparar grupo de configuração específico para Windows, com entradas FIM suportadas pelo sistema e revisão dos coletores Security. Avaliar o impacto de **múltiplos grupos**: segundo o Wazuh, o último grupo atribuído tem maior prioridade e as configurações são mescladas; uma diretiva Linux residual no `default` pode continuar sendo distribuída.
+3. Para mudança futura, preparar backup do arquivo `default/agent.conf`, `merged.mg` e vínculos de grupos, revisão de configuração, testes de sintaxe e rollback por grupo; **não** modificar automaticamente um grupo compartilhado por quatro agentes.
+4. Executar apenas após autorização explícita, com critérios de confirmação da distribuição, funcionamento do agente e teste FIM benigno específico. Não modificar credenciais, TLS ou serviços desnecessariamente.
+5. Controlar essa correção na [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17), independente da ativação da auditoria `4698` na [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15).
+
+**Referências:** [Wazuh — Grouping agents](https://documentation.wazuh.com/current/user-manual/agent/agent-management/grouping-agents.html) · [Wazuh — agent_groups](https://documentation.wazuh.com/current/user-manual/reference/tools/agent-groups.html) · [Microsoft — Audit Other Object Access Events](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/audit-other-object-access-events).
