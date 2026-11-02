@@ -57,3 +57,29 @@ A [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/is
 - [Wazuh: Centralized configuration, OS selectors e verify-agent-conf](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html)
 - [Wazuh: grupos e precedência](https://documentation.wazuh.com/current/user-manual/agent/agent-management/grouping-agents.html)
 - [Wazuh: configuração FIM](https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/how-to-configure-fim.html)
+
+## Segundo gate offline: revisar somente a inclusão de escopo por SO
+
+O validador de caminhos anterior não detecta mudanças acidentais no resto da configuração. O novo [review_fim_scope_only.py](../scripts/review_fim_scope_only.py) compara uma configuração original e uma proposta, ambas em arquivos privados, sem acessar Wazuh.
+
+A comparação:
+- exige os mesmos blocos, elementos e valores XML, sem inclusão/remoção de fontes de log, diretórios ou atributos FIM;
+- permite unicamente adicionar o atributo **os="^Linux"** a um bloco agent_config antes sem seletor, com somente caminhos Unix de FIM/log;
+- preserva comentários e rejeita alterações de conteúdo, ignorando exclusivamente alterações de indentação;
+- rejeita mudanças em blocos Windows e filtros preexistentes, declarações DTD/ENTITY e entradas fora da pasta privada .lab (com exceção de fixtures marcadas);
+- nunca modifica os arquivos e nunca imprime conteúdo sensível. Sua saída indica **deployment_performed=false** e **wazuh_parser_verified=false**.
+
+### Teste sintético no CI (sem rede nem VM)
+
+    python scripts/review_fim_scope_only.py --original tests/fixtures/m1-original-unscoped-synthetic.xml --proposed tests/fixtures/m1-proposed-scoped-synthetic.xml --fixture
+    python -m unittest discover -s tests -p test_review_fim_scope_only.py -v
+
+### Uso em staging privado, somente após autorização para manusear os arquivos
+
+Com cópias previamente coletadas e autorizadas do original e da proposta dentro da pasta .lab:
+
+    python scripts/review_fim_scope_only.py --original .lab/m1-change/original-agent.conf --proposed .lab/m1-change/proposed-agent.conf
+
+A aprovação desse comparador **não autoriza deploy**. Ainda são exigidos inventário dos agentes afetados, revisão humana do diff, backup/rollback e verificação pelo **verify-agent-conf oficial** sobre cópia temporária autorizada antes da mudança agendada.
+
+**Limite:** verifica apenas estrutura XML, não a seleção efetiva de OS, prioridade entre grupos, funcionamento da FIM ou aceitação de regras pelo Wazuh. Não foram usadas configurações originais do Manager nos testes públicos.
