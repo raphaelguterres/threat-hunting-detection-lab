@@ -172,5 +172,23 @@ class HypothesisTests(unittest.TestCase):
         self.assertNotIn("lab-syn-001", output.getvalue())
 
 
+    def test_wazuh_schtasks_create_command_is_not_a_confirmed_task(self):
+        item = raw("task_created", "wazuh_rule110120", "unconfirmed",
+                   "2026-11-02T12:07:00Z")
+        with self.assertRaises(ValueError):
+            hunting.parse_event(item)
+
+    def test_schtasks_attempt_is_not_counted_as_h01_confirmed_creation(self):
+        records = [
+            raw("powershell_process", "sysmon_eid1", "first"),
+            raw("task_creation_attempt", "wazuh_rule110120", "second",
+                "2026-11-02T12:05:00Z"),
+        ]
+        self.assertEqual(self.count(records), 0)
+        records[1]["kind"] = "task_created"
+        records[1]["source"] = "security_eid4698"
+        self.assertEqual(self.count(records), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
