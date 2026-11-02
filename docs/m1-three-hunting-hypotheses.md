@@ -15,7 +15,7 @@ O correlacionador em [scripts/hunt_correlations.py](../scripts/hunt_correlations
 | Campo | Significado |
 | --- | --- |
 | **timestamp** | ISO 8601 com UTC ou fuso explícito; comparado após normalização para UTC |
-| **kind** | Categoria observada: powershell_process, task_created, account_created, privileged_logon, file_change ou file_execution |
+| **kind** | Categoria observada: powershell_process, task_creation_attempt, task_created, account_created, privileged_logon, file_change ou file_execution |
 | **source** | Tipo de evento original permitido para a categoria; validado pelo programa |
 | **event_ref** | Referência única à evidência, preservada privadamente e nunca impressa |
 | **asset_key** | Alias estável do ativo, nunca hostname real |
@@ -29,14 +29,14 @@ O correlacionador em [scripts/hunt_correlations.py](../scripts/hunt_correlations
 **Hipótese:** um processo PowerShell seguido de tarefa agendada no mesmo ativo/ator pode merecer investigação de persistência se a mudança não for autorizada.
 
 - **Etapa A:** powershell_process, evidência Sysmon ID 1 ou regra customizada 110100 confirmada.
-- **Etapa B:** task_created, evidência de evento Security 4698 ou regra 110120 **somente quando o conteúdo confirmar criação efetiva**.
+- **Etapa B:** **task_created exige Security 4698**, que registra criação real. A regra Wazuh **110120** identifica execução de `schtasks.exe /create`, mas só pode ser normalizada como **task_creation_attempt**, que não satisfaz o gate de criação confirmada de H01.
 - **Junção:** mesmo asset_key e actor_key; A deve ocorrer antes de B, no máximo **15 minutos**.
 - **Contexto que falta a analisar:** comando, processo pai, relação entre processos, ação agendada, usuário, ticket de manutenção.
 - **Controles negativos:** ator ou host diferente, tarefa anterior ao PowerShell, janela vencida, tarefa administrativa aprovada.
 - **MITRE como hipótese:** [T1059.001](https://attack.mitre.org/techniques/T1059/001/) + [T1053.005](https://attack.mitre.org/techniques/T1053/005/).
 - **Estado:** planejada para revisão de telemetria real; correlacionador testado apenas sinteticamente.
 
-**Limite:** proximidade de eventos não prova relação causal nem intenção maliciosa.
+**Limite:** proximidade de eventos não prova relação causal nem intenção maliciosa. A regra 110120 procura **/create**, não uma consulta /query; ela não comprova que a tarefa foi efetivamente registrada. O correlacionador rejeita normalização 110120 → task_created.
 
 ### Revisão retrospectiva H01 — 02/11/2026
 

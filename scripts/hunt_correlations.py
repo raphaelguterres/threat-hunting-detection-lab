@@ -19,7 +19,8 @@ MAX_EVENTS = 1000
 MAX_CANDIDATES = 5000
 KINDS = {
     "powershell_process": frozenset({"sysmon_eid1", "wazuh_rule110100"}),
-    "task_created": frozenset({"security_eid4698", "wazuh_rule110120"}),
+    "task_created": frozenset({"security_eid4698"}),
+    "task_creation_attempt": frozenset({"wazuh_rule110120"}),
     "account_created": frozenset({"security_eid4720"}),
     "privileged_logon": frozenset({"security_eid4672"}),
     "file_change": frozenset({"wazuh_fim"}),
