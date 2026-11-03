@@ -72,14 +72,30 @@ def parse_rows(path):
     return agents
 
 
+def strict_pairs(pairs):
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate manifest JSON key")
+        result[key] = value
+    return result
+
+
+def reject_nonfinite(value):
+    raise ValueError("nonfinite manifest value")
+
+
 def prepare_manifest(path, agents):
     if not contained(path):
         raise ValueError("manifest must remain private")
     if path.exists():
         if not path.is_file() or path.stat().st_size > 65536:
             raise ValueError("manifest is not a readable local file")
-        old = json.loads(path.read_text(encoding="utf-8-sig"))
-        if not isinstance(old, dict) or old.get("schema_version") != 1 or old.get("change_id") != "M1-FIM-OS-SCOPE":
+        old = json.loads(path.read_text(encoding="utf-8-sig"),
+                         object_pairs_hook=strict_pairs,
+                         parse_constant=reject_nonfinite)
+        if (not isinstance(old, dict) or type(old.get("schema_version")) is not int
+                or old["schema_version"] != 1 or old.get("change_id") != "M1-FIM-OS-SCOPE"):
             raise ValueError("unexpected manifest schema")
     else:
         old = {"schema_version": 1, "change_id": "M1-FIM-OS-SCOPE", "checks": {}}

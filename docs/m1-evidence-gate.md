@@ -74,4 +74,4 @@ python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.c
 python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prechange
 ```
 
-O importador nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.
+O importador recusa manifesto pré-existente malformado (JSON duplicado, schema ambíguo), sem sobrescrever o original. Nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.

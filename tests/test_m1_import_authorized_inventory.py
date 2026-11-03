@@ -95,6 +95,20 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
             self.assertFalse(updated["checks"][name]["evidence_ref"])
         self.assertEqual(updated["checks"]["backup_integrity_real"]["status"], "verified")
 
+    def test_existing_duplicate_manifest_keys_rejected_without_overwrite(self):
+        self.write_csv()
+        original = '{"schema_version":1,"change_id":"M1-FIM-OS-SCOPE","checks":{},"checks":{}}'
+        self.manifest.write_text(original, encoding="utf-8")
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+        self.assertEqual(self.manifest.read_text(encoding="utf-8"), original)
+
+    def test_boolean_manifest_schema_rejected(self):
+        self.write_csv()
+        original = '{"schema_version":true,"change_id":"M1-FIM-OS-SCOPE","checks":{}}'
+        self.manifest.write_text(original, encoding="utf-8")
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+        self.assertEqual(self.manifest.read_text(encoding="utf-8"), original)
+
     def test_duplicate_agents_rejected(self):
         items = rows()
         items[1]["id"] = "001"
