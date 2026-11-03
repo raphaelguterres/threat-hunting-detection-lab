@@ -11,6 +11,8 @@
 3. Se o Dashboard não mostrar o SO, a sincronização ou a **ordem** dos grupos, marcar o campo como `NÃO VERIFICADO`. **Não inferir ordem alfabética como prioridade**. Solicitar ao responsável pelo ambiente confirmação por meio autorizado, sem mudar permissões para acessar o dado.
 4. As capturas ficam somente na pasta privada `.lab/`, sem hostname, IP, nomes de pessoas, tokens ou conteúdo de logs. Publicar exclusivamente contagens e estado dos controles. Os quatro registros precisam ser coletados em até **30 minutos** entre o primeiro e último (política local M1); cada observação precisa ter fuso explícito e no máximo 24h de idade.
 
+**Quando houver agente desconectado ou faltarem grupo, sync e horário**, usar primeiro o [roteiro de triagem do agente 001 e observações parciais](m1-agent-001-disconnection-triage.md). Ele aceita estados não ideais, registra desconhecidos e nunca autoriza implantação; **não inserir dados presumidos no CSV de aceite final**.
+
 ## 2. Evidência privada e prévia offline
 
 Preparar `.lab/m1-agent-inventory.csv` (nunca versionar) com cabeçalho exato:

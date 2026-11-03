@@ -63,6 +63,10 @@ O CSV privado contém quatro placeholders `UNVERIFIED`, que não são evidência
 
 **Existe ainda uma mudança FIM ativa potencial (Issue #17)**, com necessidade de autorização, teste e rollback. Ela não é um sétimo item de checklist independente no ROADMAP atual, de modo que o percentual **64,7% não representa o esforço total restante nem previsão de prazo**.
 
+### Triagem de conectividade antes do aceite dos agentes
+
+O operador forneceu uma lista contendo três endpoints Linux, um Windows e um agente desconectado, porém sem os dados de associação ao grupo e sincronização. O [roteiro de diagnóstico do agente desconectado](m1-agent-001-disconnection-triage.md) e a prévia privada de **observações parciais** mantêm esses campos desconhecidos sem confundi-los com o inventário formal. O status do milestone continua **NO-GO** até a reconciliação 4/4.
+
 ## Sequência segura para a próxima sessão
 
 1. **Operador:** no Wazuh Dashboard autorizado, obter os quatro registros do grupo `default` sem contornar bloqueios de API/CLI. Usar o [roteiro manual](m1-agent-inventory-operator-runbook.md); manter dados individuais e capturas em `.lab/`.
