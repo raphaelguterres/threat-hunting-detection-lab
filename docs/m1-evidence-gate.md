@@ -59,7 +59,7 @@ Quando o operador obtiver o inventario **pelo console Wazuh autorizado**, pode p
 id,os,groups,status,sync,observed_at,evidence_ref
 ```
 
-Registre **quatro linhas reais** com IDs distintos, SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
+Registre **quatro linhas reais** com IDs distintos, SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso observado nas **ultimas 24 horas** (maximo 5 minutos no futuro por desvio de relogio) e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
 
 Teste sem alterar arquivos:
 

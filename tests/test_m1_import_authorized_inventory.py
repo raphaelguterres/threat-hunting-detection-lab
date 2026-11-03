@@ -1,5 +1,6 @@
 """Offline regression coverage for operator-provided (never auto-collected) Wazuh inventory."""
 import csv
+from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 import subprocess
@@ -21,7 +22,7 @@ def rows():
             "id": str(i).zfill(3),
             "os": "Windows Server 2022" if i == 4 else "Linux Ubuntu 24.04",
             "groups": "default", "status": "active", "sync": "synced",
-            "observed_at": "2026-11-02T23:45:00-03:00",
+            "observed_at": datetime.now(timezone.utc).isoformat(),
             "evidence_ref": "synthetic-private-review",
         }
         for i in (1, 2, 3, 4)
@@ -138,6 +139,18 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
     def test_timestamp_requires_timezone(self):
         items = rows()
         items[0]["observed_at"] = "2026-11-02T23:45:00"
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_stale_inventory_rejected(self):
+        items = rows()
+        items[0]["observed_at"] = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_future_dated_inventory_rejected(self):
+        items = rows()
+        items[0]["observed_at"] = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
         self.write_csv(items)
         self.assertEqual(self.invoke("--apply").returncode, 2)
 

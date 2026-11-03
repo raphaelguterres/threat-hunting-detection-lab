@@ -8,7 +8,7 @@ import argparse
 import csv
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import re
 import tempfile
@@ -59,6 +59,9 @@ def parse_rows(path):
             raise ValueError("invalid evidence timestamp") from exc
         if timestamp.tzinfo is None or timestamp.utcoffset() is None:
             raise ValueError("evidence timestamp missing timezone")
+        age = datetime.now(timezone.utc) - timestamp.astimezone(timezone.utc)
+        if age > timedelta(hours=24) or age < -timedelta(minutes=5):
+            raise ValueError("stale or future-dated inventory evidence")
         agents.append({
             "id": ident, "os": operating_system, "groups": groups,
             "status": "active", "sync": "synced",
