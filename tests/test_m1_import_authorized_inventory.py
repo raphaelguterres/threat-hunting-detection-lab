@@ -163,6 +163,25 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.write_csv(items)
         self.assertEqual(self.invoke("--apply").returncode, 2)
 
+    def test_dashboard_amazon_kali_and_microsoft_os_labels_are_accepted(self):
+        entries = rows()
+        entries[0]["os"] = "Amazon Linux 2023"
+        entries[1]["os"] = "Kali GNU/Linux 2025.3"
+        entries[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        self.write_csv(entries)
+        result = self.invoke()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+        self.assertFalse(self.manifest.exists())
+
+    def test_dashboard_disconnected_linux_still_blocks_import(self):
+        entries = rows()
+        entries[0]["os"] = "Amazon Linux 2023"
+        entries[0]["status"] = "disconnected"
+        self.write_csv(entries)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+        self.assertFalse(self.manifest.exists())
+
     def test_os_family_without_version_is_rejected(self):
         for value in ("Linux", "Windows", "macOS", "LinuxUbuntu24.04"):
             with self.subTest(os=value):

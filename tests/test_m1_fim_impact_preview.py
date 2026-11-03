@@ -49,11 +49,27 @@ class FimOsImpactPreviewTests(unittest.TestCase):
         self.write_csv()
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("POTENTIAL_LINUX_MATCHES=2", result.stdout)
-        self.assertIn("POTENTIAL_NON_LINUX_EXCLUSIONS=2", result.stdout)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=2", result.stdout)
+        self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=2", result.stdout)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
         self.assertIn("WAZUH_RUNTIME_SELECTION_CONFIRMED=false", result.stdout)
         self.assertNotIn("PRIVATE_SYNTHETIC_FAKE_SOURCE", result.stdout)
+
+    def test_dashboard_os_labels_use_family_not_display_regex(self):
+        agents = synthetic_agents()
+        agents[0]["os"] = "Amazon Linux 2023"
+        agents[1]["os"] = "Kali GNU/Linux 2025.3"
+        agents[2]["os"] = "Linux Ubuntu 24.04"
+        agents[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        self.write_csv(agents)
+        result = self.invoke()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=1", result.stdout)
+        self.assertIn("CLASSIFICATION_BASIS=dashboard_display_os_family_not_runtime_regex", result.stdout)
+        self.assertIn("AGENT_CONFIG_OS_REGEX_CHECKED=false", result.stdout)
+        self.assertIn("WAZUH_RUNTIME_SELECTION_CONFIRMED=false", result.stdout)
+        self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
 
     def test_precedence_hazard_is_reported(self):
         agents = synthetic_agents()
@@ -71,7 +87,7 @@ class FimOsImpactPreviewTests(unittest.TestCase):
         result = self.invoke("--output", str(self.output))
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(self.output.read_text(encoding="utf-8"))
-        self.assertEqual(data["potential_linux_matches"], 2)
+        self.assertEqual(data["projected_linux_family_agents"], 2)
         self.assertEqual(data["deployment_gate"], "BLOCKED")
         content = self.output.read_text(encoding="utf-8")
         self.assertNotIn("PRIVATE_SYNTHETIC_FAKE_SOURCE", content)

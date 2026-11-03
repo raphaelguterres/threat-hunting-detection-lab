@@ -16,6 +16,23 @@ import tempfile
 REPO = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = (REPO / ".lab").resolve()
 COLUMNS = ("id", "os", "groups", "status", "sync", "observed_at", "evidence_ref")
+OS_FAMILIES = (
+    ("Microsoft Windows ", "Windows"), ("Windows ", "Windows"),
+    ("Amazon Linux ", "Linux"), ("Kali GNU/Linux ", "Linux"),
+    ("Linux ", "Linux"), ("macOS ", "macOS"),
+)
+
+
+def os_display_family(label):
+    """Classify selected Dashboard display labels; NOT Wazuh agent_config OS info."""
+    if (not isinstance(label, str) or len(label) > 160
+            or any(ord(char) < 32 or ord(char) == 127 for char in label)
+            or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", label)):
+        raise ValueError("missing, placeholder or malformed OS label")
+    for prefix, family in OS_FAMILIES:
+        if label.startswith(prefix) and re.search(r"[0-9]", label[len(prefix):]):
+            return family
+    raise ValueError("unrecognized OS label or version")
 
 
 def contained(path):
@@ -47,13 +64,8 @@ def parse_rows(path):
         if not re.fullmatch(r"[0-9]{3,6}", ident) or ident in ids:
             raise ValueError("duplicate or invalid agent ID")
         ids.add(ident)
-        if (not re.match(r"^(Windows|Linux|macOS)\s", operating_system)
-                or not re.search(r"[0-9]", operating_system)
-                or len(operating_system) > 160
-                or any(ord(char) < 32 or ord(char) == 127 for char in operating_system)
-                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", operating_system)):
-            raise ValueError("OS family and version are required")
-        if ident == "004" and not operating_system.startswith("Windows"):
+        family = os_display_family(operating_system)
+        if ident == "004" and family != "Windows":
             raise ValueError("agent 004 OS conflicts with corroborated Windows baseline")
         groups = [group.strip() for group in row["groups"].split(";")]
         if (not groups or any(not group or len(group) > 128 or any(ord(c) < 32 or ord(c) == 127 for c in group)

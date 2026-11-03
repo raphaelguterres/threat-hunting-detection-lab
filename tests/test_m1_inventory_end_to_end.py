@@ -86,6 +86,25 @@ class InventoryEndToEndTests(unittest.TestCase):
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", gate.stdout)
         self.assertNotIn("SYNTHETIC_PRIVATE_TEST_REFERENCE", gate.stdout)
 
+    def test_distro_labels_work_but_disconnect_never_becomes_approved(self):
+        items = synthetic_rows()
+        items[0]["os"] = "Amazon Linux 2023"
+        items[1]["os"] = "Kali GNU/Linux 2025.3"
+        items[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        self.write_csv(items)
+        result = self.preview()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("AGENT_CONFIG_OS_REGEX_CHECKED=false", result.stdout)
+        self.assertEqual(self.import_inventory(apply=True).returncode, 0)
+        self.assertIn("DEPLOYMENT_GATE=BLOCKED", self.gate().stdout)
+        old = self.manifest.read_bytes()
+        items[0]["status"] = "disconnected"
+        self.write_csv(items)
+        self.assertEqual(self.import_inventory(apply=True).returncode, 2)
+        self.assertEqual(self.preview().returncode, 2)
+        self.assertEqual(self.manifest.read_bytes(), old)
+
     def test_changed_group_order_revokes_review_but_preserves_baseline(self):
         items = synthetic_rows()
         self.write_csv(items)
@@ -123,8 +142,8 @@ class InventoryEndToEndTests(unittest.TestCase):
         self.write_csv(synthetic_rows())
         result = self.preview()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("POTENTIAL_LINUX_MATCHES=3", result.stdout)
-        self.assertIn("POTENTIAL_NON_LINUX_EXCLUSIONS=1", result.stdout)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=1", result.stdout)
         self.assertIn("MULTI_GROUP_AGENTS=1", result.stdout)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
         self.assertNotIn("SYNTHETIC_PRIVATE_TEST_REFERENCE", result.stdout)

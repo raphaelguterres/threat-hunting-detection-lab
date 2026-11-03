@@ -57,6 +57,15 @@ class M1GateTests(unittest.TestCase):
         document["agents"][0]["groups"] = ["default", "default"]
         self.assertIn("agent_1_groups_valid_unique_default", gate.assess(document)[1])
 
+    def test_dashboard_os_labels_are_valid_but_not_deploy_permission(self):
+        document = example()
+        document["agents"][0]["os"] = "Amazon Linux 2023"
+        document["agents"][1]["os"] = "Kali GNU/Linux 2025.3"
+        document["agents"][3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        self.assertTrue(gate.assess(document)[0])
+        document["agents"][0]["status"] = "disconnected"
+        self.assertIn("agent_1_status", gate.assess(document)[1])
+
     def test_missing_os_version_in_manifest_is_blocked(self):
         for value in ("Linux", "Windows", "macOS", "LinuxUbuntu24.04", "Linux Ubuntu TBD 24.04"):
             with self.subTest(os=value):

@@ -34,6 +34,22 @@ def reject_nonfinite_constant(value):
     raise ValueError("nonfinite JSON constant")
 
 
+def os_display_family(label):
+    """Dashboard OS display parsing, never an agent_config OS regex test."""
+    if (not isinstance(label, str) or len(label) > 160
+            or any(ord(char) < 32 or ord(char) == 127 for char in label)
+            or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", label)):
+        return None
+    for prefix, family in (
+        ("Microsoft Windows ", "Windows"), ("Windows ", "Windows"),
+        ("Amazon Linux ", "Linux"), ("Kali GNU/Linux ", "Linux"),
+        ("Linux ", "Linux"), ("macOS ", "macOS"),
+    ):
+        if label.startswith(prefix) and re.search(r"[0-9]", label[len(prefix):]):
+            return family
+    return None
+
+
 def assess(data, stage="prechange"):
     """Returns (complete, list of *field labels*, no private evidence content)."""
     missing = []
@@ -59,14 +75,10 @@ def assess(data, stage="prechange"):
         else:
             seen.add(ident)
         os_name = agent.get("os")
-        if (not isinstance(os_name, str)
-                or not re.match(r"^(Windows|Linux|macOS)\s", os_name)
-                or not re.search(r"[0-9]", os_name)
-                or len(os_name) > 160
-                or any(ord(c) < 32 or ord(c) == 127 for c in os_name)
-                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", os_name)):
+        family = os_display_family(os_name)
+        if family is None:
             missing.append(key + "_os_version")
-        if ident == "004" and isinstance(os_name, str) and not os_name.startswith("Windows"):
+        if ident == "004" and family != "Windows":
             missing.append("agent_004_windows_expected")
         groups = agent.get("groups")
         if (not isinstance(groups, list) or not groups

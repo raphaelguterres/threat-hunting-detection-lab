@@ -128,3 +128,11 @@ O CI executa `tests/test_m1_inventory_end_to_end.py` com **somente dados sintét
 - uma string de OS sem versão é rejeitada pelo importador e pela prévia.
 
 A condição `PRIVATE_UNATTESTED` se refere apenas à origem local do arquivo de **teste**; não quer dizer que a evidência sintética seja real. Esses testes não interagem com VMs, Wazuh, dados privados reais nem autorizações.
+
+## Compatibilidade de rótulos de SO do Dashboard — 03/11
+
+A coluna `os` do CSV guarda a **string de sistema operacional exibida no Dashboard**, não o campo interno completo de OS utilizado pelo mecanismo de seleção `agent_config os="^Linux"`. Entre os rótulos agora reconhecidos pelo importador e pelo gate estão `Amazon Linux 2023`, `Kali GNU/Linux 2025.3`, `Linux Ubuntu 24.04` e `Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587` (valores usados em testes sintéticos, **não confirmação de vínculo ao grupo `default`**). A validação continua exigindo versão e rejeita placeholders.
+
+A [documentação oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html) informa que o atributo `os` do `agent.conf` consulta **informações do sistema operacional do agente**, cujo formato pode incluir um prefixo `Linux |...`. O nome comercial mostrado no Dashboard **não é equivalente** à string usada na seleção. Assim, a prévia FIM calcula **somente a quantidade hipotética de endpoints da família Linux**, não testa o regex contra a informação OS interna nem certifica que `^Linux` selecionará cada agente. Seu resultado declara `agent_config_os_regex_checked=false` e `wazuh_runtime_selection_confirmed=false`.
+
+O importador e o gate exigem que os quatro membros de `default` estejam individualmente identificados e `active/synced` em observação autorizada. Um endpoint marcado `disconnected` é **inaceitável** no inventário final e não deve ser convertido manualmente para `active`. A associação e a ordem dos grupos, assim como a string interna de SO quando disponível na interface autorizada, permanecem dependentes de verificação humana. Nenhuma regra, grupo, serviço ou diretiva FIM foi alterada.

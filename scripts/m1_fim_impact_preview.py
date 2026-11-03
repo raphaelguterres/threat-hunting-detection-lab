@@ -7,27 +7,29 @@ Aggregated output intentionally avoids agent IDs, OS versions or evidence refere
 import argparse
 import json
 from pathlib import Path
-import re
 
-from m1_import_authorized_inventory import parse_rows, contained
+from m1_import_authorized_inventory import parse_rows, contained, os_display_family
 
-SELECTOR = re.compile(r"^Linux")
+# The Wazuh selector evaluates the internal agent OS info (e.g. 'Linux |...'),
+# not the distro display label in the Dashboard. Do not regex-match display OS.
 
 
 def preview(agents):
     """Summarize hypothetical selector effect; not a Wazuh runtime assertion."""
     if len(agents) != 4:
         raise ValueError("exactly four default agents required")
-    affected = [a for a in agents if SELECTOR.search(a["os"])]
-    excluded = [a for a in agents if not SELECTOR.search(a["os"])]
+    affected = [a for a in agents if os_display_family(a["os"]) == "Linux"]
+    excluded = [a for a in agents if os_display_family(a["os"]) != "Linux"]
     multi_groups = [a for a in agents if len(a["groups"]) > 1]
     non_last_default = [a for a in agents if a["groups"][-1] != "default"]
     return {
         "schema_version": 1,
         "scope_expression": "^Linux",
+        "classification_basis": "dashboard_display_os_family_not_runtime_regex",
+        "agent_config_os_regex_checked": False,
         "agents_in_default": len(agents),
-        "potential_linux_matches": len(affected),
-        "potential_non_linux_exclusions": len(excluded),
+        "projected_linux_family_agents": len(affected),
+        "projected_non_linux_family_agents": len(excluded),
         "multi_group_agents": len(multi_groups),
         "default_not_last_in_group_order": len(non_last_default),
         "requires_precedence_review": True,
