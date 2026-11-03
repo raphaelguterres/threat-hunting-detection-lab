@@ -116,3 +116,15 @@ A lista ordenada `groups` precisa conter `default` uma única vez e não pode re
 O importador de inventário e o gate **não** aceitam apenas o nome genérico de uma plataforma (`Linux`, `Windows`, `macOS`). O operador precisa incluir **família e versão** confirmadas, por exemplo no formato `Linux Ubuntu 24.04` (exemplo fictício, não representa um agente do ambiente). São recusadas strings sem separação válida, sem número de versão, campos contendo caracteres de controle e marcadores como `UNKNOWN`, `UNVERIFIED_001`, `PENDING`, `TBD` ou `placeholder`.
 
 Caminhos de CSV/manifesto e suas pastas ancestrais que contenham links simbólicos são recusados, mesmo que apontem novamente para `.lab/`. Isso evita ler ou sobrescrever evidências por meio de aliases. A importação continua limitada a arquivos locais privados e **não consulta o Manager**. O relatório de impacto é apenas uma hipótese baseada nos campos fornecidos; nenhum campo ou saída da ferramenta autentica o operador nem autoriza a mudança.
+
+## Contrato de integração offline — importador → manifesto → gate
+
+O CI executa `tests/test_m1_inventory_end_to_end.py` com **somente dados sintéticos** em uma pasta temporária dentro de `.lab/`, eliminada automaticamente após o teste. Ele confirma que:
+- o dry-run do CSV não escreve manifesto, enquanto `--apply` escreve somente o manifesto privado;
+- um manifesto com inventário estruturalmente válido **não** se converte em autorização: `EVIDENCE_SOURCE=PRIVATE_UNATTESTED`, `EVIDENCE_COMPLETENESS=INCOMPLETE` e `DEPLOYMENT_GATE=BLOCKED`;
+- mudanças na **ordem de grupos** revogam revisões dependentes anteriores, preservando a evidência independente de integridade do backup;
+- CSV incompleto não sobrescreve o manifesto existente;
+- a prévia de impacto apresenta apenas **contagens agregadas** e segue bloqueando o deployment;
+- uma string de OS sem versão é rejeitada pelo importador e pela prévia.
+
+A condição `PRIVATE_UNATTESTED` se refere apenas à origem local do arquivo de **teste**; não quer dizer que a evidência sintética seja real. Esses testes não interagem com VMs, Wazuh, dados privados reais nem autorizações.
