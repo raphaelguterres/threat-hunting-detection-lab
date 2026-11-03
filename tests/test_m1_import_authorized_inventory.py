@@ -163,6 +163,66 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.write_csv(items)
         self.assertEqual(self.invoke("--apply").returncode, 2)
 
+    def test_os_family_without_version_is_rejected(self):
+        for value in ("Linux", "Windows", "macOS", "LinuxUbuntu24.04"):
+            with self.subTest(os=value):
+                items = rows()
+                items[0]["os"] = value
+                self.write_csv(items)
+                self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_unverified_os_or_evidence_is_rejected(self):
+        items = rows()
+        items[0]["os"] = "Linux Ubuntu 24.04 UNVERIFIED"
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+        items[0]["os"] = "Linux Ubuntu 24.04"
+        items[0]["evidence_ref"] = "placeholder 001"
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_underscore_placeholder_reference_is_rejected(self):
+        items = rows()
+        items[0]["evidence_ref"] = "UNVERIFIED_001"
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_control_characters_in_fields_are_rejected(self):
+        for field, value in (("os", "Linux\tUbuntu 24.04"),
+                             ("groups", "default;lab\x01"),
+                             ("evidence_ref", "review\x01placeholder")):
+            with self.subTest(field=field):
+                items = rows()
+                items[0][field] = value
+                self.write_csv(items)
+                self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_symlinked_csv_is_rejected_even_inside_private_directory(self):
+        self.write_csv()
+        target = self.csv_path
+        link = self.dir / "alias.csv"
+        try:
+            link.symlink_to(target)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlink creation not permitted on this platform")
+        self.assertFalse(inventory.contained(link))
+        self.csv_path = link
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_symlinked_manifest_cannot_overwrite_private_target(self):
+        self.write_csv()
+        target = self.manifest
+        original = '{"schema_version": 1, "change_id": "M1-FIM-OS-SCOPE", "checks": {}}'
+        target.write_text(original, encoding="utf-8")
+        link = self.dir / "manifest-alias.json"
+        try:
+            link.symlink_to(target)
+        except (OSError, NotImplementedError):
+            self.skipTest("symlink creation not permitted on this platform")
+        self.manifest = link
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+        self.assertEqual(target.read_text(encoding="utf-8"), original)
+
     def test_duplicate_default_group_is_rejected(self):
         items = rows()
         items[0]["groups"] = "default;default"

@@ -17,7 +17,7 @@ spec.loader.exec_module(gate)
 
 def example():
     agents = [
-        {"id": str(i).zfill(3), "os": "Windows Server 2022" if i == 4 else "Linux",
+        {"id": str(i).zfill(3), "os": "Windows Server 2022" if i == 4 else "Linux Ubuntu 24.04",
          "groups": ["default"], "sync": "synced", "status": "active",
          "observed_at": datetime.now(timezone.utc).isoformat(),
          "evidence_ref": "private review"}
@@ -56,6 +56,23 @@ class M1GateTests(unittest.TestCase):
         document = example()
         document["agents"][0]["groups"] = ["default", "default"]
         self.assertIn("agent_1_groups_valid_unique_default", gate.assess(document)[1])
+
+    def test_missing_os_version_in_manifest_is_blocked(self):
+        for value in ("Linux", "Windows", "macOS", "LinuxUbuntu24.04", "Linux Ubuntu TBD 24.04"):
+            with self.subTest(os=value):
+                document = example()
+                document["agents"][0]["os"] = value
+                self.assertIn("agent_1_os_version", gate.assess(document)[1])
+
+    def test_placeholder_evidence_reference_is_blocked(self):
+        document = example()
+        document["agents"][0]["evidence_ref"] = "UNVERIFIED evidence"
+        self.assertIn("agent_1_evidence", gate.assess(document)[1])
+
+    def test_underscore_placeholder_evidence_is_blocked(self):
+        document = example()
+        document["agents"][0]["evidence_ref"] = "UNVERIFIED_001"
+        self.assertIn("agent_1_evidence", gate.assess(document)[1])
 
     def test_incoherent_observation_window_is_blocked(self):
         document = example()
@@ -137,6 +154,18 @@ class M1GateTests(unittest.TestCase):
             source = Path(folder) / "m1-existing-synthetic.json"
             source.write_text("{}", encoding="utf-8")
             self.assertTrue(gate.private_or_fixture(source, True))
+
+    def test_private_symlinked_manifest_is_denied(self):
+        (REPO / ".lab").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="m1-links-", dir=REPO / ".lab") as folder:
+            target = Path(folder) / "private-evidence.json"
+            target.write_text("{}", encoding="utf-8")
+            link = Path(folder) / "private-alias.json"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink creation not permitted on this platform")
+            self.assertFalse(gate.private_or_fixture(link, False))
 
     def test_missing_fixture_and_directory_are_denied(self):
         self.assertFalse(gate.private_or_fixture(REPO / "tests/fixtures/nonexistent-synthetic.json", True))

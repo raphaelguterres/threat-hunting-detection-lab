@@ -59,13 +59,19 @@ def assess(data, stage="prechange"):
         else:
             seen.add(ident)
         os_name = agent.get("os")
-        if not isinstance(os_name, str) or not os_name.startswith(("Windows", "Linux", "macOS")):
-            missing.append(key + "_os")
+        if (not isinstance(os_name, str)
+                or not re.match(r"^(Windows|Linux|macOS)\s", os_name)
+                or not re.search(r"[0-9]", os_name)
+                or len(os_name) > 160
+                or any(ord(c) < 32 or ord(c) == 127 for c in os_name)
+                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", os_name)):
+            missing.append(key + "_os_version")
         if ident == "004" and isinstance(os_name, str) and not os_name.startswith("Windows"):
             missing.append("agent_004_windows_expected")
         groups = agent.get("groups")
         if (not isinstance(groups, list) or not groups
-                or not all(isinstance(g, str) and g and g.strip() == g for g in groups)
+                or not all(isinstance(g, str) and g and g.strip() == g and len(g) <= 128
+                           and all(ord(c) >= 32 and ord(c) != 127 for c in g) for g in groups)
                 or len(groups) != len(set(groups)) or "default" not in groups):
             missing.append(key + "_groups_valid_unique_default")
         if agent.get("sync") != "synced":
@@ -85,7 +91,10 @@ def assess(data, stage="prechange"):
             observed_times.append(observed_dt.astimezone(timezone.utc))
         except (TypeError, ValueError, OverflowError):
             missing.append(key + "_observation_freshness")
-        if not isinstance(agent.get("evidence_ref"), str) or not agent["evidence_ref"].strip():
+        evidence = agent.get("evidence_ref")
+        if (not isinstance(evidence, str) or not evidence.strip() or len(evidence.strip()) > 256
+                or any(ord(c) < 32 or ord(c) == 127 for c in evidence)
+                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", evidence)):
             missing.append(key + "_evidence")
     if len(agents) == 4 and "004" not in seen:
         missing.append("agent_004_not_reconciled")
@@ -107,7 +116,10 @@ def assess(data, stage="prechange"):
 def private_or_fixture(path, fixture):
     """Accept only small regular files in the allowed private/fixture directory."""
     try:
-        resolved = path.resolve(strict=True)
+        candidate = path.absolute()
+        if any(part.is_symlink() for part in (candidate, *candidate.parents)):
+            return False
+        resolved = candidate.resolve(strict=True)
         parent = (REPO / ("tests/fixtures" if fixture else ".lab")).resolve()
         if not resolved.is_relative_to(parent) or not resolved.is_file():
             return False

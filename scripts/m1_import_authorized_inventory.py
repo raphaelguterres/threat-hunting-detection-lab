@@ -19,7 +19,14 @@ COLUMNS = ("id", "os", "groups", "status", "sync", "observed_at", "evidence_ref"
 
 
 def contained(path):
-    return path.resolve().is_relative_to(PRIVATE_ROOT)
+    """Refuse links at any path component, even when they point back into .lab."""
+    try:
+        candidate = path.absolute()
+        if any(item.is_symlink() for item in (candidate, *candidate.parents)):
+            return False
+        return candidate.resolve().is_relative_to(PRIVATE_ROOT)
+    except (OSError, RuntimeError):
+        return False
 
 
 def parse_rows(path):
@@ -40,18 +47,25 @@ def parse_rows(path):
         if not re.fullmatch(r"[0-9]{3,6}", ident) or ident in ids:
             raise ValueError("duplicate or invalid agent ID")
         ids.add(ident)
-        if not operating_system.startswith(("Windows", "Linux", "macOS")):
-            raise ValueError("unsupported or unknown OS")
+        if (not re.match(r"^(Windows|Linux|macOS)\s", operating_system)
+                or not re.search(r"[0-9]", operating_system)
+                or len(operating_system) > 160
+                or any(ord(char) < 32 or ord(char) == 127 for char in operating_system)
+                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", operating_system)):
+            raise ValueError("OS family and version are required")
         if ident == "004" and not operating_system.startswith("Windows"):
             raise ValueError("agent 004 OS conflicts with corroborated Windows baseline")
         groups = [group.strip() for group in row["groups"].split(";")]
-        if (not groups or any(not group for group in groups) or "default" not in groups
+        if (not groups or any(not group or len(group) > 128 or any(ord(c) < 32 or ord(c) == 127 for c in group)
+                                   for group in groups) or "default" not in groups
                 or len(set(groups)) != len(groups)):
             raise ValueError("invalid, duplicate or missing group membership")
         if row["status"].strip().lower() != "active" or row["sync"].strip().lower() != "synced":
             raise ValueError("agent active/sync state not confirmed")
         evidence = row["evidence_ref"].strip()
-        if not evidence or len(evidence) > 256:
+        if (not evidence or len(evidence) > 256
+                or any(ord(c) < 32 or ord(c) == 127 for c in evidence)
+                or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", evidence)):
             raise ValueError("missing or invalid evidence reference")
         observed = row["observed_at"].strip()
         try:

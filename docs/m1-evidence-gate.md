@@ -110,3 +110,9 @@ Ver os critérios completos em [Matriz de aceitação FIM por OS](m1-fim-accepta
 Além do limite de recência de 24 horas por linha, os quatro agentes devem ter sido observados dentro de uma **janela conjunta de até 30 minutos**. O importador CSV e o gate de revisão conferem a mesma regra. Isso reduz o risco de misturar capturas de estados diferentes dos membros do grupo; **é uma política de validação deste laboratório, não um requisito oficial do Wazuh**. Se a coleta ultrapassar a janela, repetir a observação pelo console autorizado.
 
 A lista ordenada `groups` precisa conter `default` uma única vez e não pode repetir outro grupo. O importador e o gate rejeitam duplicações; a ordem observada deve ser mantida, pois influencia a análise de precedência. Mesmo um manifesto válido estruturalmente **não constitui atestado independente** nem libera a implantação.
+
+## Validação estrita dos campos e proteção de arquivos — 03/11
+
+O importador de inventário e o gate **não** aceitam apenas o nome genérico de uma plataforma (`Linux`, `Windows`, `macOS`). O operador precisa incluir **família e versão** confirmadas, por exemplo no formato `Linux Ubuntu 24.04` (exemplo fictício, não representa um agente do ambiente). São recusadas strings sem separação válida, sem número de versão, campos contendo caracteres de controle e marcadores como `UNKNOWN`, `UNVERIFIED_001`, `PENDING`, `TBD` ou `placeholder`.
+
+Caminhos de CSV/manifesto e suas pastas ancestrais que contenham links simbólicos são recusados, mesmo que apontem novamente para `.lab/`. Isso evita ler ou sobrescrever evidências por meio de aliases. A importação continua limitada a arquivos locais privados e **não consulta o Manager**. O relatório de impacto é apenas uma hipótese baseada nos campos fornecidos; nenhum campo ou saída da ferramenta autentica o operador nem autoriza a mudança.
