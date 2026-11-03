@@ -52,3 +52,11 @@ Os números do Indexer refletem somente índices e janelas consultados. A inexis
 - [Issue #9 — hipóteses M1](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)
 
 Este resumo não contém logs brutos, arquivos de configuração reais, credenciais, endereços privados ou hashes de ativos.
+
+
+## Atualização posterior — 02/11/2026, 22h49 BRT
+
+- Implantado **somente no host de trabalho** um gate privado que retorna código **2** enquanto a mudança está bloqueada, evitando falso sucesso de automações.
+- Criado o [PR #25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) com validador de evidências fail-closed, documentação e 14 novos testes; **87/87 testes locais aprovados**. A publicação do código não autoriza alteração no Manager.
+- Realizada **aquisição somente leitura** do arquivo central real em backup privado protegido por **DPAPI do usuário Windows**. SHA-256 conferido com a baseline já validada, e bytes recuperados por descriptografia em memória com hash idêntico. A configuração no Manager foi relida e permaneceu intacta.
+- **Limite:** a restauração operacional de permissões/owner/distribuição não foi executada; inventário individual dos quatro agentes, aprovação e janela seguem pendentes. `DEPLOYMENT_GATE=BLOCKED`.
