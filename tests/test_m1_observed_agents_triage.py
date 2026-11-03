@@ -1,6 +1,7 @@
 """Contracts for preliminary, fail-closed operator-dashboard triage."""
 import importlib.util
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 import subprocess
 import sys
@@ -100,6 +101,31 @@ class SnapshotTriageTests(unittest.TestCase):
         out = self.invoke(data)
         self.assertEqual(out.returncode, 0)
         self.assertIn("OBSERVATION_TIMESTAMP_UNKNOWN=3", out.stdout)
+
+    def test_future_observation_and_future_keepalive_are_rejected(self):
+        for field in ("observed_at", "last_keepalive"):
+            with self.subTest(field=field):
+                data = sample()
+                data["agents"][0][field] = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+                out = self.invoke(data)
+                self.assertEqual(out.returncode, 2)
+                self.assertIn("DEPLOYMENT_GATE=BLOCKED", out.stdout)
+                self.assertNotIn(field, out.stdout)
+
+    def test_keepalive_newer_than_observation_is_rejected(self):
+        data = sample()
+        data["agents"][0]["observed_at"] = (datetime.now(timezone.utc) - timedelta(minutes=30)).isoformat()
+        data["agents"][0]["last_keepalive"] = (datetime.now(timezone.utc) - timedelta(minutes=10)).isoformat()
+        self.assertEqual(self.invoke(data).returncode, 2)
+        data["agents"][0]["last_keepalive"] = (datetime.now(timezone.utc) - timedelta(minutes=31)).isoformat()
+        good = self.invoke(data)
+        self.assertEqual(good.returncode, 0, good.stderr)
+        self.assertIn("DEPLOYMENT_GATE=BLOCKED", good.stdout)
+
+    def test_boolean_schema_version_is_not_integer_one(self):
+        data = sample()
+        data["schema_version"] = True
+        self.assertEqual(self.invoke(data).returncode, 2)
 
     def test_oversized_or_deeply_nested_inputs_fail_safely(self):
         self.filename.write_bytes(b" " * 33000)

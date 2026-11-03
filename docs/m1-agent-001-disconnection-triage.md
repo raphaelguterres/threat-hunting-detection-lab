@@ -51,3 +51,9 @@ A execução exibe quantidades por família de SO, status e lacunas, mas **não 
 - **Decisão:** `NO-GO / DEPLOYMENT_GATE=BLOCKED`; não implantar, não reiniciar preventivamente e não simular evidências
 
 Relacionado: [roadmap](roadmap-progress.md), [matriz FIM](m1-fim-acceptance-matrix.md), [roteiro de inventário](m1-agent-inventory-operator-runbook.md), [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17).
+
+## Coerência temporal do diagnóstico — 03/11
+
+O script `m1_observed_agents_triage.py` valida os horários `last_keepalive` e `observed_at` separadamente, com **fuso obrigatório**. Valores ausentes continuam `null` e são contabilizados como desconhecidos, sem qualquer preenchimento automático. Um horário no futuro mais de cinco minutos além do relógio da execução, ou um último *keep-alive* superior ao horário da captura por mais de cinco minutos, torna a observação **inválida**; versões de esquema booleanas também são recusadas. A pequena tolerância considera variação de relógios e não autentica a evidência.
+
+Assim, mesmo quando o operador trouxer a tela do último contato do agente `001`, o relatório não transformará uma diferença cronológica impossível em telemetria válida. A conclusão continua sendo `PRELIMINARY_UNATTESTED` e `DEPLOYMENT_GATE=BLOCKED` até revisão humana dos quatro membros do grupo `default`.

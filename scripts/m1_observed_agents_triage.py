@@ -6,7 +6,7 @@ Never connects to Wazuh, reveals identifiers or writes input/output files.
 This preliminary workflow is deliberately separate from the stricter M1 inventory gate.
 """
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
 import re
@@ -31,9 +31,10 @@ def _invalid_constant(value):
     raise ValueError("invalid JSON constant")
 
 
-def _iso_with_zone(value):
+def _parse_timestamp(value, now):
+    """Return aware UTC time or None; never infer a missing Dashboard timestamp."""
     if value is None:
-        return False
+        return None
     if not isinstance(value, str):
         raise ValueError("timestamp must be a string or null")
     try:
@@ -42,11 +43,14 @@ def _iso_with_zone(value):
         raise ValueError("invalid timestamp") from exc
     if stamp.tzinfo is None or stamp.utcoffset() is None:
         raise ValueError("timestamp without timezone")
-    return True
+    instant = stamp.astimezone(timezone.utc)
+    if instant > now + timedelta(minutes=5):
+        raise ValueError("future-dated Dashboard timestamp")
+    return instant
 
 
 def summarize(data):
-    if not isinstance(data, dict) or data.get("schema_version") != 1:
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int or data["schema_version"] != 1:
         raise ValueError("invalid snapshot schema")
     agents = data.get("agents")
     if not isinstance(agents, list) or len(agents) != 4:
@@ -54,6 +58,7 @@ def summarize(data):
     seen, statuses = set(), {name: 0 for name in STATUS}
     linux = windows = other = groups_unknown = sync_unknown = 0
     keepalive_unknown = time_unknown = default_observed = 0
+    now = datetime.now(timezone.utc)
     for row in agents:
         if not isinstance(row, dict):
             raise ValueError("invalid agent row")
@@ -88,10 +93,14 @@ def summarize(data):
             raise ValueError("unsupported or missing group sync state")
         if sync == "unverified":
             sync_unknown += 1
-        if not _iso_with_zone(row.get("last_keepalive")):
+        keepalive = _parse_timestamp(row.get("last_keepalive"), now)
+        observed = _parse_timestamp(row.get("observed_at"), now)
+        if keepalive is None:
             keepalive_unknown += 1
-        if not _iso_with_zone(row.get("observed_at")):
+        if observed is None:
             time_unknown += 1
+        if keepalive is not None and observed is not None and keepalive > observed + timedelta(minutes=5):
+            raise ValueError("keepalive newer than Dashboard observation")
         evidence = row.get("evidence_ref")
         if (not isinstance(evidence, str) or not evidence or len(evidence) > 256
                 or any(ord(c) < 32 or ord(c) == 127 for c in evidence)):
