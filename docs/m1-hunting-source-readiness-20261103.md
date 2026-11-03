@@ -4,6 +4,12 @@
 
 Esta matriz não é o resultado de uma consulta atual aos eventos do Manager/Indexer. Ela reúne fatos observados em **recortes anteriores**, que podem estar defasados. Uma ausência no recorte **não** equivale à ausência do comportamento no ambiente. As capturas e referências individuais devem permanecer em `.lab/` privado.
 
+## Nova coleta real do Windows Server — 03/11 (~20h25 BRT)
+
+Foi realizada uma [nova auditoria agregada, somente leitura](m1-native-telemetry-checkpoint-20261103.md) na janela **02/11 00:00 UTC a 04/11 00:00 UTC** (limite final futuro). Contagens observadas: **4698=0**, **4720=0**, **4672=289**, **4624=295**, **Sysmon ID 1 ≥2.000** (consulta limitada a 2.000). A correlação local H02 não encontrou criação de conta nem par 4624/4672 vinculado à mesma conta: **fonte inicial insuficiente na janela**, não declaração de ausência de ameaça. A auditoria `Other Object Access Events` permaneceu desabilitada.
+
+A tela de Discover estava indisponível com `Wazuh dashboard server is not ready yet`, e **não houve nova validação de um par FIM→execução H03**. O status `RUNNING` do contêiner não equivale a disponibilidade da aplicação. As capturas individuais da VM ficaram na área privada `.lab/`, sem exportar eventos brutos.
+
 ## Critérios gerais de evidência
 
 O correlacionador offline lê **exatamente sete campos** normalizados e pseudonimizados, com fonte permitida e timestamp com fuso. Identidades ambíguas ou marcadores como `UNKNOWN`, `UNVERIFIED`, `PENDING`, `TBD`, `placeholder`, `NULL`, `N/A` e caracteres de controle/Unicode invisíveis agora são recusados, inclusive nos campos usados para unir pares. A ausência de identidade verificável deve ser relatada como **lacuna**, não convertida em valor compartilhado. Um par candidato **nunca** confirma automaticamente incidente, intenção maliciosa ou causalidade.

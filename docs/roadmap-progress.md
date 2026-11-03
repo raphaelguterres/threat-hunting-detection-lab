@@ -47,6 +47,10 @@ Essas conclusões históricas são sobre **entregas do roadmap original** e não
 
 A relação acima **reordena os seis itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
+### Telemetria nativa real — nova consulta em 03/11 (~20h25 BRT)
+
+Na [segunda auditoria somente leitura](m1-native-telemetry-checkpoint-20261103.md), Windows Server Security retornou **4698=0, 4720=0, 4672=289, 4624=295** e Sysmon ID 1 retornou **pelo menos 2.000 registros** (teto de coleta). A correlação de H02 não teve fonte 4720 na nova janela, e H03 não foi reavaliada no Indexer porque o Dashboard mostrava **not ready yet**. Portanto, os dados reais não concluem nenhuma hipótese nem desbloqueiam FIM. Os 11/17 itens marcados de roadmap permanecem inalterados.
+
 ### Threat Hunting H01/H02/H03 — atualização de 03/11, 20h
 
 O [checkpoint de fontes H01/H02/H03](m1-hunting-source-readiness-20261103.md) registra que a auditoria 4698 ainda depende de mudança aprovada, a associação 4720→4672/4624 não foi provada no recorte anterior e não há par FIM→execução real validado para o mesmo artefato. O motor offline rejeita aliases de identidade indefinidos; os testes sintéticos **não** são evidências novas de ataque. A [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) permanece em aberto.
