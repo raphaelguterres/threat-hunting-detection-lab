@@ -36,6 +36,41 @@ class OSScopeValidatorTests(unittest.TestCase):
         self.assertFalse(data["wazuh_parser_verified"])
         self.assertFalse(data["deployed"])
 
+    def test_reject_hidden_windows_ignore_in_linux_scope(self):
+        text = fragment("^Linux", "/opt/lab").replace(
+            "</syscheck>", "<ignore>C:\\Windows\\Temp</ignore></syscheck>")
+        with self.assertRaises(ValueError):
+            scope.validate(text)
+
+    def test_reject_hidden_windows_registry_in_linux_scope(self):
+        text = fragment("^Linux", "/opt/lab").replace(
+            "</syscheck>", "<windows_registry>HKEY_LOCAL_MACHINE\\Software</windows_registry></syscheck>")
+        with self.assertRaises(ValueError):
+            scope.validate(text)
+
+    def test_reject_windows_only_log_format_in_linux_scope(self):
+        text = fragment("^Linux", "/opt/lab", "/var/log/example").replace(
+            "<log_format>syslog</log_format>", "<log_format>eventchannel</log_format>")
+        with self.assertRaises(ValueError):
+            scope.validate(text)
+
+    def test_reject_windows_reference_hidden_in_xml_attribute(self):
+        text = fragment("^Linux", "/opt/lab").replace(
+            'realtime="yes"', 'realtime="yes" excluded="%PROGRAMDATA%\\Temp"')
+        with self.assertRaises(ValueError):
+            scope.validate(text)
+
+    def test_reject_unix_ignore_path_in_windows_scope(self):
+        text = fragment("^Windows", r"C:\\Lab").replace(
+            "</syscheck>", "<ignore>/var/log/host</ignore></syscheck>")
+        with self.assertRaises(ValueError):
+            scope.validate(text)
+
+    def test_allowed_unix_ignore_remains_valid(self):
+        text = fragment("^Linux", "/opt/lab").replace(
+            "</syscheck>", "<ignore>/var/cache/lab</ignore></syscheck>")
+        self.assertEqual(scope.validate(text)["linux_directories"], 1)
+
     def test_reject_unscoped_linux_fim(self):
         with self.assertRaises(ValueError):
             scope.validate("<agent_config><syscheck><directories>/tmp/lab</directories></syscheck></agent_config>")

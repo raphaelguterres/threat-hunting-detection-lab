@@ -134,3 +134,9 @@ O comparador [review_fim_scope_only.py](../scripts/review_fim_scope_only.py) pas
 O resultado de uma identificação suspeita é **rejeitar o escopo automático Linux** e exigir revisão humana de toda a configuração. Uma exclusão Unix legítima em um bloco Unix continua permitida, desde que nenhuma outra alteração XML além de `os="^Linux"` tenha ocorrido. São controles conservadores para reduzir classificação incorreta; **não comprovam detecção de toda configuração específica de Windows nem substituem o parser oficial do Wazuh**.
 
 Testes sintéticos incluem diretório Unix com exclusão Windows, atributo Windows, referência UNC, registro Windows, formato `eventchannel`, caminho XML codificado e um caso exclusivamente Unix permitido. Nenhum arquivo ativo do Manager foi lido, gravado ou implantado nessa revisão.
+
+## Alinhamento dos dois validadores estruturais — 03/11/2026
+
+O [validador OS-scope](../scripts/validate_fim_os_scope.py) também examina referências cruzadas fora dos campos de diretório e fonte de log. Ele rejeita no escopo Linux referências Windows de unidade, UNC, variável de ambiente, registro e formatos `eventchannel/eventlog`; no escopo Windows, rejeita exclusão FIM com caminho Unix absoluto. Controles negativos sintéticos exercitam essas possibilidades e um exemplo Unix válido.
+
+Os dois verificadores têm funções diferentes: `validate_fim_os_scope.py` confere padrões estruturais de um fragmento já marcado por SO, enquanto `review_fim_scope_only.py` compara original/proposta e permite **somente** a inclusão mínima do seletor Linux. A aprovação de ambos **não** equivale a `verify-agent-conf` oficial, não valida a precedência efetiva dos grupos e **não** permite implantação sem inventário e autorização.
