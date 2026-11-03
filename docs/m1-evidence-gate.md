@@ -31,13 +31,13 @@ python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage post
 python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
 ```
 
-Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos. Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS ambíguo ou evidência não confirmada: saída **BLOCKED** e código **2**. Um manifesto estruturalmente completo gera código 0 **apenas para a checagem de completude**, mas o deployment permanece bloqueado para aprovação independente. Não usar esse código como gatilho de mudanças.
+Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos; chaves JSON duplicadas e constantes não finitas são rejeitadas. Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS ambíguo ou evidência não confirmada: saída **BLOCKED** e código **2**. Um manifesto estruturalmente completo gera código 0 **apenas para a checagem de completude**, mas o deployment permanece bloqueado para aprovação independente. Não usar esse código como gatilho de mudanças.
 
 **Atenção:** um `evidence_ref` preenchido não garante autenticidade por si só. O responsável deve verificar a fonte no console autorizado. Esta ferramenta não faz atestado criptográfico nem controle de acesso.
 
 ## Evidências já existentes e limites
 
-- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **15 testes adicionais**, totalizando **88/88 PASS** em 02/11/2026. Um teste de regressão cobre JSON UTF-8 com BOM gerado pelo Windows PowerShell.
+- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **21 testes adicionais**, totalizando **94/94 PASS** em 02/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
 - Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
 - 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
 - O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.

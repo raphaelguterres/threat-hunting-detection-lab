@@ -106,6 +106,49 @@ class M1GateTests(unittest.TestCase):
             self.assertIn("EVIDENCE_COMPLETENESS=REVIEW_READY", result.stdout)
             self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
 
+    def test_boolean_schema_version_rejected(self):
+        document = example()
+        document["schema_version"] = True
+        self.assertFalse(gate.assess(document)[0])
+
+    def test_blank_approval_evidence_rejected(self):
+        document = example()
+        document["checks"]["change_approval"]["evidence_ref"] = "   "
+        self.assertIn("change_approval", gate.assess(document)[1])
+
+    def test_unapproved_os_value_rejected(self):
+        document = example()
+        document["agents"][0]["os"] = "UNKNOWN"
+        self.assertFalse(gate.assess(document)[0])
+
+    def test_traversal_outside_private_evidence_rejected(self):
+        self.assertFalse(gate.private_or_fixture(REPO / ".lab/../README.md", False))
+        self.assertFalse(gate.private_or_fixture(REPO / "tests/fixtures/../../README.md", True))
+
+    def test_duplicate_json_key_fails_closed(self):
+        with tempfile.TemporaryDirectory(prefix="m1-dupe-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            path = Path(folder) / "duplicate-synthetic.json"
+            path.write_text('{"schema_version":1,"schema_version":1}', encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--manifest", str(path), "--fixture"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("EVIDENCE=UNREADABLE", result.stdout)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+
+    def test_nonfinite_json_fails_closed(self):
+        with tempfile.TemporaryDirectory(prefix="m1-nan-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            path = Path(folder) / "nonfinite-synthetic.json"
+            path.write_text('{"schema_version":NaN}', encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(SCRIPT), "--manifest", str(path), "--fixture"],
+                capture_output=True, text=True,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("EVIDENCE=UNREADABLE", result.stdout)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+
     def test_no_real_evidence_is_printed(self):
         document = example()
         secret = "private-SENSITIVE-MOCK-VALUE"

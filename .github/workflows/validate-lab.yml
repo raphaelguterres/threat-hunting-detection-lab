@@ -50,6 +50,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_review_fim_scope_only.py -v
       - name: Run M1 fail-closed evidence gate contract tests
         run: python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
+      - name: Run full offline M1 regression suite
+        run: python -m unittest discover -s tests -q
       - name: Test bounded H01 retrospective audit
         run: python -m unittest discover -s tests -p test_audit_h01_existing_evidence.py -v
       - name: Run H01 audit on synthetic six-event projection

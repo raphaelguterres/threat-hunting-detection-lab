@@ -17,10 +17,25 @@ POSTCHANGE = (
 )
 
 
+def reject_duplicate_keys(pairs):
+    """Reject ambiguous JSON objects rather than silently accepting the last key."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
+def reject_nonfinite_constant(value):
+    """JSON must not silently accept Python's NaN/Infinity extensions."""
+    raise ValueError("nonfinite JSON constant")
+
+
 def assess(data, stage="prechange"):
     """Returns (complete, list of *field labels*, no private evidence content)."""
     missing = []
-    if not isinstance(data, dict) or data.get("schema_version") != 1:
+    if not isinstance(data, dict) or type(data.get("schema_version")) is not int or data["schema_version"] != 1:
         return False, ["schema_version"]
     if data.get("change_id") != "M1-FIM-OS-SCOPE":
         missing.append("change_id")
@@ -85,8 +100,10 @@ def main():
         print("DEPLOYMENT_GATE=BLOCKED")
         return 2
     try:
-        data = json.loads(args.manifest.read_text(encoding="utf-8-sig"))
-    except (OSError, UnicodeError, json.JSONDecodeError):
+        data = json.loads(args.manifest.read_text(encoding="utf-8-sig"),
+                          object_pairs_hook=reject_duplicate_keys,
+                          parse_constant=reject_nonfinite_constant)
+    except (OSError, UnicodeError, ValueError):
         print("EVIDENCE=UNREADABLE")
         print("DEPLOYMENT_GATE=BLOCKED")
         return 2
