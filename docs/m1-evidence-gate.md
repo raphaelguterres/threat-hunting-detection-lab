@@ -50,3 +50,28 @@ Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos; chaves JSON du
 - [Plano FIM por SO](m1-fim-os-scoped-remediation-plan.md)
 - [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
 - [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)
+
+## Importacao segura de inventario autorizado (CSV privado)
+
+Quando o operador obtiver o inventario **pelo console Wazuh autorizado**, pode preparar um arquivo local ignorado pelo Git chamado `.lab/m1-agent-inventory.csv`. O CSV usa exatamente as colunas:
+
+```csv
+id,os,groups,status,sync,observed_at,evidence_ref
+```
+
+Registre **quatro linhas reais** com IDs distintos, SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
+
+Teste sem alterar arquivos:
+
+```powershell
+python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv
+```
+
+Somente depois de revisar os quatro dados reais, importe para o manifesto privado:
+
+```powershell
+python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv --apply
+python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prechange
+```
+
+O importador nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.
