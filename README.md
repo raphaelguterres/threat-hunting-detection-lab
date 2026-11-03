@@ -46,6 +46,9 @@ Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), 
 
 ## Progresso e próximos marcos
 
+A [revisão independente do PR M1](docs/m1-pr-review-guide.md) é organizada por módulos (inventário privado, FIM, hunting, CI e documentação). CI aprovado não equivale a code review ou autorização de mudança no Wazuh.
+
+
 O [painel atualizado do roadmap](docs/roadmap-progress.md) separa as seis fases históricas concluídas do M1 ainda em andamento, lista as entregas pendentes e documenta o gate operacional **NO-GO**. A contagem de checkboxes é reproduzível localmente com `python scripts/roadmap_progress.py` e não equivale a aprovação de implantação.
 
 ## Arquitetura
