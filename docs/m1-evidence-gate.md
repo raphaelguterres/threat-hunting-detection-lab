@@ -40,7 +40,8 @@ Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS a
 - 73/73 testes anteriores passaram no host remoto antes desta melhoria; nova suíte inclui testes adicionais do gate.
 - Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
 - 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
-- O ensaio de restauração de 02/11 usou fixtures **sintéticas**, nunca arquivos reais do Manager.
+- O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.
+- Em checkpoint posterior de 02/11, a configuração central **real** foi copiada por operação somente leitura para backup privado criptografado via DPAPI do usuário Windows. A integridade foi verificada contra a baseline privada, inclusive após descriptografia em memória; o original no Manager permaneceu idêntico. **Isso não comprova restauração operacional**, que ainda exige validação autorizada de owner/permissões/distribuição e aprovação humana.
 - A auditoria Windows Security `4698` é outro change request e não deve ser alterada por esse gate.
 
 ## Rastreabilidade
