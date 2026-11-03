@@ -185,12 +185,36 @@ class HypothesisTests(unittest.TestCase):
 
     def test_identity_aliases_with_control_characters_are_rejected(self):
         for field in ("event_ref", "asset_key", "actor_key", "object_key"):
-            for value in ("safe\nspoofed", "safe\x1b[31m", "safe\x7f"):
+            for value in ("safe\nspoofed", "safe\x1b[31m", "safe\x7f",
+                          "safe\u202eother", "safe\u200bother"):
                 with self.subTest(field=field, value=repr(value)):
                     item = raw("powershell_process", "sysmon_eid1", "safe")
                     item[field] = value
                     with self.assertRaisesRegex(ValueError, "control character"):
                         hunting.parse_event(item)
+
+    def test_identity_placeholder_aliases_are_rejected_before_correlation(self):
+        placeholders = ("UNKNOWN", "unverified_001", "pending-item", "asset-unknown",
+                        "placeholder", "TBD", "null", "N/A", "missing")
+        for field in ("event_ref", "asset_key", "actor_key", "object_key"):
+            for value in placeholders:
+                with self.subTest(field=field, placeholder=value):
+                    item = raw("account_created", "security_eid4720", "known-ref")
+                    item[field] = value
+                    with self.assertRaisesRegex(ValueError, "unverified placeholder"):
+                        hunting.parse_event(item)
+
+    def test_known_aliases_continue_to_work_for_real_case_review(self):
+        item = raw("account_created", "security_eid4720", "event-001",
+                   asset="known-asset", actor="reviewer-001", obj="account-001")
+        self.assertEqual(hunting.parse_event(item).object_key, "account-001")
+
+    def test_unknown_file_artifact_cannot_create_false_h03_pair(self):
+        records = [raw("file_change", "wazuh_fim", "file-ref-01", obj="UNKNOWN"),
+                   raw("file_execution", "sysmon_eid1", "file-ref-02",
+                       "2026-11-02T12:01:00Z", obj="UNKNOWN")]
+        with self.assertRaisesRegex(ValueError, "unverified placeholder"):
+            self.count(records, "H03_FIM_EXECUTION")
 
     def test_reject_symlinked_private_parent_even_when_target_is_private(self):
         (ROOT / ".lab").mkdir(exist_ok=True)

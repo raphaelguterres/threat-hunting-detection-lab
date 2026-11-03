@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,6 +31,10 @@ IDENTITY_FIELDS = ("event_ref", "asset_key", "actor_key", "object_key")
 FIELDS = set(IDENTITY_FIELDS) | {"timestamp", "kind", "source"}
 OFFSET = re.compile(r"([+-]\d{2})(\d{2})$")
 TZ_SUFFIX = re.compile(r"(Z|[+-]\d{2}:?\d{2})$")
+PLACEHOLDER_COMPONENT = re.compile(
+    r"(?:^|[-_:/\.])(?:unknown|unverified|pending|placeholder|tbd|undefined|missing|null|none|n/?a)(?:$|[-_:/\.])",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -87,8 +92,10 @@ def parse_event(obj: object) -> Event:
             raise ValueError("missing or oversized identity field")
         if value != value.strip():
             raise ValueError("whitespace around identity field")
-        if any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
+        if any(unicodedata.category(ch) in {"Cc", "Cf"} for ch in value):
             raise ValueError("control character in identity field")
+        if PLACEHOLDER_COMPONENT.search(value):
+            raise ValueError("unverified placeholder in identity field")
     kind, source = obj["kind"], obj["source"]
     if not isinstance(kind, str) or kind not in KINDS:
         raise ValueError("unsupported event kind")

@@ -47,6 +47,10 @@ Essas conclusões históricas são sobre **entregas do roadmap original** e não
 
 A relação acima **reordena os seis itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
+### Threat Hunting H01/H02/H03 — atualização de 03/11, 20h
+
+O [checkpoint de fontes H01/H02/H03](m1-hunting-source-readiness-20261103.md) registra que a auditoria 4698 ainda depende de mudança aprovada, a associação 4720→4672/4624 não foi provada no recorte anterior e não há par FIM→execução real validado para o mesmo artefato. O motor offline rejeita aliases de identidade indefinidos; os testes sintéticos **não** são evidências novas de ataque. A [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) permanece em aberto.
+
 ### Atualização operacional — 03/11, 19h46 BRT
 
 - **Concluído por observação autorizada:** grupo `default` com IDs `001`, `002`, `004`, `005`; o Dashboard exibiu `SYNCHRONIZED` para os três agentes ativos `002`, `004` e `005`. A listagem centralizada mostrava somente o grupo `default`.
