@@ -35,6 +35,31 @@ Uma segunda consulta privada, ainda somente leitura, buscou `4720` e procurou as
 
 **Interpretação:** **nenhum par H02 foi observado neste recorte** porque não houve um `4720` disponível para iniciar a correlação. **Não inferir** que nenhum usuário novo existe, nem correlacionar os 289 eventos `4672` genericamente com alguma conta. A revisão anterior de 02/11 (janela diferente) encontrou um `4720` histórico; os recortes **não são intercambiáveis**.
 
+## Retenção do Security e Sysmon — conferência adicional
+
+O operador repetiu uma consulta local somente leitura à configuração e aos primeiros/últimos registros de cada canal. Os horários abaixo são os **timestamps UTC dos eventos extremos que a VM retornou**, não o momento de coleta:
+
+| Canal | Máximo | Modo | Eventos reportados no canal | Primeiro evento UTC observado | Último evento UTC observado |
+| --- | ---: | --- | ---: | --- | --- |
+| Security | **20 MiB** | Circular | **13.307** | **22/10/2026 00:27:59Z** | **03/11/2026 23:31:43Z** |
+| Sysmon/Operational | **64 MiB** | Circular | **78.156** | **30/10/2026 14:15:09Z** | **03/11/2026 23:32:42Z** |
+
+A janela iniciada em 02/11 encontra-se dentro da cobertura temporal apresentada pelo canal Security; portanto, a ausência de `4720` nessa janela **não parece decorrer da rotação integral do canal nesse período**. A retenção circular ainda pode eliminar eventos mais antigos e não prova que todos os eventos possíveis tenham sido auditados ou preservados.
+
+## H02 — verificação retrospectiva da janela mais ampla
+
+Para confrontar a nova janela com a observação histórica anterior, a correlação local foi repetida em **31/10/2026 00:00 UTC a 04/11/2026 00:00 UTC** (fim de filtro futuro, execução em 03/11). Resultados agregados:
+
+| Critério retrospectivo | Contagem |
+| --- | ---: |
+| Eventos de criação de conta `4720` | **1** |
+| Eventos `4720` com TargetSid válido | **1** |
+| Logons privilegiados `4672` do mesmo SID até 30 minutos depois | **0** |
+| Logons bem-sucedidos `4624` do mesmo SID até 30 minutos depois | **0** |
+| Cadeias `4624 → 4672` com mesmo Logon ID na janela | **0** |
+
+Portanto, o `4720` histórico **continua disponível na janela ampla**, mas **não houve cadeia privilegiada da mesma identidade nos 30 minutos seguintes**. Isso reproduz a conclusão restrita ao recorte anterior, não uma comprovação de ausência de atividade em outros períodos. A ausência de `4720` entre 02/11 e a consulta de 03/11 é compatível com o evento histórico ter ocorrido **antes de 02/11**, sem divulgar o seu timestamp exato.
+
 ## H03 — FIM e execução do mesmo artefato
 
 A fonte **Sysmon 1** está presente e atingiu o teto de leitura (≥2.000 eventos). **Isso não demonstra nenhum par com FIM**. A interface Wazuh Dashboard exibiu `Wazuh dashboard server is not ready yet` quando se tentou abrir o Discover, apesar de os contêineres retornarem `Running` e os endpoints HTTP responderem. **Nenhuma consulta nova conclusiva de FIM ao Indexer/Discover foi realizada nesta rodada.**

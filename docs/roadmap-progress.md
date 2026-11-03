@@ -49,7 +49,7 @@ A relação acima **reordena os seis itens pendentes por dependência operaciona
 
 ### Telemetria nativa real — nova consulta em 03/11 (~20h25 BRT)
 
-Na [segunda auditoria somente leitura](m1-native-telemetry-checkpoint-20261103.md), Windows Server Security retornou **4698=0, 4720=0, 4672=289, 4624=295** e Sysmon ID 1 retornou **pelo menos 2.000 registros** (teto de coleta). A correlação de H02 não teve fonte 4720 na nova janela, e H03 não foi reavaliada no Indexer porque o Dashboard mostrava **not ready yet**. Portanto, os dados reais não concluem nenhuma hipótese nem desbloqueiam FIM. Os 11/17 itens marcados de roadmap permanecem inalterados.
+Na [segunda auditoria somente leitura](m1-native-telemetry-checkpoint-20261103.md), Windows Server Security retornou **4698=0, 4720=0, 4672=289, 4624=295** e Sysmon ID 1 retornou **pelo menos 2.000 registros** (teto de coleta). A correlação de H02 não teve fonte 4720 na nova janela, e H03 não foi reavaliada no Indexer porque o Dashboard mostrava **not ready yet**. Portanto, os dados reais não concluem nenhuma hipótese nem desbloqueiam FIM. A nova conferência de retenção mostrou Security circular de 20 MiB com evento mais antigo em 22/10. Reabrindo a janela histórica de 31/10–04/11, H02 encontrou **1 criação de conta `4720`**, porém **nenhum 4624/4672 do mesmo SID nos 30 minutos seguintes**. Isso confirma apenas o recorte, não a ausência de comportamento em geral. Os 11/17 itens marcados de roadmap permanecem inalterados.
 
 ### Threat Hunting H01/H02/H03 — atualização de 03/11, 20h
 

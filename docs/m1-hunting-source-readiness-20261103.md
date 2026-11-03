@@ -8,6 +8,8 @@ Esta matriz não é o resultado de uma consulta atual aos eventos do Manager/Ind
 
 Foi realizada uma [nova auditoria agregada, somente leitura](m1-native-telemetry-checkpoint-20261103.md) na janela **02/11 00:00 UTC a 04/11 00:00 UTC** (limite final futuro). Contagens observadas: **4698=0**, **4720=0**, **4672=289**, **4624=295**, **Sysmon ID 1 ≥2.000** (consulta limitada a 2.000). A correlação local H02 não encontrou criação de conta nem par 4624/4672 vinculado à mesma conta: **fonte inicial insuficiente na janela**, não declaração de ausência de ameaça. A auditoria `Other Object Access Events` permaneceu desabilitada.
 
+A retenção do Security foi conferida como **20 MiB circular**, com registro mais antigo visível em **22/10**; portanto a janela nova 02/11–03/11 ainda estava dentro do intervalo temporal retido. Ao ampliar o período para **31/10–04/11**, o `4720` histórico reapareceu (**1 evento, SID válido**), mas novamente **sem 4624 ou 4672 da mesma conta nos 30 minutos seguintes**. Isso reforça apenas a conclusão limitada ao recorte.
+
 A tela de Discover estava indisponível com `Wazuh dashboard server is not ready yet`, e **não houve nova validação de um par FIM→execução H03**. O status `RUNNING` do contêiner não equivale a disponibilidade da aplicação. As capturas individuais da VM ficaram na área privada `.lab/`, sem exportar eventos brutos.
 
 ## Critérios gerais de evidência
