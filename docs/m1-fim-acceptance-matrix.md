@@ -81,3 +81,7 @@ A conclusão da matriz depende das evidências privadas conferidas por operador,
 Os quatro registros obtidos no console autorizado precisam ser parte da **mesma janela de coleta, com no máximo 30 minutos entre a primeira e a última observação**. Cada registro continua limitado a 24 horas de idade e pode ter até cinco minutos de desvio futuro. O importador CSV e o gate M1 revalidam essas condições. Este limite de 30 minutos é uma salvaguarda específica do laboratório para evitar inventários misturados, **não uma regra imposta pelo Wazuh**. Se não for possível concluir a coleta nesse intervalo, produzir uma nova captura autorizada.
 
 Grupos devem ser apresentados uma única vez por agente, em sua ordem original. O verificador rejeita grupos duplicados, sem tentar resolver ambiguidades de precedência automaticamente. Todas as aprovações dependentes continuam sujeitas a revisão humana e `DEPLOYMENT_GATE=BLOCKED`.
+
+## Conciliação do inventário pelo Dashboard autorizado
+
+O [roteiro de conferência dos quatro agentes](m1-agent-inventory-operator-runbook.md) descreve a coleta manual, a preservação da ordem dos grupos, a revisão da precedência e o critério **NO-GO** enquanto dados individuais, revisor e autorização estiverem pendentes. As capturas individuais e a folha de revisão devem ficar somente em `.lab/` e **não** no GitHub.
