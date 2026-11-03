@@ -3,6 +3,7 @@ import importlib.util
 import json
 import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -94,6 +95,16 @@ class M1GateTests(unittest.TestCase):
         result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True)
         self.assertEqual(result.returncode, 2)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+
+    def test_windows_utf8_bom_manifest_supported(self):
+        # Windows PowerShell 5.1 Set-Content -Encoding UTF8 writes a UTF-8 BOM.
+        with tempfile.TemporaryDirectory(prefix="m1-evidence-bom-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            source = Path(folder) / "m1-evidence-bom-synthetic.json"
+            source.write_text(json.dumps(example()), encoding="utf-8-sig")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--manifest", str(source), "--fixture"], capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0)
+            self.assertIn("EVIDENCE_COMPLETENESS=REVIEW_READY", result.stdout)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
 
     def test_no_real_evidence_is_printed(self):
         document = example()

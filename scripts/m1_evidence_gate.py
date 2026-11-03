@@ -85,7 +85,7 @@ def main():
         print("DEPLOYMENT_GATE=BLOCKED")
         return 2
     try:
-        data = json.loads(args.manifest.read_text(encoding="utf-8"))
+        data = json.loads(args.manifest.read_text(encoding="utf-8-sig"))
     except (OSError, UnicodeError, json.JSONDecodeError):
         print("EVIDENCE=UNREADABLE")
         print("DEPLOYMENT_GATE=BLOCKED")

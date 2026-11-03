@@ -31,17 +31,17 @@ python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage post
 python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
 ```
 
-Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS ambíguo ou evidência não confirmada: saída **BLOCKED** e código **2**. Um manifesto estruturalmente completo gera código 0 **apenas para a checagem de completude**, mas o deployment permanece bloqueado para aprovação independente. Não usar esse código como gatilho de mudanças.
+Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos. Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS ambíguo ou evidência não confirmada: saída **BLOCKED** e código **2**. Um manifesto estruturalmente completo gera código 0 **apenas para a checagem de completude**, mas o deployment permanece bloqueado para aprovação independente. Não usar esse código como gatilho de mudanças.
 
 **Atenção:** um `evidence_ref` preenchido não garante autenticidade por si só. O responsável deve verificar a fonte no console autorizado. Esta ferramenta não faz atestado criptográfico nem controle de acesso.
 
 ## Evidências já existentes e limites
 
-- 73/73 testes anteriores passaram no host remoto antes desta melhoria; nova suíte inclui testes adicionais do gate.
+- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **15 testes adicionais**, totalizando **88/88 PASS** em 02/11/2026. Um teste de regressão cobre JSON UTF-8 com BOM gerado pelo Windows PowerShell.
 - Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
 - 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
 - O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.
-- Em checkpoint posterior de 02/11, a configuração central **real** foi copiada por operação somente leitura para backup privado criptografado via DPAPI do usuário Windows. A integridade foi verificada contra a baseline privada, inclusive após descriptografia em memória; o original no Manager permaneceu idêntico. **Isso não comprova restauração operacional**, que ainda exige validação autorizada de owner/permissões/distribuição e aprovação humana.
+- Em checkpoint posterior de 02/11, a configuração central **real** foi copiada por operação somente leitura para backup privado criptografado via DPAPI do usuário Windows. Integridade da baseline e do original no Manager: PASS. Foi executado **ensaio de restauração isolada dos bytes reais**, com controle negativo de corrupção, verificação SHA-256 e descarte da pasta temporária: PASS. **Isso não comprova restauração operacional no Manager**, que ainda exige validação autorizada de owner/permissões/distribuição e aprovação humana. O backup DPAPI depende do mesmo perfil Windows e não é portável por padrão.
 - A auditoria Windows Security `4698` é outro change request e não deve ser alterada por esse gate.
 
 ## Rastreabilidade
