@@ -12,7 +12,7 @@
 | **M1 — Threat Hunting por hipóteses** | **Em andamento** | **11/17 marcados (64,7%); 6 pendentes** | Critérios reais de aceitação ainda incompletos |
 | **CI e contratos offline M1** | **PASS no checkpoint** | 168/168 testes locais; Actions #57 SUCCESS (3/3 jobs) | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
-| **Mudança ativa de FIM no Manager** | **NO-GO** | 0/4 registros individuais confirmados no inventário atual | Backup/rollback e revisão operacional não substituem autorização |
+| **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: 4 membros conferidos no Dashboard; 3/3 ativos sincronizados, `001` histórico desconectado; gate formal ainda incompleto | Backup/rollback e revisão operacional não substituem autorização |
 | **Jornada de 03/11** | Acompanhada em arquivo privado | Controle de horário separado de progresso | Tempo de sessão não mede porcentagem do roadmap |
 
 ```text
@@ -47,6 +47,15 @@ Essas conclusões históricas são sobre **entregas do roadmap original** e não
 
 A relação acima **reordena os seis itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
+### Atualização operacional — 03/11, 19h46 BRT
+
+- **Concluído por observação autorizada:** grupo `default` com IDs `001`, `002`, `004`, `005`; o Dashboard exibiu `SYNCHRONIZED` para os três agentes ativos `002`, `004` e `005`. A listagem centralizada mostrava somente o grupo `default`.
+- **Pendente:** `001` continua desconectado e preservado como registro histórico. O gate formal de quatro agentes `active/synced` continua **não atendido**. Ver [decisão formal](m1-legacy-agent-001-decision.md) e [Issue #27](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/27).
+- **Baseline revalidada:** checkpoint de somente leitura do Manager com hash igual ao backup privado, parser PASS e `004` sync PASS. A proposta mínima `os="^Linux"` foi aprovada offline, **não implantada**.
+- **Autorização pendente:** [pacote de mudança FIM](m1-fim-change-approval-package.md), rollback operacional, janela, revisão independente e posterior verificação real do pipeline. O status segue **NO-GO**.
+
+Os 11/17 itens marcados do M1 **não mudaram**: há progresso operacional verificável, mas não conclusão dos critérios totais de aceite. O bloco histórico abaixo registra o checkpoint anterior de 16h02 e não substitui o atual.
+
 ### Gate técnico atual: NO-GO
 
 Às 16h02 BRT, o checkpoint read-only retornou:
@@ -69,7 +78,7 @@ O operador forneceu uma lista contendo três endpoints Linux, um Windows e um ag
 
 ## Sequência segura para a próxima sessão
 
-1. **Operador:** no Wazuh Dashboard autorizado, obter os quatro registros do grupo `default` sem contornar bloqueios de API/CLI. Usar o [roteiro manual](m1-agent-inventory-operator-runbook.md); manter dados individuais e capturas em `.lab/`.
+1. **Operador / responsável:** os quatro membros de `default` já foram identificados na interface. **Agora** obter decisão formal sobre `001` e, na futura janela autorizada, renovar a coleta de status/sync, OS e grupos na ordem. Não usar API/CLI para contornar bloqueios; manter capturas privadas em `.lab/`. Ver [Issue #27](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/27).
 2. **Revisor técnico:** conferir ordem/precedência dos grupos, diferenças Linux/Windows, telemetria local FIM, duplicidade dos coletores Security, e finalizar parecer **GO/NO-GO**.
 3. **Gestor da mudança:** aprovar separadamente a janela, restauração operacional e, se pertinente, a mudança FIM e o `4698`. **Nenhuma execução antecipada.**
 4. **Após mudanças autorizadas:** coletar eventos benignos reais e investigar H01/H02/H03 até o Discover com amostras, contexto e controle negativo.

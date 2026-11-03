@@ -4,6 +4,12 @@
 >
 > Consulta oficial: [Wazuh — Listing agents using the dashboard](https://documentation.wazuh.com/current/user-manual/agent/agent-management/listing/wazuh-dashboard.html), [Grouping agents](https://documentation.wazuh.com/current/user-manual/agent/agent-management/grouping-agents.html).
 
+## Atualização de 03/11 — conciliação parcial obtida
+
+Na consulta autorizada ao Dashboard, foram confirmados **quatro membros do grupo `default`** (`001`, `002`, `004`, `005`). Os agentes ativos `002`, `004` e `005` exibiram **`SYNCHRONIZED`** na aba de configuração. O `001` permaneceu **desconectado**, mantido como registro histórico por decisão do operador, sem exclusão. O Wazuh listou somente um grupo centralizado, `default`; resta analisar formalmente a interação com configurações locais e o escopo de mudança. O Manager passou no checkpoint de parser, baseline e sync do `004` às 19h46 BRT.
+
+**Isso não satisfaz o gate 4/4 active+synced.** A [decisão sobre o `001`](m1-legacy-agent-001-decision.md) e o [pacote de aprovação FIM](m1-fim-change-approval-package.md) devem ser examinados antes de executar qualquer alteração. Para agentes removidos de todos os grupos, o Wazuh reatribui o `default`; remoção simples de grupo não é solução de descomissionamento. A evidência visual tem data e deve ser reconfirmada antes da eventual janela.
+
 ## 1. Coleta autorizada, quatro membros do default
 
 1. Entrar no Dashboard com a sessão e as permissões já autorizadas. Navegar para **Agents management → Summary**; identificar os membros atribuídos a `default`. Em **Agents management → Groups**, revisar associação e detalhes visíveis. **Não usar Dev Tools, API, SSH ou CLI como contorno** de consultas individuais anteriormente bloqueadas.
@@ -51,7 +57,7 @@ No Wazuh, um agente pode pertencer a múltiplos grupos, e o **último grupo atri
 | Gate | Estado atual | Critério de liberação |
 | --- | --- | --- |
 | Baseline e parser ativo | PASS somente leitura | Hash baseline e parser preservados antes da mudança |
-| Inventário individual `default` 4/4 | **PENDENTE** | Quatro registros reais, atuais, revisados e coerentes |
+| Inventário individual `default` 4/4 | **PARCIAL — IDs/membership confirmados, 3/3 ativos synced, `001` histórico disconnected** | Decisão sobre `001`; contrato do gate revisto formalmente se mudar o escopo, registros atuais e revisor independente |
 | Precedência e impacto por OS | **PENDENTE** | Grupos ordenados e conflitos avaliados por agente |
 | Backup real DPAPI, integridade e restauração isolada | PASS **somente no sandbox local** | Procedimento operacional com owner, gid, mode, hash e responsabilidade aprovado |
 | Revisão independente de código | **PENDENTE** | PRs #24/#25 revisados formalmente; CI verde não substitui aprovação |

@@ -46,6 +46,9 @@ Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), 
 
 ## Progresso e próximos marcos
 
+A decisão [sobre o agente histórico `001`](docs/m1-legacy-agent-001-decision.md) e o [pacote de aprovação FIM](docs/m1-fim-change-approval-package.md) distinguem a conciliação técnica da autorização operacional. O grupo `default` tem quatro membros identificados, mas o `001` permanece desconectado; **não há liberação para implantar**.
+
+
 O [checkpoint offline consolidado M1](docs/m1-checkpoint-offline.md) reúne os dados privados de inventário preliminar, gate e checklist sem exibir IPs, hostnames ou IDs. Execute `python scripts/m1_checkpoint_summary.py`; o resultado **nunca autoriza mudanças operacionais**.
 
 
