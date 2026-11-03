@@ -37,7 +37,7 @@ Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos; chaves JSON du
 
 ## Evidências já existentes e limites
 
-- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **21 testes adicionais**, totalizando **94/94 PASS** em 02/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
+- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **25 testes do gate**, com validação de recência a cada execução e rejeição de agente inativo; a suíte geral está em **116/116 PASS** em 02/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
 - Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
 - 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
 - O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.
@@ -74,4 +74,4 @@ python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.c
 python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prechange
 ```
 
-O importador recusa manifesto pré-existente malformado (JSON duplicado, schema ambíguo), sem sobrescrever o original. Nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.
+O gate revalida `status=active` e o timestamp `observed_at` de cada agente a cada execução (máximo 24 horas, tolerância de cinco minutos futuros), evitando que um manifesto previamente importado permaneça pronto indefinidamente. O importador recusa manifesto pré-existente malformado (JSON duplicado, schema ambíguo), sem sobrescrever o original. Nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.

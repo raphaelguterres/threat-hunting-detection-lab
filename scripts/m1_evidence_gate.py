@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed, read-only M1 evidence completeness check. Never authorizes deployment."""
 import argparse
+from datetime import datetime, timedelta, timezone
 import json
 import re
 from pathlib import Path
@@ -44,6 +45,7 @@ def assess(data, stage="prechange"):
         missing.append("agents_exactly_four")
         agents = []
     seen = set()
+    checked_at = datetime.now(timezone.utc)
     for idx, agent in enumerate(agents):
         key = "agent_" + str(idx + 1)
         if not isinstance(agent, dict):
@@ -63,6 +65,20 @@ def assess(data, stage="prechange"):
             missing.append(key + "_default_group")
         if agent.get("sync") != "synced":
             missing.append(key + "_sync")
+        if agent.get("status") != "active":
+            missing.append(key + "_status")
+        observed = agent.get("observed_at")
+        try:
+            if not isinstance(observed, str):
+                raise ValueError("missing observation timestamp")
+            observed_dt = datetime.fromisoformat(observed)
+            if observed_dt.tzinfo is None or observed_dt.utcoffset() is None:
+                raise ValueError("timestamp without timezone")
+            age = checked_at - observed_dt.astimezone(timezone.utc)
+            if age > timedelta(hours=24) or age < -timedelta(minutes=5):
+                raise ValueError("stale or future observation")
+        except (TypeError, ValueError, OverflowError):
+            missing.append(key + "_observation_freshness")
         if not isinstance(agent.get("evidence_ref"), str) or not agent["evidence_ref"].strip():
             missing.append(key + "_evidence")
     if len(agents) == 4 and "004" not in seen:

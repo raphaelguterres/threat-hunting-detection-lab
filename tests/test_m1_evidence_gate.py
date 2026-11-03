@@ -1,4 +1,5 @@
 """Contract tests for the non-deploying, fail-closed M1 evidence gate."""
+from datetime import datetime, timedelta, timezone
 import importlib.util
 import json
 import subprocess
@@ -17,7 +18,9 @@ spec.loader.exec_module(gate)
 def example():
     agents = [
         {"id": str(i).zfill(3), "os": "Windows Server 2022" if i == 4 else "Linux",
-         "groups": ["default"], "sync": "synced", "evidence_ref": "private review"}
+         "groups": ["default"], "sync": "synced", "status": "active",
+         "observed_at": datetime.now(timezone.utc).isoformat(),
+         "evidence_ref": "private review"}
         for i in (1, 2, 3, 4)
     ]
     checks = {name: {"status": "verified", "evidence_ref": "private review"}
@@ -53,6 +56,26 @@ class M1GateTests(unittest.TestCase):
         document = example()
         document["agents"][0]["groups"] = ["other"]
         self.assertFalse(gate.assess(document)[0])
+
+    def test_old_agent_observation_is_blocked_even_after_import(self):
+        document = example()
+        document["agents"][0]["observed_at"] = (datetime.now(timezone.utc) - timedelta(days=2)).isoformat()
+        self.assertIn("agent_1_observation_freshness", gate.assess(document)[1])
+
+    def test_naive_timestamp_is_blocked(self):
+        document = example()
+        document["agents"][0]["observed_at"] = "2026-11-02T23:00:00"
+        self.assertIn("agent_1_observation_freshness", gate.assess(document)[1])
+
+    def test_future_agent_observation_is_blocked(self):
+        document = example()
+        document["agents"][0]["observed_at"] = (datetime.now(timezone.utc) + timedelta(hours=1)).isoformat()
+        self.assertIn("agent_1_observation_freshness", gate.assess(document)[1])
+
+    def test_inactive_agent_is_blocked(self):
+        document = example()
+        document["agents"][0]["status"] = "inactive"
+        self.assertIn("agent_1_status", gate.assess(document)[1])
 
     def test_unknown_sync_is_blocked(self):
         document = example()
