@@ -60,3 +60,14 @@ Este resumo não contém logs brutos, arquivos de configuração reais, credenci
 - Criado o [PR #25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) com validador de evidências fail-closed, documentação e 14 novos testes; **87/87 testes locais aprovados**. A publicação do código não autoriza alteração no Manager.
 - Realizada **aquisição somente leitura** do arquivo central real em backup privado protegido por **DPAPI do usuário Windows**. SHA-256 conferido com a baseline já validada, e bytes recuperados por descriptografia em memória com hash idêntico. A configuração no Manager foi relida e permaneceu intacta.
 - **Limite:** a restauração operacional de permissões/owner/distribuição não foi executada; inventário individual dos quatro agentes, aprovação e janela seguem pendentes. `DEPLOYMENT_GATE=BLOCKED`.
+
+
+### Auditoria adicional — 02/11/2026, após 23h
+
+- Confirmados CI verde e merge sem conflitos nos PRs #24 e #25; nenhuma **aprovação formal de revisor** registrada; execução do CodeRabbit marcada como `SKIPPED`. Não houve merge.
+- Ensaio de **restauração de bytes reais** a partir do backup DPAPI em diretório temporário com controle de acesso restrito: hash PASS, controle negativo de corrupção PASS, nova restauração PASS e limpeza PASS. **Não é rollback operacional no Manager.**
+- Criado manifesto privado de evidências do grupo `default` com todos os IDs/OS explicitamente `UNVERIFIED`; validador retorna `INCOMPLETE`, `DEPLOYMENT_GATE=BLOCKED`, exit 2.
+- Corrigido tratamento de JSON UTF-8 com BOM do PowerShell Windows no PR #25. **88/88 testes locais PASS**, incluindo 15 testes do gate.
+- Roteiro privado de cutover/rollback com critérios de parada e restauração de proprietário/grupo/permissões preparado, **não executado**.
+
+**Bloqueio permanece:** inventário individual dos quatro agentes pelo console autorizado, aprovação formal, janela e validação operacional pós-mudança.
