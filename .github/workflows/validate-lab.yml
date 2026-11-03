@@ -62,6 +62,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_m1_inventory_end_to_end.py -v
       - name: Check fail-closed triage of partial agent observations (synthetic only)
         run: python -m unittest discover -s tests -p test_m1_observed_agents_triage.py -v
+      - name: Test offline combined M1 status report (synthetic private fixtures)
+        run: python -m unittest discover -s tests -p test_m1_checkpoint_summary.py -v
       - name: Run full offline M1 regression suite
         run: python -m unittest discover -s tests -q
       - name: Test bounded H01 retrospective audit

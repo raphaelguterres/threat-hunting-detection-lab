@@ -46,6 +46,9 @@ Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), 
 
 ## Progresso e próximos marcos
 
+O [checkpoint offline consolidado M1](docs/m1-checkpoint-offline.md) reúne os dados privados de inventário preliminar, gate e checklist sem exibir IPs, hostnames ou IDs. Execute `python scripts/m1_checkpoint_summary.py`; o resultado **nunca autoriza mudanças operacionais**.
+
+
 A [revisão independente do PR M1](docs/m1-pr-review-guide.md) é organizada por módulos (inventário privado, FIM, hunting, CI e documentação). CI aprovado não equivale a code review ou autorização de mudança no Wazuh.
 
 
