@@ -52,6 +52,8 @@ jobs:
         run: python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
       - name: Run offline authorized-inventory importer contract tests
         run: python -m unittest discover -s tests -p test_m1_import_authorized_inventory.py -v
+      - name: Run FIM OS impact preview offline contracts
+        run: python -m unittest discover -s tests -p test_m1_fim_impact_preview.py -v
       - name: Run full offline M1 regression suite
         run: python -m unittest discover -s tests -q
       - name: Test bounded H01 retrospective audit

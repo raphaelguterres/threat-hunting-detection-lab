@@ -20,7 +20,7 @@ Foi iniciado um incremento **separado dos cinco casos históricos**, com [três 
 
 ### Segurança do M1: evidências antes de implantação
 
-O [gate de evidências M1](docs/m1-evidence-gate.md) confere a completude declarada do inventário dos quatro agentes, revisão de impacto, backup real, rollback e aprovações, **sem acesso às VMs e sem autorizar deploy**. Ausência de evidência retorna erro; o estado operacional permanece bloqueado até revisão independente.
+O [gate de evidências M1](docs/m1-evidence-gate.md) confere a completude declarada do inventário dos quatro agentes, revisão de impacto, backup real, rollback e aprovações, **sem acesso às VMs e sem autorizar deploy**. Consulte também a [matriz de aceitação FIM por OS](docs/m1-fim-acceptance-matrix.md) e a prévia offline do impacto do seletor Linux antes da revisão humana. Ausência de evidência retorna erro; o estado operacional permanece bloqueado até revisão independente.
 
 ## O que este laboratório demonstra
 

@@ -86,3 +86,21 @@ https://documentation.wazuh.com/current/user-manual/agent/agent-management/group
 Na evidência privada, conferir para cada agente: ID, string real do SO, versão, lista **ordenada** de grupos, status `active`, `synced`, horário da consulta (com fuso), qual bloco FIM se aplica e como a configuração compartilhada interage com a configuração local. Se houver vários grupos, confrontar a precedência efetiva de configurações. A mera contagem de membros do `default` não comprova esse gate. Mudança na lista ou na ordem dos grupos invalida a revisão anterior.
 
 A documentação informa que os agentes **recarregam automaticamente** a configuração centralizada quando a recebem; não planejar restart automático como etapa obrigatória. Conferir sincronização e logs pertinentes depois de uma mudança **especificamente aprovada**. Não enviar comandos de inventário por caminhos alternativos depois do bloqueio de segurança anterior, nem realizar a mudança nesta etapa.
+
+## Prévia offline de impacto do seletor Linux
+
+Depois de obter quatro linhas **reais e autorizadas** no CSV privado `.lab/m1-agent-inventory.csv`, o analista pode conferir o efeito **hipotético** do regex `^Linux` sem conexão ao Manager:
+
+```powershell
+python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv
+```
+
+O relatório imprime somente contagens agregadas: possíveis correspondências Linux, exclusões não Linux, quantidade de agentes com múltiplos grupos e aqueles em que `default` não é o último grupo. Para gerar um relatório **privado** sem sobrescrever arquivos existentes:
+
+```powershell
+python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv --output .lab/m1-impact-aggregate.json
+```
+
+Mesmo com todas as linhas válidas, o resultado informa `DEPLOYMENT_GATE=BLOCKED` e `WAZUH_RUNTIME_SELECTION_CONFIRMED=false`. **Não é prova de match em runtime, nem substitui revisão da ordem de grupos, aprovação e teste pós-mudança.** O importador CSV e a prévia nunca executam comandos no Wazuh.
+
+Ver os critérios completos em [Matriz de aceitação FIM por OS](m1-fim-acceptance-matrix.md).
