@@ -122,6 +122,17 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.assertEqual(self.invoke("--apply").returncode, 2)
         self.assertEqual(self.manifest.read_text(encoding="utf-8"), original)
 
+    def test_existing_deeply_nested_manifest_is_preserved(self):
+        self.write_csv()
+        original = "[" * 2000 + "0" + "]" * 2000
+        self.manifest.write_text(original, encoding="utf-8")
+        result = self.invoke("--apply")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("MANIFEST_UPDATED=False", result.stdout)
+        self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+        self.assertNotIn("Traceback", result.stderr)
+        self.assertEqual(self.manifest.read_text(encoding="utf-8"), original)
+
     def test_boolean_manifest_schema_rejected(self):
         self.write_csv()
         original = '{"schema_version":true,"change_id":"M1-FIM-OS-SCOPE","checks":{}}'

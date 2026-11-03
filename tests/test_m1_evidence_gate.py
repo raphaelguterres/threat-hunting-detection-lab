@@ -133,7 +133,41 @@ class M1GateTests(unittest.TestCase):
     def test_public_path_denied_unless_fixture(self):
         self.assertFalse(gate.private_or_fixture(REPO / "README.md", False))
         self.assertFalse(gate.private_or_fixture(REPO / "README.md", True))
-        self.assertTrue(gate.private_or_fixture(REPO / "tests/fixtures/m1-example-synthetic.json", True))
+        with tempfile.TemporaryDirectory(prefix="m1-allowed-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            source = Path(folder) / "m1-existing-synthetic.json"
+            source.write_text("{}", encoding="utf-8")
+            self.assertTrue(gate.private_or_fixture(source, True))
+
+    def test_missing_fixture_and_directory_are_denied(self):
+        self.assertFalse(gate.private_or_fixture(REPO / "tests/fixtures/nonexistent-synthetic.json", True))
+        self.assertFalse(gate.private_or_fixture(REPO / "tests/fixtures", True))
+
+    def test_oversized_manifest_is_rejected_before_parsing(self):
+        with tempfile.TemporaryDirectory(prefix="m1-oversize-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            source = Path(folder) / "oversize-synthetic.json"
+            source.write_bytes(b"{" + b" " * gate.MAX_MANIFEST_BYTES + b"}")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--manifest", str(source), "--fixture"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("EVIDENCE=UNAVAILABLE_OR_DISALLOWED", result.stdout)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+
+    def test_deeply_nested_manifest_fails_closed_without_traceback(self):
+        with tempfile.TemporaryDirectory(prefix="m1-nested-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            source = Path(folder) / "nested-synthetic.json"
+            source.write_text("[" * 2000 + "0" + "]" * 2000, encoding="utf-8")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--manifest", str(source), "--fixture"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+            self.assertNotIn("Traceback", result.stderr)
+
+    def test_allowed_small_private_manifest_file(self):
+        (REPO / ".lab").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="m1-small-evidence-", dir=REPO / ".lab") as folder:
+            source = Path(folder) / "small-evidence.json"
+            source.write_text("{}", encoding="utf-8")
+            self.assertTrue(gate.private_or_fixture(source, False))
 
     def test_missing_manifest_cli_returns_nonzero_and_blocked(self):
         result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True)
@@ -147,7 +181,22 @@ class M1GateTests(unittest.TestCase):
             source.write_text(json.dumps(example()), encoding="utf-8-sig")
             result = subprocess.run([sys.executable, str(SCRIPT), "--manifest", str(source), "--fixture"], capture_output=True, text=True)
             self.assertEqual(result.returncode, 0)
-            self.assertIn("EVIDENCE_COMPLETENESS=REVIEW_READY", result.stdout)
+            self.assertIn("EVIDENCE_SOURCE=SYNTHETIC_FIXTURE", result.stdout)
+            self.assertIn("EVIDENCE_COMPLETENESS=SYNTHETIC_VALIDATED", result.stdout)
+            self.assertNotIn("EVIDENCE_COMPLETENESS=REVIEW_READY", result.stdout)
+            self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
+
+    def test_incomplete_fixture_never_claims_operator_review_readiness(self):
+        with tempfile.TemporaryDirectory(prefix="m1-incomplete-synthetic-", dir=REPO / "tests/fixtures") as folder:
+            source = Path(folder) / "incomplete-synthetic.json"
+            source.write_text(json.dumps({"schema_version": 1, "change_id": "M1-FIM-OS-SCOPE",
+                                          "agents": [], "checks": {}}), encoding="utf-8")
+            result = subprocess.run([sys.executable, str(SCRIPT), "--manifest", str(source), "--fixture"],
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("EVIDENCE_SOURCE=SYNTHETIC_FIXTURE", result.stdout)
+            self.assertIn("EVIDENCE_COMPLETENESS=SYNTHETIC_INCOMPLETE", result.stdout)
+            self.assertNotIn("EVIDENCE_COMPLETENESS=REVIEW_READY", result.stdout)
             self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
 
     def test_boolean_schema_version_rejected(self):

@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
+MAX_MANIFEST_BYTES = 65536
 PRECHANGE = (
     "inventory_review", "os_impact_review", "group_precedence_review", "baseline_integrity",
     "parser_staging", "backup_integrity_real", "rollback_rehearsal_real",
@@ -104,12 +105,17 @@ def assess(data, stage="prechange"):
 
 
 def private_or_fixture(path, fixture):
-    """Only read explicitly allowed repo-local evidence locations."""
-    resolved = path.resolve()
-    parent = (REPO / ("tests/fixtures" if fixture else ".lab")).resolve()
-    if not resolved.is_relative_to(parent):
+    """Accept only small regular files in the allowed private/fixture directory."""
+    try:
+        resolved = path.resolve(strict=True)
+        parent = (REPO / ("tests/fixtures" if fixture else ".lab")).resolve()
+        if not resolved.is_relative_to(parent) or not resolved.is_file():
+            return False
+        if resolved.stat().st_size > MAX_MANIFEST_BYTES:
+            return False
+        return not fixture or "synthetic" in resolved.name.lower()
+    except (OSError, RuntimeError):
         return False
-    return not fixture or "synthetic" in resolved.name.lower()
 
 
 def main():
@@ -126,13 +132,19 @@ def main():
         data = json.loads(args.manifest.read_text(encoding="utf-8-sig"),
                           object_pairs_hook=reject_duplicate_keys,
                           parse_constant=reject_nonfinite_constant)
-    except (OSError, UnicodeError, ValueError):
+    except (OSError, UnicodeError, ValueError, RecursionError):
         print("EVIDENCE=UNREADABLE")
         print("DEPLOYMENT_GATE=BLOCKED")
         return 2
     complete, missing = assess(data, args.stage)
     print("STAGE=" + args.stage)
-    print("EVIDENCE_COMPLETENESS=" + ("REVIEW_READY" if complete else "INCOMPLETE"))
+    if args.fixture:
+        print("EVIDENCE_SOURCE=SYNTHETIC_FIXTURE")
+        completeness = "SYNTHETIC_VALIDATED" if complete else "SYNTHETIC_INCOMPLETE"
+    else:
+        print("EVIDENCE_SOURCE=PRIVATE_UNATTESTED")
+        completeness = "REVIEW_READY" if complete else "INCOMPLETE"
+    print("EVIDENCE_COMPLETENESS=" + completeness)
     print("MISSING_OR_UNVERIFIED=" + (",".join(missing) if missing else "none"))
     print("DEPLOYMENT_GATE=BLOCKED")
     print("MANUAL_INDEPENDENT_APPROVAL_REQUIRED=true")

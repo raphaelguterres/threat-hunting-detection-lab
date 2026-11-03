@@ -148,7 +148,7 @@ def main():
         print("DEPLOYMENT_GATE=BLOCKED")
         print("NO_REMOTE_CONNECTION_NO_CONFIGURATION_CHANGE=true")
         return 0
-    except (ValueError, OSError, UnicodeError, json.JSONDecodeError):
+    except (ValueError, OSError, UnicodeError, RecursionError):
         print("CSV_STRUCTURE=INVALID_OR_UNREADABLE")
         print("MANIFEST_UPDATED=False")
         print("DEPLOYMENT_GATE=BLOCKED")
