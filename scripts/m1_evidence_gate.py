@@ -50,6 +50,18 @@ def os_display_family(label):
     return None
 
 
+def valid_review_reference(value):
+    """Refuse blank, placeholder and unsafe labels in manual review references.
+
+    This is a *format* check, not authentication of a human review.
+    """
+    return (isinstance(value, str)
+            and value == value.strip()
+            and 1 <= len(value) <= 256
+            and all(ord(c) >= 32 and ord(c) != 127 for c in value)
+            and not re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", value))
+
+
 def assess(data, stage="prechange"):
     """Returns (complete, list of *field labels*, no private evidence content)."""
     missing = []
@@ -119,8 +131,7 @@ def assess(data, stage="prechange"):
     for name in needed:
         entry = checks.get(name)
         if (not isinstance(entry, dict) or entry.get("status") != "verified"
-                or not isinstance(entry.get("evidence_ref"), str)
-                or not entry["evidence_ref"].strip()):
+                or not valid_review_reference(entry.get("evidence_ref"))):
             missing.append(name)
     return len(missing) == 0, missing
 

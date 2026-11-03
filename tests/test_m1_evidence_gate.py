@@ -147,6 +147,22 @@ class M1GateTests(unittest.TestCase):
         self.assertIn("backup_integrity_real", missing)
         self.assertIn("change_approval", missing)
 
+    def test_review_checks_reject_placeholder_and_unsafe_references(self):
+        for item in gate.PRECHANGE + gate.POSTCHANGE:
+            for ref in ("UNVERIFIED_001", "pending-review", "placeholder", "review\ninvalid",
+                        "private review " , "x" * 257):
+                with self.subTest(check=item, ref=repr(ref)):
+                    doc = example()
+                    doc["checks"][item]["evidence_ref"] = ref
+                    self.assertIn(item, gate.assess(doc, "postchange")[1])
+
+    def test_review_checks_accept_well_formed_ref_but_never_authorize_deploy(self):
+        doc = example()
+        doc["checks"]["change_approval"]["evidence_ref"] = "private_review_record_20261103"
+        self.assertTrue(gate.assess(doc)[0])
+        self.assertTrue(gate.valid_review_reference("private_review_record_20261103"))
+        self.assertFalse(gate.valid_review_reference("UNVERIFIED_001"))
+
     def test_synthetic_rollback_is_not_real_evidence(self):
         document = example()
         document["checks"]["rollback_rehearsal_real"]["status"] = "synthetic"
