@@ -183,6 +183,30 @@ class HypothesisTests(unittest.TestCase):
             self.assertNotIn(str(path), output.getvalue())
             self.assertNotIn("Traceback", output.getvalue())
 
+    def test_identity_aliases_with_control_characters_are_rejected(self):
+        for field in ("event_ref", "asset_key", "actor_key", "object_key"):
+            for value in ("safe\nspoofed", "safe\x1b[31m", "safe\x7f"):
+                with self.subTest(field=field, value=repr(value)):
+                    item = raw("powershell_process", "sysmon_eid1", "safe")
+                    item[field] = value
+                    with self.assertRaisesRegex(ValueError, "control character"):
+                        hunting.parse_event(item)
+
+    def test_reject_symlinked_private_parent_even_when_target_is_private(self):
+        (ROOT / ".lab").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="m1-parent-", dir=ROOT / ".lab") as folder:
+            original = Path(folder) / "source"
+            original.mkdir()
+            file = original / "events.jsonl"
+            file.write_text("{}\n", encoding="utf-8")
+            link = Path(folder) / "alias"
+            try:
+                link.symlink_to(original, target_is_directory=True)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlinks not permitted on this platform")
+            self.assertTrue(hunting.allowed_input(file, ROOT, False))
+            self.assertFalse(hunting.allowed_input(link / "events.jsonl", ROOT, False))
+
     def test_private_only_input_policy(self):
         with tempfile.TemporaryDirectory() as tmp:
             repo = Path(tmp)

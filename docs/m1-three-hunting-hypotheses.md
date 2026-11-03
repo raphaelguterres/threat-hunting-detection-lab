@@ -126,3 +126,9 @@ O resultado global permanece `verdict=not_an_incident_determination`. O H01 requ
 A leitura JSONL offline passou a rejeitar `NaN`/`Infinity` e estruturas excessivamente aninhadas, com erro genérico que não expõe caminhos privados ou conteúdo bruto no console. A execução com `--fixture` permanece **sintética**; essas melhorias não comprovam eventos reais, nem alteram Wazuh, agentes ou auditoria Windows.
 
 **Status do M1:** as fontes reais do recorte de 02/11 ainda são insuficientes para confirmar integralmente H01/H02/H03. Novas evidências dependem da revisão autorizada de logs, sem gerar simulações desnecessárias nas VMs.
+
+## Revisão do leitor de evidências offline — 03/11/2026
+
+Os aliases normalizados `event_ref`, `asset_key`, `actor_key` e `object_key` agora recusam caracteres de controle (incluindo quebras de linha, escapes ANSI e DEL), evitando campos pseudonimizados ambíguos. A validação de caminho recusa arquivos e **diretórios ancestrais simbólicos**, inclusive aliases que apontem de volta para `.lab/`. O processamento continua limitado a amostras normalizadas sob `.lab/` (ou fixtures explicitamente sintéticas, para CI), sem consultar serviços.
+
+O objetivo desses controles é **integridade da entrada**, não inferir incidentes nem validar autenticidade da origem. Os cenários de regressão rodam em Windows e Linux; se a criação de symlinks não estiver permitida no host, o cenário específico é ignorado de forma declarada. Nenhuma alteração operacional no Wazuh.

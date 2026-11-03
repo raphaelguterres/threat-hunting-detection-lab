@@ -87,6 +87,8 @@ def parse_event(obj: object) -> Event:
             raise ValueError("missing or oversized identity field")
         if value != value.strip():
             raise ValueError("whitespace around identity field")
+        if any(ord(ch) < 32 or ord(ch) == 127 for ch in value):
+            raise ValueError("control character in identity field")
     kind, source = obj["kind"], obj["source"]
     if not isinstance(kind, str) or kind not in KINDS:
         raise ValueError("unsupported event kind")
@@ -184,17 +186,17 @@ def load_events(path: Path) -> list[Event]:
 
 
 def allowed_input(path: Path, repository: Path, fixture: bool) -> bool:
-    private_root = repository / ".lab"
-    fixture_root = repository / "tests" / "fixtures"
-    if path.is_symlink():
-        return False
-    if fixture:
-        if fixture_root.is_symlink():
+    """Allow trusted repository paths only, without symlink traversal."""
+    try:
+        candidate = path.absolute()
+        root = (repository / ("tests/fixtures" if fixture else ".lab")).absolute()
+        if any(part.is_symlink() for part in (candidate, *candidate.parents)):
             return False
-        return fixture_root.resolve() in path.resolve().parents
-    if private_root.is_symlink():
+        if any(part.is_symlink() for part in (root, *root.parents)):
+            return False
+        return root.resolve() in candidate.resolve().parents
+    except (OSError, RuntimeError):
         return False
-    return private_root.resolve() in path.resolve().parents
 
 
 def main(argv=None) -> int:
