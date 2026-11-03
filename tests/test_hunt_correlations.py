@@ -45,11 +45,32 @@ class HypothesisTests(unittest.TestCase):
         )
         self.assertEqual(result["verdict"], "not_an_incident_determination")
 
-    def test_empty_sample_reports_no_candidates_not_clearance(self):
+    def test_empty_sample_reports_insufficient_coverage_not_clearance(self):
         result = hunting.correlate([])
         self.assertTrue(all(x["candidate_pairs"] == 0
                             for x in result["hypotheses"].values()))
+        self.assertTrue(all(x["status"] == "insufficient_source_coverage"
+                            for x in result["hypotheses"].values()))
         self.assertEqual(result["verdict"], "not_an_incident_determination")
+
+    def test_missing_required_source_is_not_misreported_as_negative_result(self):
+        only_first = [raw("powershell_process", "sysmon_eid1", "first")]
+        result = hunting.correlate([hunting.parse_event(e) for e in only_first])
+        h01 = result["hypotheses"]["H01_POWERSHELL_TASK"]
+        self.assertEqual(h01["first_kind_events"], 1)
+        self.assertEqual(h01["second_kind_events"], 0)
+        self.assertEqual(h01["status"], "insufficient_source_coverage")
+
+    def test_both_sources_without_valid_join_produce_no_candidate_status(self):
+        rows = [raw("powershell_process", "sysmon_eid1", "first"),
+                raw("task_created", "security_eid4698", "second",
+                    "2026-11-02T12:05:00Z", asset="other-host")]
+        result = hunting.correlate([hunting.parse_event(e) for e in rows])
+        h01 = result["hypotheses"]["H01_POWERSHELL_TASK"]
+        self.assertEqual(h01["first_kind_events"], 1)
+        self.assertEqual(h01["second_kind_events"], 1)
+        self.assertEqual(h01["candidate_pairs"], 0)
+        self.assertEqual(h01["status"], "no_candidate_in_supplied_sample")
 
     def test_15_min_boundary_is_inclusive(self):
         self.events[1]["timestamp"] = "2026-11-02T12:15:00Z"
@@ -138,6 +159,29 @@ class HypothesisTests(unittest.TestCase):
             path.write_text('{"kind":"a","kind":"b"}\n', encoding="utf-8")
             with self.assertRaises(ValueError):
                 hunting.load_events(path)
+
+    def test_nonfinite_json_constant_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "nonfinite.jsonl"
+            row = json.dumps(raw("powershell_process", "sysmon_eid1", "synthetic-ref"))
+            row = row.replace('"actor_key": "actor-a"', '"actor_key": NaN')
+            path.write_text(row + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "nonfinite JSON constant"):
+                hunting.load_events(path)
+
+    def test_deeply_nested_jsonl_fails_closed_without_private_path(self):
+        (ROOT / ".lab").mkdir(exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix="m1-hunt-nested-", dir=ROOT / ".lab") as tmp:
+            path = Path(tmp) / "SYNTHETIC_DO_NOT_PRINT.jsonl"
+            path.write_text("[" * 2000 + "0" + "]" * 2000 + "\n", encoding="utf-8")
+            output = io.StringIO()
+            with contextlib.redirect_stderr(output):
+                code = hunting.main(["--input", str(path)])
+            self.assertEqual(code, 2)
+            self.assertIn("M1_INPUT_REJECTED", output.getvalue())
+            self.assertNotIn("SYNTHETIC_DO_NOT_PRINT", output.getvalue())
+            self.assertNotIn(str(path), output.getvalue())
+            self.assertNotIn("Traceback", output.getvalue())
 
     def test_private_only_input_policy(self):
         with tempfile.TemporaryDirectory() as tmp:

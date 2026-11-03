@@ -112,3 +112,17 @@ O programa rejeita arquivo fora de .lab (exceto fixture declarada), campos inesp
 | Falsos positivos, lacunas e próxima ação | |
 
 Referências: [matriz de telemetria](telemetry-matrix.md), [cobertura ATT&CK](mitre-coverage.md), [registro de falsos positivos](false-positive-register.md), [modelo de investigação](registro-de-investigacao.md), [MITRE ATT&CK](https://attack.mitre.org/), [Microsoft Security Event 4698](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4698), [4720](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4720) e [4672](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4672).
+
+## Revisão de qualidade de cobertura — 03/11/2026
+
+O correlacionador agora reporta, para cada hipótese, as **contagens agregadas** `first_kind_events` e `second_kind_events`, além de `candidate_pairs`. Ele distingue três estados:
+
+- `insufficient_source_coverage`: pelo menos um tipo obrigatório não aparece na amostra fornecida. **Não é uma busca negativa válida**, nem comprova que a fonte esteja desabilitada no ambiente.
+- `no_candidate_in_supplied_sample`: os dois tipos aparecem na amostra, porém não formam um par com a ordem, janela e chaves de correlação esperadas. **Não exclui ocorrência fora do recorte**.
+- `triage_candidate`: há um ou mais pares compatíveis com a hipótese. **Não determina incidente, causalidade ou intenção maliciosa**.
+
+O resultado global permanece `verdict=not_an_incident_determination`. O H01 requer `task_created` validado por Security 4698; um comando `schtasks /create` da regra 110120 é apenas tentativa e não substitui 4698. Em H02, confirmar Logon ID/4624 junto ao 4672 antes de uma conclusão operacional. Em H03, exigir correspondência do **mesmo artefato** FIM e execução, não somente host compartilhado.
+
+A leitura JSONL offline passou a rejeitar `NaN`/`Infinity` e estruturas excessivamente aninhadas, com erro genérico que não expõe caminhos privados ou conteúdo bruto no console. A execução com `--fixture` permanece **sintética**; essas melhorias não comprovam eventos reais, nem alteram Wazuh, agentes ou auditoria Windows.
+
+**Status do M1:** as fontes reais do recorte de 02/11 ainda são insuficientes para confirmar integralmente H01/H02/H03. Novas evidências dependem da revisão autorizada de logs, sem gerar simulações desnecessárias nas VMs.
