@@ -1,49 +1,85 @@
-# Painel de progresso do laboratório
+# Painel de progresso — Threat Hunting & Detection Lab
 
-Atualizado em 25/10/2026. Este painel consolida o estado confirmado do ambiente; não substitui os critérios de aceite definidos no [roadmap](../ROADMAP.md).
+**Checkpoint verificado em 03/11/2026, 16h02 BRT.**
+
+> **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
+
+## Visão resumida
+
+| Trilho | Estado | Contagem | Evidência/limite |
+| --- | --- | --- | --- |
+| **Fases históricas 1–6** | **Concluídas no roadmap original** | **8/8 entregas** e **6/6 fases** | [Issues #1–#8](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues?q=is%3Aissue+is%3Aclosed), todas encerradas em 26/10 ou antes |
+| **M1 — Threat Hunting por hipóteses** | **Em andamento** | **11/17 marcados (64,7%); 6 pendentes** | Critérios reais de aceitação ainda incompletos |
+| **CI e contratos offline M1** | **PASS no checkpoint** | 168/168 testes locais; Actions #57 SUCCESS (3/3 jobs) | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
+| **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
+| **Mudança ativa de FIM no Manager** | **NO-GO** | 0/4 registros individuais confirmados no inventário atual | Backup/rollback e revisão operacional não substituem autorização |
+| **Jornada de 03/11** | Acompanhada em arquivo privado | Controle de horário separado de progresso | Tempo de sessão não mede porcentagem do roadmap |
 
 ```text
-[concluída] Base do laboratório
-      -> [concluída] Telemetria e visibilidade
-      -> [em execução] Engenharia de detecção
-      -> [concluída] Investigação
-      -> [concluída] Resposta segura
-      -> [concluída] Portfólio e publicação
+Laboratório original  ████████████████████  8/8 entregas documentadas
+M1 checklist          █████████████░░░░░░░ 11/17 (64,7%)
+M1 deployment FIM     BLOQUEADO — não expressar como porcentagem
 ```
 
-| Fase | Estado | Situação verificável | Issue |
-| --- | --- | --- | --- |
-| 1. Base | Concluída | Arquitetura, inventário e limites documentados. | #1 fechada |
-| 2. Telemetria | **Concluída** | Sysmon IDs 1 e 11 recebidos no Manager; FIM Linux validado no agente Kali nativo com controle negativo. | #2 e #3 fechadas |
-| 3. Detecção | Concluída | Os cinco casos possuem evidência apropriada; PowerShell e conexão privada foram validados no Windows, e os demais no Kali. | #4 pronta para encerramento; #5 fechada |
-| 4. Investigação | Concluída | Cinco linhas do tempo redigidas respondem evento, ativo, evidência, classificação e ação recomendada. | #6 pronta para encerramento |
-| 5. Resposta | Concluída | Playbooks de autenticação, PowerShell, FIM e rede exigem preservação de evidências, aprovação humana e rollback. | #7 pronta para encerramento |
-| 6. Portfólio | Concluída | README, diagrama textual, documentação e duas capturas redigidas foram revisados para publicação externa. | #8 pronta para encerramento |
+## Fases 1–6 (baseline histórica)
 
-## Evidências confirmadas agora
+| Fase | Entrega e evidência histórica | Estado |
+| --- | --- | --- |
+| 1. Base | Arquitetura, inventário e limites; Issue #1 | Concluída |
+| 2. Telemetria | Sysmon/Windows e FIM Linux fora de container; Issues #2 e #3 | Concluída |
+| 3. Detecção original | Cinco casos e cobertura ATT&CK, com controles negativos; Issues #4 e #5 | Concluída |
+| 4. Investigação | Cinco estudos de caso/timelines; Issue #6 | Concluída |
+| 5. Resposta segura | Playbooks com aprovação humana e rollback; Issue #7 | Concluída |
+| 6. Portfólio | README, exemplos e materiais redigidos; Issue #8 | Concluída |
 
-- Windows Server e Kali/Wazuh estão em execução, conforme o health check local do VirtualBox.
-- O serviço `Sysmon64` está em execução no Windows e a configuração foi aceita pelo Sysmon.
-- O Manager registrou 36 alertas do canal Sysmon Windows, incluindo IDs 1 e 11, para o agente Windows ativo.
-- O agente Kali nativo `kali-native-fim` foi registrado, teve FIM ativado em diretório do filesystem do convidado e gerou regras 554 (criação) e 550 (mudança de checksum).
-- O controle FIM fora do escopo monitorado gerou zero alertas.
-- Os quatro marcadores sintéticos `100100`–`100103` geraram exatamente quatro alertas no agente Kali nativo; uma linha de controle sem assinatura gerou zero alertas.
-- As regras e arquivos de configuração versionados passam em `scripts/validate_lab_config.ps1`.
-- A recarga autorizada do painel HTTPS privado pelo Edge gerou Sysmon ID 3 no agente Windows; a regra 100105 registrou processo e porta, e o controle ocioso não gerou novo alerta.
-- O processo PowerShell filho com marcador benigno gerou Sysmon ID 1 e foi recebido pela regra nativa 92027 com comando, usuário e processo-pai.
+Essas conclusões históricas são sobre **entregas do roadmap original** e não equivalem à correlação real das **três novas hipóteses M1**. O [status operacional mais antigo](STATUS_ATUAL_LAB.md) permanece como registro datado, não uma afirmação sobre disponibilidade atual das VMs.
 
-## Ponto atual e bloqueio real
+## M1 — 11 itens marcados e seis entregas ainda abertas
 
-O trabalho de detecção da **Fase 3** foi concluído em termos técnicos. O Kali possui acesso SSH autenticado com validação de host; o Windows continua sem um canal de administração remota autenticado, mas isso não impede a evidência já recebida pelo Manager. A Issue #4 está pronta para encerramento após revisão humana do repositório.
+| Prioridade | Pendente no checklist M1 | Dependências e critério |
+| --- | --- | --- |
+| **1** | Confirmar inventário/OS dos demais agentes, duplicidade Security e cobertura FIM efetiva do `004` | Quatro membros de `default` com ID, OS+versão, grupos **na ordem**, status, sync e captura autorizada; revisar precedência; [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) |
+| **2** | Aprovar, executar e validar change control Windows `4698` | Aprovação e janela separadas, retenção, ingestão Wazuh, rollback e evidências pós-mudança; [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) |
+| **3** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
+| **4** | Registrar estudos de caso adicionais com timelines e decisões | Dados realmente observados, limitação da amostra, triagem e evidência sanitizada |
+| **5** | Revisar tuning, falsos positivos e cobertura ATT&CK por hipótese | Comparar com controles negativos reais; documentar detecções ausentes e ajustes aprovados |
+| **6** | Encerrar M1 com revisão independente e evidência sanitizada | PRs revisados por terceiro habilitado, aprovação documentada e critérios técnicos satisfeitos; [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 
-## Próxima sequência ao disponibilizar acesso autenticado
+A relação acima **reordena os seis itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
-1. Iniciar a Fase 4 com investigações e linhas do tempo para as evidências validadas.
-2. Revisar a severidade e os falsos positivos antes de cada publicação de case study.
-3. Encerrar a Issue #4 após revisão humana do repositório.
+### Gate técnico atual: NO-GO
 
-O roteiro detalhado dos dois cenários Windows pendentes está em [windows-pending-validation.md](windows-pending-validation.md).
+Às 16h02 BRT, o checkpoint read-only retornou:
+- `AGENT_004_SYNC=PASS`
+- `ACTIVE_DEFAULT_CONFIG_PARSER=PASS`
+- `MANAGER_HASH_EQUALS_PRIVATE_BASELINE=True`
+- `M1_READ_ONLY_CHECKPOINT=PASS`
+- `ALL_FOUR_AGENT_OS_INDIVIDUALLY_CONFIRMED=NOT_VERIFIED`
+- `BACKUP_RESTORE_APPROVED=NOT_VERIFIED`
+- `CHANGE_WINDOW_APPROVED=NOT_VERIFIED`
+- `DEPLOYMENT_GATE=BLOCKED`
 
-Consulte também o [status operacional](STATUS_ATUAL_LAB.md), o [roteiro de validação do Sysmon](../tests/windows-sysmon-validation.md) e as [operações seguras entre as VMs](remote-dual-vm-operations.md).
+O CSV privado contém quatro placeholders `UNVERIFIED`, que não são evidência operacional. O ensaio isolado de restauração de bytes do backup real DPAPI foi aprovado, **sem** realizar rollback no Manager. A proposta FIM `os="^Linux"` foi aceita pelo parser oficial **somente em cópia isolada**, não distribuída. Nem o teste nem o CI autorizam modificar a configuração ativa.
 
-As linhas do tempo de investigação estão em [case-study-timelines.md](case-study-timelines.md).
+**Existe ainda uma mudança FIM ativa potencial (Issue #17)**, com necessidade de autorização, teste e rollback. Ela não é um sétimo item de checklist independente no ROADMAP atual, de modo que o percentual **64,7% não representa o esforço total restante nem previsão de prazo**.
+
+## Sequência segura para a próxima sessão
+
+1. **Operador:** no Wazuh Dashboard autorizado, obter os quatro registros do grupo `default` sem contornar bloqueios de API/CLI. Usar o [roteiro manual](m1-agent-inventory-operator-runbook.md); manter dados individuais e capturas em `.lab/`.
+2. **Revisor técnico:** conferir ordem/precedência dos grupos, diferenças Linux/Windows, telemetria local FIM, duplicidade dos coletores Security, e finalizar parecer **GO/NO-GO**.
+3. **Gestor da mudança:** aprovar separadamente a janela, restauração operacional e, se pertinente, a mudança FIM e o `4698`. **Nenhuma execução antecipada.**
+4. **Após mudanças autorizadas:** coletar eventos benignos reais e investigar H01/H02/H03 até o Discover com amostras, contexto e controle negativo.
+5. **Encerramento:** completar timelines, tuning, revisão de PR por terceiro e documentação redigida. Só então marcar os seis checkboxes restantes.
+
+## Fontes e rastreabilidade
+
+- [Roadmap de referência](../ROADMAP.md)
+- [Hipóteses M1](m1-three-hunting-hypotheses.md)
+- [Matriz de aceitação FIM por OS](m1-fim-acceptance-matrix.md)
+- [Gate de evidências](m1-evidence-gate.md)
+- [Issue #9 — Hipóteses de hunting](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)
+- [Issue #15 — Change control 4698](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15)
+- [Issue #17 — FIM por OS](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
+- [Issue #26 — Proteção de main e revisão](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26)
+
+*Documentação pública apresenta apenas estados e contagens; não inclui dados de endpoints, hashes privados, credenciais ou capturas reais.*

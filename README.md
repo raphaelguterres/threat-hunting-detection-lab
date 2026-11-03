@@ -44,6 +44,10 @@ O [gate de evidências M1](docs/m1-evidence-gate.md) confere a completude declar
 
 Veja o [inventário](docs/inventory.md), a [arquitetura](docs/architecture.md), a [matriz de telemetria](docs/telemetry-matrix.md), o [catálogo de detecções](docs/detection-catalog.md), a [cobertura MITRE](docs/mitre-coverage.md), a [triagem de T1078/T1021](docs/mitre-triage-t1078-t1021.md), os [estudos de caso](docs/case-study-timelines.md), os [playbooks](playbooks/), a [checklist de publicação](docs/publication-checklist.md) e a [saúde operacional](docs/operational-health.md).
 
+## Progresso e próximos marcos
+
+O [painel atualizado do roadmap](docs/roadmap-progress.md) separa as seis fases históricas concluídas do M1 ainda em andamento, lista as entregas pendentes e documenta o gate operacional **NO-GO**. A contagem de checkboxes é reproduzível localmente com `python scripts/roadmap_progress.py` e não equivale a aprovação de implantação.
+
 ## Arquitetura
 
 ```text
