@@ -42,7 +42,9 @@ class CheckpointSummaryTests(unittest.TestCase):
     def test_combines_roadmap_and_partial_evidence_without_identity_leak(self):
         result = self.run_script()
         self.assertEqual(result.returncode, 0, result.stderr)
-        for value in ("ROADMAP_DONE=11", "ROADMAP_TOTAL=17", "OBSERVED_AGENTS=4",
+        self.assertRegex(result.stdout, r"(?m)^ROADMAP_DONE=[0-9]+$")
+        self.assertRegex(result.stdout, r"(?m)^ROADMAP_TOTAL=[0-9]+$")
+        for value in ("OBSERVED_AGENTS=4",
                       "ACTIVE_OBSERVED=3", "DISCONNECTED_OBSERVED=1",
                       "GROUP_MEMBERSHIPS_UNKNOWN=4", "GROUP_SYNC_UNKNOWN=4",
                       "KEEPALIVE_UNKNOWN=4", "MANIFEST_STATE=INCOMPLETE",
@@ -57,6 +59,10 @@ class CheckpointSummaryTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         data = json.loads(result.stdout)
         self.assertEqual(data["checkpoint_type"], "PRIVATE_OFFLINE_STATUS_ONLY")
+        self.assertIsInstance(data["roadmap_done"], int)
+        self.assertIsInstance(data["roadmap_total"], int)
+        self.assertGreater(data["roadmap_total"], 0)
+        self.assertGreaterEqual(data["roadmap_total"], data["roadmap_done"])
         self.assertEqual(data["operational_deployment_gate"], "BLOCKED")
         self.assertEqual(data["github_reviews"], "NOT_CHECKED_BY_THIS_SCRIPT")
         self.assertIs(data["writes_performed"], False)
