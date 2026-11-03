@@ -80,6 +80,7 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
             "checks": {
                 "inventory_review": {"status": "verified", "evidence_ref": "prior-review"},
                 "os_impact_review": {"status": "verified", "evidence_ref": "prior-impact"},
+                "group_precedence_review": {"status": "verified", "evidence_ref": "prior-priority-review"},
                 "change_approval": {"status": "verified", "evidence_ref": "prior-approval"},
                 "approved_window": {"status": "verified", "evidence_ref": "prior-window"},
                 "windows_fim": {"status": "verified", "evidence_ref": "prior-fim"},
@@ -90,10 +91,29 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         result = self.invoke("--apply")
         self.assertEqual(result.returncode, 0, result.stderr)
         updated = json.loads(self.manifest.read_text(encoding="utf-8"))
-        for name in ("inventory_review", "os_impact_review", "change_approval", "approved_window", "windows_fim"):
+        for name in ("inventory_review", "os_impact_review", "group_precedence_review", "change_approval", "approved_window", "windows_fim"):
             self.assertEqual(updated["checks"][name]["status"], "pending")
             self.assertFalse(updated["checks"][name]["evidence_ref"])
         self.assertEqual(updated["checks"]["backup_integrity_real"]["status"], "verified")
+
+    def test_group_priority_change_invalidates_prior_approval(self):
+        self.write_csv()
+        first = rows()
+        first[0]["groups"] = "other;default"
+        self.write_csv(first)
+        result = self.invoke("--apply")
+        self.assertEqual(result.returncode, 0)
+        manifest = json.loads(self.manifest.read_text(encoding="utf-8"))
+        manifest["checks"]["group_precedence_review"] = {
+            "status": "verified", "evidence_ref": "prior-review"
+        }
+        self.manifest.write_text(json.dumps(manifest), encoding="utf-8")
+        first[0]["groups"] = "default;other"
+        self.write_csv(first)
+        result = self.invoke("--apply")
+        self.assertEqual(result.returncode, 0)
+        updated = json.loads(self.manifest.read_text(encoding="utf-8"))
+        self.assertEqual(updated["checks"]["group_precedence_review"]["status"], "pending")
 
     def test_existing_duplicate_manifest_keys_rejected_without_overwrite(self):
         self.write_csv()

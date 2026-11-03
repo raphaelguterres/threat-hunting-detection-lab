@@ -92,6 +92,17 @@ class M1GateTests(unittest.TestCase):
         document["agents"][-1]["id"] = "005"
         self.assertIn("agent_004_not_reconciled", gate.assess(document)[1])
 
+    def test_group_precedence_review_is_required_even_if_single_group(self):
+        document = example()
+        document["checks"].pop("group_precedence_review")
+        self.assertIn("group_precedence_review", gate.assess(document)[1])
+
+    def test_multi_group_agent_requires_review_reference(self):
+        document = example()
+        document["agents"][0]["groups"] = ["default", "other"]
+        document["checks"]["group_precedence_review"] = {"status": "pending", "evidence_ref": ""}
+        self.assertIn("group_precedence_review", gate.assess(document)[1])
+
     def test_absent_real_backup_or_human_approval_is_blocked(self):
         document = example()
         document["checks"]["backup_integrity_real"]["status"] = "pending"

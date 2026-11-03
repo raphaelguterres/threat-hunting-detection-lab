@@ -106,7 +106,7 @@ def prepare_manifest(path, agents):
         if not isinstance(checks, dict):
             raise ValueError("invalid checks section")
         dependent = (
-            "inventory_review", "os_impact_review", "change_approval",
+            "inventory_review", "os_impact_review", "group_precedence_review", "change_approval",
             "approved_window", "agents_resynced", "windows_fim", "linux_fim",
             "manager_ingestion", "indexer_ingestion", "discover_visibility",
         )

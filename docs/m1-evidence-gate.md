@@ -19,8 +19,8 @@ Os quatro membros do grupo `default` precisam ser reconciliados individualmente 
 Crie um manifesto JSON privado em `.lab/` (pasta ignorada por Git). Campos requeridos:
 
 - `schema_version: 1`, `change_id: "M1-FIM-OS-SCOPE"`.
-- `agents`: lista de quatro objetos contendo `id`, `os`, `groups` (inclui `default`), `sync: "synced"` e `evidence_ref`. O ID `004` deve ser revalidado como Windows.
-- `checks`: objetos para `inventory_review`, `os_impact_review`, `baseline_integrity`, `parser_staging`, `backup_integrity_real`, `rollback_rehearsal_real`, `change_approval`, `approved_window`; cada objeto com `status: "verified"` e `evidence_ref` indicando uma referência a evidência privada revisada.
+- `agents`: lista de quatro objetos contendo `id`, `os`, `groups` (lista em ordem de prioridade observada, inclui `default`), `status: "active"`, `sync: "synced"`, `observed_at` (ISO 8601 com fuso, coleta das últimas 24h) e `evidence_ref`. O ID `004` deve ser revalidado como Windows.
+- `checks`: objetos para `inventory_review`, `os_impact_review`, `group_precedence_review`, `baseline_integrity`, `parser_staging`, `backup_integrity_real`, `rollback_rehearsal_real`, `change_approval`, `approved_window`; cada objeto com `status: "verified"` e `evidence_ref` indicando uma referência a evidência privada revisada.
 - Para validação após mudança, acrescente `agents_resynced`, `windows_fim`, `linux_fim`, `manager_ingestion`, `indexer_ingestion`, `discover_visibility` com o mesmo formato.
 
 Comandos:
@@ -37,7 +37,7 @@ Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos; chaves JSON du
 
 ## Evidências já existentes e limites
 
-- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **25 testes do gate**, com validação de recência a cada execução e rejeição de agente inativo; a suíte geral está em **116/116 PASS** em 02/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
+- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **25 testes do gate**, com validação de recência a cada execução e rejeição de agente inativo; a suíte geral está em **119/119 PASS** no checkpoint de 03/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
 - Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
 - 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
 - O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.
@@ -75,3 +75,14 @@ python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prec
 ```
 
 O gate revalida `status=active` e o timestamp `observed_at` de cada agente a cada execução (máximo 24 horas, tolerância de cinco minutos futuros), evitando que um manifesto previamente importado permaneça pronto indefinidamente. O importador recusa manifesto pré-existente malformado (JSON duplicado, schema ambíguo), sem sobrescrever o original. Nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.
+## Revisão de precedência de grupos e aceitação por SO
+
+Segundo a documentação oficial do Wazuh, o atributo `os` em `agent_config` aplica uma expressão regular sobre o sistema operacional declarado pelo agente. A própria documentação utiliza `os="^Linux"` como exemplo. Isso confirma **suporte do seletor**, não o impacto nos quatro membros atuais:
+https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html
+
+Um mesmo agente pode participar de vários grupos. A **ordem de atribuição importa**, porque a configuração do último grupo tem precedência quando há conflito. O `group_precedence_review` é obrigatório antes da mudança, **mesmo se o operador observar apenas o grupo default**: deve deixar registrada essa observação e a ausência/presença de conflitos. Fonte:
+https://documentation.wazuh.com/current/user-manual/agent/agent-management/grouping-agents.html
+
+Na evidência privada, conferir para cada agente: ID, string real do SO, versão, lista **ordenada** de grupos, status `active`, `synced`, horário da consulta (com fuso), qual bloco FIM se aplica e como a configuração compartilhada interage com a configuração local. Se houver vários grupos, confrontar a precedência efetiva de configurações. A mera contagem de membros do `default` não comprova esse gate. Mudança na lista ou na ordem dos grupos invalida a revisão anterior.
+
+A documentação informa que os agentes **recarregam automaticamente** a configuração centralizada quando a recebem; não planejar restart automático como etapa obrigatória. Conferir sincronização e logs pertinentes depois de uma mudança **especificamente aprovada**. Não enviar comandos de inventário por caminhos alternativos depois do bloqueio de segurança anterior, nem realizar a mudança nesta etapa.

@@ -8,7 +8,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 PRECHANGE = (
-    "inventory_review", "os_impact_review", "baseline_integrity",
+    "inventory_review", "os_impact_review", "group_precedence_review", "baseline_integrity",
     "parser_staging", "backup_integrity_real", "rollback_rehearsal_real",
     "change_approval", "approved_window",
 )
