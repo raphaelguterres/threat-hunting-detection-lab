@@ -46,10 +46,12 @@
 
 ## Adendo final — 02/11/2026, sessão noturna
 
-- PR #25 evoluiu para **110/110 testes locais PASS** (73 existentes + 21 testes de gate + 16 testes de importação CSV).
+- PR #25 evoluiu para **112/112 testes locais PASS** (73 existentes + 21 testes de gate + 18 testes de importação CSV).
 - CI do último commit de PR #25: **GitHub Actions run #43 SUCCESS**, com suíte integral nos runners Ubuntu e Windows.
 - Foi implementado importador offline de inventário `scripts/m1_import_authorized_inventory.py` (disponível no PR #25), que consome CSV coletado **pelo operador no console autorizado**, em arquivos privados `.lab`, e verifica membros, OS, grupo, sync, timestamp com fuso e evidência observada nas últimas 24 horas. O padrão valida sem escrever; `--apply` exige solicitação explícita, sem alterar configurações Wazuh.
 - Alterações do inventário invalidam revisões, aprovações, janela e evidência pós-mudança anteriores dependentes. Modelos privados usam apenas `UNVERIFIED` e permanecem bloqueados até coleta real; nenhuma consulta protegida foi contornada.
 - Permanece **`DEPLOYMENT_GATE=BLOCKED`**, sem implantação ativa e sem merge. Os PRs requerem revisão humana independente, e o M1 precisa do inventário real 4/4 e comprovação FIM ponta a ponta.
 
 **Carga horária:** registrar somente minutos efetivamente apontados no diário privado; o marco M1 não deve ser encerrado por cumprimento de meta horária.
+
+- O importador privado também rejeita e preserva manifestos pré-existentes malformados (chaves JSON duplicadas, schema ambíguo), evitando reaproveitamento indevido de aprovações. O resultado local final foi **112/112 PASS**.
