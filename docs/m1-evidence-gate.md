@@ -46,7 +46,7 @@ Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS a
 
 ## Rastreabilidade
 
-- [Checkpoint M1](m1-checkpoint-2026-11-02.md) (referência a ser incorporada à `main` via PR #24)
+- [Checkpoint M1 — PR #24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) (aguardando revisão e incorporação à `main`)
 - [Plano FIM por SO](m1-fim-os-scoped-remediation-plan.md)
 - [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
 - [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)
