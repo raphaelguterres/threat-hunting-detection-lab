@@ -104,3 +104,9 @@ python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv --outp
 Mesmo com todas as linhas válidas, o resultado informa `DEPLOYMENT_GATE=BLOCKED` e `WAZUH_RUNTIME_SELECTION_CONFIRMED=false`. **Não é prova de match em runtime, nem substitui revisão da ordem de grupos, aprovação e teste pós-mudança.** O importador CSV e a prévia nunca executam comandos no Wazuh.
 
 Ver os critérios completos em [Matriz de aceitação FIM por OS](m1-fim-acceptance-matrix.md).
+
+## Coerência temporal do inventário (política local M1)
+
+Além do limite de recência de 24 horas por linha, os quatro agentes devem ter sido observados dentro de uma **janela conjunta de até 30 minutos**. O importador CSV e o gate de revisão conferem a mesma regra. Isso reduz o risco de misturar capturas de estados diferentes dos membros do grupo; **é uma política de validação deste laboratório, não um requisito oficial do Wazuh**. Se a coleta ultrapassar a janela, repetir a observação pelo console autorizado.
+
+A lista ordenada `groups` precisa conter `default` uma única vez e não pode repetir outro grupo. O importador e o gate rejeitam duplicações; a ordem observada deve ser mantida, pois influencia a análise de precedência. Mesmo um manifesto válido estruturalmente **não constitui atestado independente** nem libera a implantação.

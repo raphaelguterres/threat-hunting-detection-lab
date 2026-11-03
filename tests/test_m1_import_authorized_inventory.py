@@ -152,6 +152,18 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.write_csv(items)
         self.assertEqual(self.invoke("--apply").returncode, 2)
 
+    def test_duplicate_default_group_is_rejected(self):
+        items = rows()
+        items[0]["groups"] = "default;default"
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
+    def test_inventory_from_different_time_windows_is_rejected(self):
+        items = rows()
+        items[0]["observed_at"] = (datetime.now(timezone.utc) - timedelta(minutes=45)).isoformat()
+        self.write_csv(items)
+        self.assertEqual(self.invoke("--apply").returncode, 2)
+
     def test_other_group_is_rejected(self):
         items = rows()
         items[0]["groups"] = "other"

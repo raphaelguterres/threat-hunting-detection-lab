@@ -32,7 +32,7 @@ def parse_rows(path):
         rows = list(reader)
     if len(rows) != 4:
         raise ValueError("expected exactly four member rows")
-    agents, ids = [], set()
+    agents, ids, observed_times = [], set(), []
     for row in rows:
         if None in row or any(value is None for value in row.values()):
             raise ValueError("inventory row missing or surplus fields")
@@ -45,8 +45,9 @@ def parse_rows(path):
         if ident == "004" and not operating_system.startswith("Windows"):
             raise ValueError("agent 004 OS conflicts with corroborated Windows baseline")
         groups = [group.strip() for group in row["groups"].split(";")]
-        if not groups or any(not group for group in groups) or "default" not in groups:
-            raise ValueError("agent does not belong to default")
+        if (not groups or any(not group for group in groups) or "default" not in groups
+                or len(set(groups)) != len(groups)):
+            raise ValueError("invalid, duplicate or missing group membership")
         if row["status"].strip().lower() != "active" or row["sync"].strip().lower() != "synced":
             raise ValueError("agent active/sync state not confirmed")
         evidence = row["evidence_ref"].strip()
@@ -62,6 +63,7 @@ def parse_rows(path):
         age = datetime.now(timezone.utc) - timestamp.astimezone(timezone.utc)
         if age > timedelta(hours=24) or age < -timedelta(minutes=5):
             raise ValueError("stale or future-dated inventory evidence")
+        observed_times.append(timestamp.astimezone(timezone.utc))
         agents.append({
             "id": ident, "os": operating_system, "groups": groups,
             "status": "active", "sync": "synced",
@@ -69,6 +71,8 @@ def parse_rows(path):
         })
     if "004" not in ids:
         raise ValueError("agent 004 missing from group default")
+    if max(observed_times) - min(observed_times) > timedelta(minutes=30):
+        raise ValueError("agent inventory is not a coherent 30-minute snapshot")
     return agents
 
 

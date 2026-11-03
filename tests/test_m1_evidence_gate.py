@@ -52,6 +52,16 @@ class M1GateTests(unittest.TestCase):
         document["agents"][1]["id"] = "001"
         self.assertFalse(gate.assess(document)[0])
 
+    def test_duplicate_group_in_manifest_is_blocked(self):
+        document = example()
+        document["agents"][0]["groups"] = ["default", "default"]
+        self.assertIn("agent_1_groups_valid_unique_default", gate.assess(document)[1])
+
+    def test_incoherent_observation_window_is_blocked(self):
+        document = example()
+        document["agents"][0]["observed_at"] = (datetime.now(timezone.utc) - timedelta(minutes=45)).isoformat()
+        self.assertIn("inventory_time_coherence", gate.assess(document)[1])
+
     def test_other_group_is_blocked(self):
         document = example()
         document["agents"][0]["groups"] = ["other"]

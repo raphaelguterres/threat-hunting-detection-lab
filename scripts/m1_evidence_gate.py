@@ -46,6 +46,7 @@ def assess(data, stage="prechange"):
         agents = []
     seen = set()
     checked_at = datetime.now(timezone.utc)
+    observed_times = []
     for idx, agent in enumerate(agents):
         key = "agent_" + str(idx + 1)
         if not isinstance(agent, dict):
@@ -61,8 +62,11 @@ def assess(data, stage="prechange"):
             missing.append(key + "_os")
         if ident == "004" and isinstance(os_name, str) and not os_name.startswith("Windows"):
             missing.append("agent_004_windows_expected")
-        if not isinstance(agent.get("groups"), list) or "default" not in agent["groups"]:
-            missing.append(key + "_default_group")
+        groups = agent.get("groups")
+        if (not isinstance(groups, list) or not groups
+                or not all(isinstance(g, str) and g and g.strip() == g for g in groups)
+                or len(groups) != len(set(groups)) or "default" not in groups):
+            missing.append(key + "_groups_valid_unique_default")
         if agent.get("sync") != "synced":
             missing.append(key + "_sync")
         if agent.get("status") != "active":
@@ -77,12 +81,15 @@ def assess(data, stage="prechange"):
             age = checked_at - observed_dt.astimezone(timezone.utc)
             if age > timedelta(hours=24) or age < -timedelta(minutes=5):
                 raise ValueError("stale or future observation")
+            observed_times.append(observed_dt.astimezone(timezone.utc))
         except (TypeError, ValueError, OverflowError):
             missing.append(key + "_observation_freshness")
         if not isinstance(agent.get("evidence_ref"), str) or not agent["evidence_ref"].strip():
             missing.append(key + "_evidence")
     if len(agents) == 4 and "004" not in seen:
         missing.append("agent_004_not_reconciled")
+    if len(observed_times) == 4 and max(observed_times) - min(observed_times) > timedelta(minutes=30):
+        missing.append("inventory_time_coherence")
     checks = data.get("checks")
     if not isinstance(checks, dict):
         checks = {}
