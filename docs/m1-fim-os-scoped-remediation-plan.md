@@ -126,3 +126,11 @@ Procedimento executado no Manager via Windows Remote/SSH autorizado:
 **Próximo gate não concluído:** inventário autorizado dos demais agentes no `default`, análise do impacto por sistema operacional, backup/restauração da configuração ativa, aprovação explícita para **aplicar** a mudança, publicação em janela controlada e validação efetiva de Windows/Linux. A [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) permanece aberta.
 
 **Fonte oficial sobre o uso de `-f` em arquivo temporário:** [Wazuh centralized configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html). Evidência operacional detalhada permanece apenas no diretório privado `.lab/`; sem publicação de caminhos reais, arquivo integral, credenciais ou hash.
+
+## Reforço de revisão FIM — 03/11/2026 (somente offline)
+
+O comparador [review_fim_scope_only.py](../scripts/review_fim_scope_only.py) passou a rejeitar **blocos mistos Unix/Windows**, inclusive quando as referências Windows aparecem fora de `syscheck/directories` ou `localfile/location`. A análise conservadora percorre todos os elementos e atributos XML do bloco proposto para reconhecer caminhos de unidade (exemplo sintético `C:\\Windows`), UNC, variáveis como `%PROGRAMDATA%\\`, elementos de registro Windows e formatos de log `eventlog`/`eventchannel`. A normalização XML também impede ocultar um prefixo de drive por entidade numérica.
+
+O resultado de uma identificação suspeita é **rejeitar o escopo automático Linux** e exigir revisão humana de toda a configuração. Uma exclusão Unix legítima em um bloco Unix continua permitida, desde que nenhuma outra alteração XML além de `os="^Linux"` tenha ocorrido. São controles conservadores para reduzir classificação incorreta; **não comprovam detecção de toda configuração específica de Windows nem substituem o parser oficial do Wazuh**.
+
+Testes sintéticos incluem diretório Unix com exclusão Windows, atributo Windows, referência UNC, registro Windows, formato `eventchannel`, caminho XML codificado e um caso exclusivamente Unix permitido. Nenhum arquivo ativo do Manager foi lido, gravado ou implantado nessa revisão.

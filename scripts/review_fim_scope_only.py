@@ -19,6 +19,8 @@ from xml.etree import ElementTree as ET
 
 MAX_BYTES = 65536
 FORBIDDEN = re.compile(r"<!\s*(?:DOCTYPE|ENTITY)\b|<\?xml\b", re.I)
+WINDOWS_PATH = re.compile(r"[A-Za-z]:[\\/]|%[A-Za-z_][A-Za-z_0-9]*%[\\/]|\\\\")
+WINDOWS_EVENT_FORMATS = frozenset({"eventchannel", "eventlog"})
 
 
 def _parse(text: str) -> ET.Element:
@@ -42,6 +44,20 @@ def _value(text: str | None) -> str:
 
 
 def _unix_only(block: ET.Element) -> bool:
+    # Inspect the entire staged block, not just recognized FIM/log locations.
+    # Mixed-platform settings must never be silently classified as Unix-only.
+    for node in block.iter():
+        if not isinstance(node.tag, str):
+            continue
+        tag = node.tag.lower()
+        if "registry" in tag or tag.startswith("windows_"):
+            return False
+        if tag == "log_format" and (node.text or "").strip().lower() in WINDOWS_EVENT_FORMATS:
+            return False
+        if WINDOWS_PATH.search(node.text or ""):
+            return False
+        if any(WINDOWS_PATH.search(value) for value in node.attrib.values()):
+            return False
     locations = []
     for dirs in block.findall("./syscheck/directories"):
         locations.extend(x.strip() for x in (dirs.text or "").split(","))
