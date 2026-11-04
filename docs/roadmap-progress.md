@@ -12,6 +12,8 @@
 
 **Checkpoint renovado do `004`:** o Manager retornou agente sincronizado e `verify-agent-conf` aprovou o `default/agent.conf`. Isso é uma validação sintática e de sync, não confirma hash, distribuição efetiva ou cobertura FIM em runtime.
 
+**Grupo central atual:** após autorização explícita do operador, o cadastro legado `001` foi removido. A verificação sanitizada posterior confirmou `AGENT_001_REGISTERED=False`; `default` contém `002`, `004` e `005`, todos ativos e sincronizados. O `003` continua `never_connected`, fora do `default`. A mudança real de três membros não altera silenciosamente o contrato original 4/4: faltam OS/versão e ordem dos grupos, além da revisão independente da emenda de escopo; o gate segue bloqueado.
+
 > **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
 
 ## Visão resumida
@@ -22,7 +24,7 @@
 | **M1 — Threat Hunting por hipóteses** | **Em andamento** | **11/17 marcados (64,7%); 6 pendentes** | Critérios reais de aceitação ainda incompletos |
 | **CI e contratos offline M1** | **PASS local em 04/11** | 198 testes aprovados, 4 ignorados e 160 subtestes aprovados; Actions #79 SUCCESS (3/3 jobs), commit ce557d4, é histórico | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
-| **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: 4 membros conferidos no Dashboard; 3/3 ativos sincronizados, `001` histórico desconectado; gate formal ainda incompleto | Backup/rollback e revisão operacional não substituem autorização |
+| **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: três membros atuais, todos ativos/sincronizados; `001` removido formalmente; contrato original 4/4 ainda aguarda emenda revisada | Backup/rollback e revisão operacional não substituem autorização |
 | **Jornada de 03/11** | Acompanhada em arquivo privado | Controle de horário separado de progresso | Tempo de sessão não mede porcentagem do roadmap |
 
 ```text
@@ -59,7 +61,7 @@ Detalhes sanitizados: [auditoria FIM e política do Indexer](m1-agent004-syschec
 
 | Prioridade | Pendente no checklist M1 | Dependências e critério |
 | --- | --- | --- |
-| **1** | Confirmar inventário/OS dos demais agentes, duplicidade Security e cobertura FIM efetiva do `004` | Quatro membros de `default` com ID, OS+versão, grupos **na ordem**, status, sync e captura autorizada; revisar precedência; [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) |
+| **1** | Aprovar a emenda de escopo, confirmar inventário/OS dos três agentes atuais, duplicidade Security e cobertura FIM efetiva do `004` | Revisão independente do contrato antigo 4/4; depois, três membros de `default` com ID, OS+versão, grupos **na ordem**, status, sync e captura autorizada; revisar precedência; [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) |
 | **2** | Aprovar, executar e validar change control Windows `4698` | Aprovação e janela separadas, retenção, ingestão Wazuh, rollback e evidências pós-mudança; [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) |
 | **3** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
 | **4** | Registrar estudos de caso adicionais com timelines e decisões | Dados realmente observados, limitação da amostra, triagem e evidência sanitizada |
@@ -107,7 +109,7 @@ O operador forneceu uma lista contendo três endpoints Linux, um Windows e um ag
 
 ## Sequência segura para a próxima sessão
 
-1. **Operador / responsável:** os quatro membros de `default` já foram identificados na interface. **Agora** obter decisão formal sobre `001` e, na futura janela autorizada, renovar a coleta de status/sync, OS e grupos na ordem. Não usar API/CLI para contornar bloqueios; manter capturas privadas em `.lab/`. Ver [Issue #27](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/27).
+1. **Revisor independente / responsável:** registrar a remoção autorizada de `001` e aprovar ou rejeitar uma emenda explícita ao contrato 4/4 para o novo escopo de três agentes. Depois, renovar a coleta de status/sync, OS e grupos na ordem dos três membros atuais. Manter capturas privadas em `.lab/`; a aprovação da emenda não autoriza a mudança FIM. Ver [Issue #27](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/27).
 2. **Revisor técnico:** conferir ordem/precedência dos grupos, diferenças Linux/Windows, telemetria local FIM, duplicidade dos coletores Security, e finalizar parecer **GO/NO-GO**.
 3. **Gestor da mudança:** aprovar separadamente a janela, restauração operacional e, se pertinente, a mudança FIM e o `4698`. **Nenhuma execução antecipada.**
 4. **Após mudanças autorizadas:** coletar eventos benignos reais e investigar H01/H02/H03 até o Discover com amostras, contexto e controle negativo.

@@ -2,7 +2,7 @@
 
 > **Estado:** pendente de evidências e autorização. Não é um procedimento de implantação automática.
 >
-> **Escopo:** grupo Wazuh `default` (contagem observada: quatro agentes). Um agente sem grupo foi observado separadamente e **não faz parte** desta avaliação do `default`.
+> **Escopo contratual original:** grupo Wazuh `default` (quatro agentes no checkpoint de 03/11). Um agente sem grupo foi observado separadamente e **não faz parte** desta avaliação do `default`. O estado operacional posterior e a revisão necessária do escopo estão registrados abaixo.
 
 ## Objetivo e limites
 
@@ -25,9 +25,22 @@ A validação de `os="^Linux"` por expressão regular no inventário é uma **pr
 
 **Ordem obrigatória:** 0–4 antes de qualquer mudança operacional, 5 somente em janela aprovada, 6–7 depois. O gate automatizado é sempre **não autorizador** e imprime `DEPLOYMENT_GATE=BLOCKED`.
 
+## Mudança de escopo em 04/11 — revisão obrigatória
+
+Após autorização explícita do operador, o cadastro legado `001` foi removido. A
+verificação sanitizada posterior confirmou `AGENT_001_REGISTERED=False`; `default`
+tem agora três membros (`002`, `004`, `005`), todos `active` e `synchronized`.
+
+Esse fato **não altera** o Gate 1 acima nem os testes/manifesto que ainda exigem o
+contrato original 4/4. Antes de importar ou aplicar um novo inventário, um revisor
+independente deve aprovar uma emenda que defina explicitamente o escopo de três
+agentes, a evidência exigida para cada um, a ordem dos grupos e o critério de
+aceite. Até a aprovação e atualização revisada do contrato, `DEPLOYMENT_GATE` segue
+`BLOCKED`.
+
 ## Aquisição autorizada e privacidade
 
-No console Wazuh autorizado, filtrar `default` e registrar **cada um dos quatro membros** com ID, OS completo, versão, grupos **na ordem**, status, sync e timestamp com fuso. O agente Windows `004` exige confirmação no console. Não inventar integrantes a partir da quantidade; não usar APIs/CLI alternativas para contornar um bloqueio anterior. Não publicar IP, hostname, usuário, credenciais, hashes privados ou logs brutos.
+Enquanto o contrato original vigorar, no console Wazuh autorizado filtrar `default` e registrar **cada um dos quatro membros** com ID, OS completo, versão, grupos **na ordem**, status, sync e timestamp com fuso. Somente após a emenda independente aprovada, coletar os mesmos campos para os três membros do novo escopo. O agente Windows `004` exige confirmação no console. Não inventar integrantes a partir da quantidade; não publicar IP, hostname, usuário, credenciais, hashes privados ou logs brutos.
 
 A evidência do inventário perde atualidade após **24 horas**, e o validador também tolera no máximo cinco minutos de diferença futura de relógio.
 
@@ -39,7 +52,7 @@ A primeira linha do CSV privado `.lab/m1-agent-inventory.csv` deve ser:
 id,os,groups,status,sync,observed_at,evidence_ref
 ```
 
-Depois de o operador conferir quatro linhas **reais**:
+Depois de o operador e o revisor conferirem a quantidade de linhas **reais** exigida pelo contrato então aprovado (quatro enquanto a emenda não for aprovada):
 
 ```powershell
 python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv

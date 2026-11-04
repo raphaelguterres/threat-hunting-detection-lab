@@ -126,6 +126,25 @@ editada. Esse resultado renova apenas a sincronização do `004` e a validade do
 central no Manager; não substitui o inventário atual 4/4, a revisão de precedência,
 a comparação com o backup privado ou a validação funcional de FIM.
 
+## Inventário central antes e depois do descomissionamento autorizado
+
+Antes da remoção, o comando read-only `agent_groups -l` retornou um único grupo,
+`default`, com quatro membros. A listagem filtrada confirmou os IDs `001`, `002`,
+`004` e `005`. A verificação posterior retornou `synchronized` e `active` para
+`002`, `004` e `005`; `001` estava `disconnected` e sem sincronização confirmada.
+O agente `003` foi observado como `never_connected`, mas não pertencia ao `default`.
+
+Em 04/11, após autorização explícita do operador, o cadastro legado `001` foi
+removido pelo procedimento administrativo do Wazuh. A verificação posterior
+sanitizada comprovou `AGENT_001_REGISTERED=False`; o `default` passou a conter
+`002`, `004` e `005`, todos `active` e `synchronized`.
+
+Essa alteração comprova o estado operacional atual, mas **não** altera
+silenciosamente o contrato de aceite original de inventário 4/4. Ainda faltam
+OS/versão completos e ordem dos grupos dos três membros atuais, além de uma emenda
+formal revisada independentemente para definir o novo critério de aceite. Até isso
+ocorrer, o gate de pré-mudança permanece bloqueado.
+
 ## Mudanças em preparação
 
 | Solicitação | Estado | Pré-condições ainda ausentes |
