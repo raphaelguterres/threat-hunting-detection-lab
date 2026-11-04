@@ -1,6 +1,8 @@
 # M1 — Change C / H03: pacote de aprovação e execução controlada
 
-**Preparado em 04/11/2026, BRT.** **Estado: PREPARED / NOT APPROVED / DEPLOYMENT_GATE=BLOCKED.**
+**Preparado em 04/11/2026, BRT.** **Estado: OWNER_APPROVAL=GRANTED_CONDITIONAL / CHANGE_C_EXECUTION=NO_GO / DEPLOYMENT_GATE=BLOCKED.**
+
+**Registro explícito do proprietário:** em 04/11/2026 às 17h28 BRT, o proprietário declarou na conversa que **aprova condicionalmente a janela 18h–19h BRT** e o escopo específico da mudança C, sujeito a todos os gates restantes. O ato foi registrado na [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) (comentário ID `6641318793`). Não constitui revisão independente e **não autoriza o binário H03**. Nenhuma mudança inicia automaticamente às 18h.
 
 Este documento registra evidências reais coletadas em somente leitura e um backup protegido do `ossec.conf` local do agente Windows `004`. **Não autoriza execução de alteração do FIM, teste de binário, ACL real, reinício nem merge.**
 
@@ -11,11 +13,11 @@ Este documento registra evidências reais coletadas em somente leitura e um back
 | Operador técnico identificado | VM `004`: sessão elevada `Administrator` (conta local RID 500); SID completo capturado apenas em `.lab/` | **Identidade verificada**; titular e autorização de negócio ainda requerem validação do dono |
 | Agente e serviço | `WazuhSvc=Running`, serviço `LocalSystem`; Wazuh Manager confirmou sincronização `004` e parser `agent.conf` OK | **PASS** de estado, não de configuração ativa |
 | FIM local e central | 6 diretivas locais, 1 central UnixStyle; nenhuma colisão exata de caminho, central sem `os`, H03 não monitorado | **Inventário confirmado**; API de configuração efetiva ainda pendente |
-| ACL isolada | Simulação `DirectorySecurity` protegida de herança: `SYSTEM`, `Administrators`, operador sintético; sem ACEs amplas; `Everyone` foi rejeitado com exit 2 | **PASS em memória**; SID do operador deve ser verificado na VM antes de aplicar |
+| ACL isolada | Simulação `DirectorySecurity` executada **na VM 004 com SID real da sessão `Administrator`**, obtido do próprio Windows: três ACEs específicas (`SYSTEM`, `Administrators`, operador), herança protegida e zero ACEs amplas; controle negativo `Everyone` rejeitado com exit 2 | **PASS em memória COM SID REAL**; futura ACL efetiva da pasta ainda não existe e deverá ser inspecionada após criação autorizada |
 | Backup real do `ossec.conf` | Criptografado no Windows Server via DPAPI `CurrentUser` em pasta própria de DACL restrita. Fonte 9725 B; backup cifrado 9942 B | **BACKUP CRIADO** |
 | Restauro isolado | Criptografia/decriptografia, SHA-256 de bytes iguais; corrupção negativa rejeitada. Uma segunda leitura do backup retornou `BACKUP_MATCHES_CURRENT_ACTIVE_FILE=True` | **PASS** de recuperação **em memória**; restauração operacional não executada |
 | Revisão independente | GitHub PRs #24 e #25 sem review formal registrado na consulta de 04/11 | **PENDENTE** — não pode ser substituída por aprovação do próprio autor, CI ou assistente |
-| Janela operacional | **Proposta:** 04/11/2026, **18:00–19:00 BRT**, a confirmar explicitamente com o operador e o revisor | **NÃO APROVADA**; não iniciar automaticamente |
+| Janela operacional | 04/11/2026, **18:00–19:00 BRT**, aprovada condicionalmente pelo **proprietário** às 17h28 | **OWNER APPROVED (CONDITIONAL)**; revisor, gates técnicos e liberação de execução permanecem pendentes; não iniciar automaticamente |
 | Rollback | Backup local do arquivo afetado já íntegro; etapas de revert em execução devem ser acordadas, com serviço, checksum, alerta e log pós-mudança | **Planejado**, não executado sobre arquivo ativo |
 
 **Evidências privadas de backup:** `.lab/m1-change-prep/M1_CHANGE_C_PRIVATE_BACKUP_RECEIPT_20261104.md`, `.lab/m1-change-c-backup-guest-result2.png` e `.lab/m1-change-c-repeat-verify.png`. O backup criptografado é **local à VM**, no perfil do operador, e **não deve ser enviado ao Git**. A chave DPAPI é vinculada ao mesmo usuário local; verificar disponibilidade desse perfil durante a janela e no rollback. Em caso de indisponibilidade, **NO-GO**.
@@ -56,14 +58,15 @@ flowchart TD
 
 ## Registro da decisão humana (a completar pelo revisor/operador)
 
-- **Responsável pela execução:** `UNCONFIRMED` (conta técnica Administrator identificada).
-- **Revisor independente GitHub:** `NOT_ASSIGNED`.
-- **Escopo autorizado:** `WindowsServer agent 004 ONLY`.
-- **Janela sugerida:** `2026-11-04 18:00-19:00 America/Sao_Paulo`.
-- **Aprovação do revisor com referência verificável:** `PENDING`.
-- **Aprovação explícita do dono para criar pasta/ACL, alterar FIM e reiniciar serviço:** `PENDING`.
-- **Aprovação adicional para alterar/executar binário H03:** `PENDING`.
-- **Decisão formal:** `NO-GO`.
+- **Conta técnica identificada no endpoint:** Windows Server `Administrator` (RID 500), SID capturado privadamente. Simulação de ACL com o **SID real da sessão** validada na VM em 04/11 às ~17h29 BRT (imagem privada `.lab/m1-owner-real-operator-acl-in-memory.png`); vínculo formal entre executor e proprietário deve ser conferido na janela.
+- **Revisor independente GitHub:** `NOT_ASSIGNED` — a aprovação do proprietário não supre esse requisito; sem exceção formal aprovada.
+- **Escopo aprovado pelo proprietário, condicionado aos gates:** `WindowsServer agent 004 ONLY`: diretório isolado com ACL restrita, uma diretiva FIM realtime local e restart somente de `WazuhSvc`.
+- **Janela aprovada pelo proprietário:** `2026-11-04 18:00–19:00 America/Sao_Paulo`, expira ao término; **não é autorização de início automático**.
+- **Evidência da autorização de proprietário:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9), comentário ID `6641318793`, registrada em 04/11 às 17h28 BRT; `OWNER_APPROVAL=GRANTED_CONDITIONAL`.
+- **Aprovação do revisor independente com referência verificável:** `PENDING`.
+- **Consulta da configuração Syscheck ativa por API/Dashboard:** `PENDING` (não inferir do XML).
+- **Aprovação adicional para alterar/executar binário H03:** `EXPLICITLY_NOT_GRANTED`.
+- **Decisão formal de execução:** `NO-GO` / `DEPLOYMENT_GATE=BLOCKED`.
 
 **M1 atual: 11/17 (64,7%); `DEPLOYMENT_GATE=BLOCKED`.** O backup validado reduz um risco operacional, mas não libera o cutover.
 
