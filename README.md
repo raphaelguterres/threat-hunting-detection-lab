@@ -4,6 +4,8 @@
 
 Laboratório prático de **monitoramento, engenharia de detecção e investigação** com Wazuh. O ambiente usa uma VM Kali Linux como servidor Wazuh em Docker, um agente Linux e um Windows Server 2022 em rede privada isolada.
 
+**Visão técnica atual (04/11/2026):** [arquitetura e exposição pública](docs/architecture-network-public-exposure-20261104.md) · [roadmap autoral completo de Cyber Defense Engineering](docs/cyber-defense-authorial-lab-roadmap-20261104.md) · [preparo do binário benigno H03 e critérios de evidência real](docs/m1-h03-benign-binary-test-plan-20261104.md). **M1 11/17; H03 ainda não comprovado em operação; gate BLOCKED.**
+
 > Todos os eventos deste projeto são simulações inofensivas. Não há exploração, malware ou tentativa de acesso a sistemas de terceiros.
 
 ## Projeto principal: Segurança Defensiva
