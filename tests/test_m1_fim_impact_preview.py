@@ -17,10 +17,10 @@ def synthetic_agents():
     now = datetime.now(timezone.utc).isoformat()
     return [
         {"id": str(idx).zfill(3),
-         "os": "Windows Server 2022" if idx in (2, 4) else "Linux Ubuntu 24.04",
+         "os": "Windows Server 2022" if idx == 4 else "Linux Ubuntu 24.04",
          "groups": "default", "status": "active", "sync": "synced",
          "observed_at": now, "evidence_ref": "PRIVATE_SYNTHETIC_FAKE_SOURCE"}
-        for idx in (1, 2, 3, 4)
+        for idx in (2, 4, 5)
     ]
 
 
@@ -45,12 +45,12 @@ class FimOsImpactPreviewTests(unittest.TestCase):
             capture_output=True, text=True,
         )
 
-    def test_two_linux_two_windows_are_previewed_without_approval(self):
+    def test_two_linux_one_windows_are_previewed_without_approval(self):
         self.write_csv()
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=2", result.stdout)
-        self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=2", result.stdout)
+        self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=1", result.stdout)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
         self.assertIn("WAZUH_RUNTIME_SELECTION_CONFIRMED=false", result.stdout)
         self.assertNotIn("PRIVATE_SYNTHETIC_FAKE_SOURCE", result.stdout)
@@ -58,13 +58,12 @@ class FimOsImpactPreviewTests(unittest.TestCase):
     def test_dashboard_os_labels_use_family_not_display_regex(self):
         agents = synthetic_agents()
         agents[0]["os"] = "Amazon Linux 2023"
-        agents[1]["os"] = "Kali GNU/Linux 2025.3"
-        agents[2]["os"] = "Linux Ubuntu 24.04"
-        agents[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        agents[2]["os"] = "Kali GNU/Linux 2025.3"
+        agents[1]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
         self.write_csv(agents)
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=2", result.stdout)
         self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=1", result.stdout)
         self.assertIn("CLASSIFICATION_BASIS=dashboard_display_os_family_not_runtime_regex", result.stdout)
         self.assertIn("AGENT_CONFIG_OS_REGEX_CHECKED=false", result.stdout)
@@ -107,7 +106,7 @@ class FimOsImpactPreviewTests(unittest.TestCase):
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)
 
     def test_incomplete_inventory_rejected(self):
-        self.write_csv(synthetic_agents()[:3])
+        self.write_csv(synthetic_agents()[:2])
         result = self.invoke()
         self.assertEqual(result.returncode, 2)
         self.assertIn("INVENTORY_CSV_STRUCTURE=INVALID_OR_UNREADABLE", result.stdout)

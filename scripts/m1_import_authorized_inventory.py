@@ -16,6 +16,7 @@ import tempfile
 REPO = Path(__file__).resolve().parents[1]
 PRIVATE_ROOT = (REPO / ".lab").resolve()
 COLUMNS = ("id", "os", "groups", "status", "sync", "observed_at", "evidence_ref")
+EXPECTED_DEFAULT_AGENT_IDS = frozenset(("002", "004", "005"))
 OS_FAMILIES = (
     ("Microsoft Windows ", "Windows"), ("Windows ", "Windows"),
     ("Amazon Linux ", "Linux"), ("Kali GNU/Linux ", "Linux"),
@@ -54,8 +55,8 @@ def parse_rows(path):
         if not reader.fieldnames or tuple(reader.fieldnames) != COLUMNS:
             raise ValueError("inventory CSV header missing or changed")
         rows = list(reader)
-    if len(rows) != 4:
-        raise ValueError("expected exactly four member rows")
+    if len(rows) != len(EXPECTED_DEFAULT_AGENT_IDS):
+        raise ValueError("expected exactly three current default member rows")
     agents, ids, observed_times = [], set(), []
     for row in rows:
         if None in row or any(value is None for value in row.values()):
@@ -95,8 +96,8 @@ def parse_rows(path):
             "status": "active", "sync": "synced",
             "observed_at": observed, "evidence_ref": evidence,
         })
-    if "004" not in ids:
-        raise ValueError("agent 004 missing from group default")
+    if ids != EXPECTED_DEFAULT_AGENT_IDS:
+        raise ValueError("inventory IDs do not match the approved default scope")
     if max(observed_times) - min(observed_times) > timedelta(minutes=30):
         raise ValueError("agent inventory is not a coherent 30-minute snapshot")
     return agents

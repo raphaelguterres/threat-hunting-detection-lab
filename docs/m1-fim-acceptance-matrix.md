@@ -15,7 +15,7 @@ A validação de `os="^Linux"` por expressão regular no inventário é uma **pr
 | Gate | Critério verificável | Evidência aceita | Bloqueio |
 | --- | --- | --- | --- |
 | 0 — baseline | Configuração ativa no Manager com parser OK e hash correspondente ao snapshot privado | Resultado datado e inventário de metadados originais | Hash divergente ou erro de parser |
-| 1 — inventário 4/4 | IDs distintos, OS/versão, grupos ordenados, status ativo, sincronização, evidências com horário/fuso | Console Wazuh **autorizado**, transcrição privada/revisão humana | ID ou OS presumido, agente sem sincronização, captura antiga |
+| 1 — inventário 3/3 | IDs `002`, `004`, `005`, OS/versão, grupos ordenados, status ativo, sincronização, evidências com horário/fuso | Console Wazuh **autorizado**, transcrição privada/revisão humana | ID ou OS presumido, agente sem sincronização, captura antiga |
 | 2 — precedência e impacto | Avaliar para cada membro todos os grupos, sua ordem, conflitos e coexistência de FIM central/local | Matriz individual privada e revisor independente | Conflito de grupo sem resolução documentada |
 | 3 — backup/rollback | Backup real conferido; proprietário/grupo/permissões registrados; plano de restauração operacional testável | Backup privado, hash/metadata, teste isolado e procedimento de recuperação | Apenas fixture sintética ou recuperação de bytes sem owner/mode |
 | 4 — controle de mudança | Diff mínimo aprovado, janela autorizada, responsável, plano de parada e rollback | Aprovação específica externa ao script, com data e escopo | Ausência de autorização, CI apenas verde |
@@ -25,22 +25,21 @@ A validação de `os="^Linux"` por expressão regular no inventário é uma **pr
 
 **Ordem obrigatória:** 0–4 antes de qualquer mudança operacional, 5 somente em janela aprovada, 6–7 depois. O gate automatizado é sempre **não autorizador** e imprime `DEPLOYMENT_GATE=BLOCKED`.
 
-## Mudança de escopo em 04/11 — revisão obrigatória
+## Mudança de escopo em 04/11 — aprovada pelo revisor
 
 Após autorização explícita do operador, o cadastro legado `001` foi removido. A
 verificação sanitizada posterior confirmou `AGENT_001_REGISTERED=False`; `default`
 tem agora três membros (`002`, `004`, `005`), todos `active` e `synchronized`.
 
-Esse fato **não altera** o Gate 1 acima nem os testes/manifesto que ainda exigem o
-contrato original 4/4. Antes de importar ou aplicar um novo inventário, um revisor
-independente deve aprovar uma emenda que defina explicitamente o escopo de três
-agentes, a evidência exigida para cada um, a ordem dos grupos e o critério de
-aceite. Até a aprovação e atualização revisada do contrato, `DEPLOYMENT_GATE` segue
-`BLOCKED`.
+O revisor do laboratório aprovou a emenda `M1-INVENTORY-SCOPE-3` em
+`2026-11-04T20:07:31-03:00`. A aprovação tem limitação de segregação, pois o revisor
+também autorizou/executou a remoção. O contrato revisado exige os três IDs acima;
+antes de importar inventário real, renovar OS/versão, ordem de grupos e evidência
+autorizada. `DEPLOYMENT_GATE` continua `BLOCKED`.
 
 ## Aquisição autorizada e privacidade
 
-Enquanto o contrato original vigorar, no console Wazuh autorizado filtrar `default` e registrar **cada um dos quatro membros** com ID, OS completo, versão, grupos **na ordem**, status, sync e timestamp com fuso. Somente após a emenda independente aprovada, coletar os mesmos campos para os três membros do novo escopo. O agente Windows `004` exige confirmação no console. Não inventar integrantes a partir da quantidade; não publicar IP, hostname, usuário, credenciais, hashes privados ou logs brutos.
+No console Wazuh autorizado, filtrar `default` e registrar os três membros do escopo aprovado (`002`, `004`, `005`) com ID, OS completo, versão, grupos **na ordem**, status, sync e timestamp com fuso. O agente Windows `004` exige confirmação no console. Não inventar integrantes a partir da quantidade; não publicar IP, hostname, usuário, credenciais, hashes privados ou logs brutos.
 
 A evidência do inventário perde atualidade após **24 horas**, e o validador também tolera no máximo cinco minutos de diferença futura de relógio.
 
@@ -52,7 +51,7 @@ A primeira linha do CSV privado `.lab/m1-agent-inventory.csv` deve ser:
 id,os,groups,status,sync,observed_at,evidence_ref
 ```
 
-Depois de o operador e o revisor conferirem a quantidade de linhas **reais** exigida pelo contrato então aprovado (quatro enquanto a emenda não for aprovada):
+Depois de o operador e o revisor conferirem as três linhas **reais** exigidas pelo contrato aprovado:
 
 ```powershell
 python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv
@@ -91,7 +90,7 @@ A conclusão da matriz depende das evidências privadas conferidas por operador,
 
 ## Gate de consistência temporal (política local)
 
-Os quatro registros obtidos no console autorizado precisam ser parte da **mesma janela de coleta, com no máximo 30 minutos entre a primeira e a última observação**. Cada registro continua limitado a 24 horas de idade e pode ter até cinco minutos de desvio futuro. O importador CSV e o gate M1 revalidam essas condições. Este limite de 30 minutos é uma salvaguarda específica do laboratório para evitar inventários misturados, **não uma regra imposta pelo Wazuh**. Se não for possível concluir a coleta nesse intervalo, produzir uma nova captura autorizada.
+Os três registros obtidos no console autorizado precisam ser parte da **mesma janela de coleta, com no máximo 30 minutos entre a primeira e a última observação**. Cada registro continua limitado a 24 horas de idade e pode ter até cinco minutos de desvio futuro. O importador CSV e o gate M1 revalidam essas condições. Este limite de 30 minutos é uma salvaguarda específica do laboratório para evitar inventários misturados, **não uma regra imposta pelo Wazuh**. Se não for possível concluir a coleta nesse intervalo, produzir uma nova captura autorizada.
 
 Grupos devem ser apresentados uma única vez por agente, em sua ordem original. O verificador rejeita grupos duplicados, sem tentar resolver ambiguidades de precedência automaticamente. Todas as aprovações dependentes continuam sujeitas a revisão humana e `DEPLOYMENT_GATE=BLOCKED`.
 

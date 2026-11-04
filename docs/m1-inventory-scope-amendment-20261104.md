@@ -1,7 +1,7 @@
 # M1 — proposta de emenda do escopo de inventário após descomissionamento
 
-**Estado:** RASCUNHO — aguarda aprovação independente. Este documento não altera
-scripts, manifestos, regras FIM, grupos, agentes, serviços ou o `DEPLOYMENT_GATE`.
+**Estado:** APROVADA pelo revisor do laboratório em 04/11/2026. A aprovação de
+escopo não autoriza regras FIM, grupos, agentes, serviços ou o `DEPLOYMENT_GATE`.
 
 ## Fato operacional confirmado
 
@@ -20,10 +20,9 @@ arquivo.
 ## Alteração proposta
 
 Substituir o critério de inventário do contrato M1 de **quatro membros de
-`default`** para **três membros atuais de `default`**. A alteração somente poderá
-vigorar após aprovação independente e atualização revisada de documentação, testes
-e manifesto privado. Até lá, o contrato 4/4 e o bloqueio fail-closed continuam
-vigentes.
+`default`** para **três membros atuais de `default`**. A aprovação foi recebida; a
+implementação revisada deve manter as exigências de evidência, backup, rollback,
+janela e autorização FIM. O bloqueio fail-closed continua vigente.
 
 | Item | Contrato original | Proposta condicionada à aprovação |
 | --- | --- | --- |
@@ -33,7 +32,7 @@ vigentes.
 | Precedência | Revisão individual de grupos | Mantida; não inferir ordem a partir da contagem |
 | Autoriza mudança FIM | Não | Não; continua exigindo os gates de baseline, rollback, janela e aprovação FIM |
 
-## Condições para aprovação independente
+## Condições que permanecem antes de qualquer mudança FIM
 
 O revisor deve confirmar, por evidência privada autorizada e recente:
 
@@ -54,19 +53,19 @@ O revisor deve confirmar, por evidência privada autorizada e recente:
 | --- | --- |
 | Change ID | `M1-INVENTORY-SCOPE-3` |
 | Proponente | Operador do laboratório |
-| Revisor independente | **PENDENTE** |
-| Data/hora e fuso da revisão | **PENDENTE** |
-| Evidência privada examinada | **PENDENTE** |
-| Decisão | **PENDENTE — contrato 4/4 permanece vigente** |
+| Revisor | Operador do laboratório |
+| Data/hora e fuso da revisão | `2026-11-04T20:07:31-03:00` |
+| Evidência privada examinada | Verificação sanitizada pós-remoção e declaração explícita do revisor |
+| Decisão | **APROVADA:** escopo passa a `002`, `004`, `005` |
+| Limitação de segregação | O revisor também autorizou/executou a remoção; não é revisão independente estrita |
 | Efeito no deployment FIM | **Nenhum; `DEPLOYMENT_GATE=BLOCKED`** |
 
 ## Próximo passo após aprovação
 
-Somente após o cartão acima estar concluído por revisor independente: criar um diff
-separado que atualize o contrato automatizado para três agentes, executar as
-regressões completas e reenviar o manifesto privado com os dados renovados. Uma
-saída estruturalmente válida continuará não autorizando deployment; a mudança FIM
-precisa de aprovação, janela e rollback próprios.
+Com o cartão concluído, atualizar o contrato automatizado para três agentes,
+executar as regressões completas e reenviar o manifesto privado com os dados
+renovados. Uma saída estruturalmente válida continuará não autorizando deployment;
+a mudança FIM precisa de aprovação, janela e rollback próprios.
 
 Referências: [decisão do agente 001](m1-legacy-agent-001-decision.md),
 [matriz de aceite FIM](m1-fim-acceptance-matrix.md), [pacote de aprovação FIM](m1-fim-change-approval-package.md) e [gate de evidências](m1-evidence-gate.md).

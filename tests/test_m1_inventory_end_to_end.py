@@ -23,13 +23,13 @@ def synthetic_rows():
         {
             "id": f"{i:03d}",
             "os": "Windows Server 2022" if i == 4 else "Linux Ubuntu 24.04",
-            "groups": "default;second" if i == 1 else "default",
+            "groups": "default;second" if i == 2 else "default",
             "status": "active",
             "sync": "synced",
             "observed_at": observed,
             "evidence_ref": "SYNTHETIC_PRIVATE_TEST_REFERENCE",
         }
-        for i in (1, 2, 3, 4)
+        for i in (2, 4, 5)
     ]
 
 
@@ -77,7 +77,7 @@ class InventoryEndToEndTests(unittest.TestCase):
         self.assertEqual(applied.returncode, 0, applied.stderr)
         self.assertIn("INDEPENDENT_EVIDENCE_REVIEW_REQUIRED=true", applied.stdout)
         manifest = json.loads(self.manifest.read_text(encoding="utf-8"))
-        self.assertEqual(len(manifest["agents"]), 4)
+        self.assertEqual(len(manifest["agents"]), 3)
         self.assertFalse(manifest["checks"])
         gate = self.gate()
         self.assertEqual(gate.returncode, 2)
@@ -90,11 +90,11 @@ class InventoryEndToEndTests(unittest.TestCase):
         items = synthetic_rows()
         items[0]["os"] = "Amazon Linux 2023"
         items[1]["os"] = "Kali GNU/Linux 2025.3"
-        items[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        items[1]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
         self.write_csv(items)
         result = self.preview()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=2", result.stdout)
         self.assertIn("AGENT_CONFIG_OS_REGEX_CHECKED=false", result.stdout)
         self.assertEqual(self.import_inventory(apply=True).returncode, 0)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", self.gate().stdout)
@@ -132,7 +132,7 @@ class InventoryEndToEndTests(unittest.TestCase):
         self.write_csv(items)
         self.assertEqual(self.import_inventory(apply=True).returncode, 0)
         prior = self.manifest.read_bytes()
-        self.write_csv(items[:3])
+        self.write_csv(items[:2])
         result = self.import_inventory(apply=True)
         self.assertEqual(result.returncode, 2)
         self.assertIn("MANIFEST_UPDATED=False", result.stdout)
@@ -142,7 +142,7 @@ class InventoryEndToEndTests(unittest.TestCase):
         self.write_csv(synthetic_rows())
         result = self.preview()
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=3", result.stdout)
+        self.assertIn("PROJECTED_LINUX_FAMILY_AGENTS=2", result.stdout)
         self.assertIn("PROJECTED_NON_LINUX_FAMILY_AGENTS=1", result.stdout)
         self.assertIn("MULTI_GROUP_AGENTS=1", result.stdout)
         self.assertIn("DEPLOYMENT_GATE=BLOCKED", result.stdout)

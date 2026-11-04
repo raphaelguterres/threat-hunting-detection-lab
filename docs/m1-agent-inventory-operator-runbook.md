@@ -8,14 +8,14 @@
 
 Na consulta autorizada ao Dashboard, foram confirmados **quatro membros do grupo `default`** (`001`, `002`, `004`, `005`). Os agentes ativos `002`, `004` e `005` exibiram **`SYNCHRONIZED`** na aba de configuração. O `001` permaneceu **desconectado**, mantido como registro histórico por decisão do operador, sem exclusão. O Wazuh listou somente um grupo centralizado, `default`; resta analisar formalmente a interação com configurações locais e o escopo de mudança. O Manager passou no checkpoint de parser, baseline e sync do `004` às 19h46 BRT.
 
-**Isso não satisfaz o gate 4/4 active+synced.** A [decisão sobre o `001`](m1-legacy-agent-001-decision.md) e o [pacote de aprovação FIM](m1-fim-change-approval-package.md) devem ser examinados antes de executar qualquer alteração. Para agentes removidos de todos os grupos, o Wazuh reatribui o `default`; remoção simples de grupo não é solução de descomissionamento. A evidência visual tem data e deve ser reconfirmada antes da eventual janela.
+Em 04/11, `001` foi removido formalmente e o revisor aprovou o escopo atual de três agentes (`002`, `004`, `005`), com limitação de segregação registrada na [emenda de escopo](m1-inventory-scope-amendment-20261104.md). O inventário recente, grupos ordenados e demais gates ainda precisam ser renovados antes de qualquer alteração FIM.
 
-## 1. Coleta autorizada, quatro membros do default
+## 1. Coleta autorizada, três membros do default
 
 1. Entrar no Dashboard com a sessão e as permissões já autorizadas. Navegar para **Agents management → Summary**; identificar os membros atribuídos a `default`. Em **Agents management → Groups**, revisar associação e detalhes visíveis. **Não usar Dev Tools, API, SSH ou CLI como contorno** de consultas individuais anteriormente bloqueadas.
-2. Registrar para cada um dos **quatro** agentes reais: ID, string do SO e versão, status, sincronização, timestamp de observação com fuso, grupos **na ordem atribuída** e referência privada da captura. Não presumir IDs pelo total do grupo. Reconferir o agente `004` como Windows no console.
+2. Registrar para cada um dos três agentes reais (`002`, `004`, `005`): ID, string do SO e versão, status, sincronização, timestamp de observação com fuso, grupos **na ordem atribuída** e referência privada da captura. Não presumir IDs pelo total do grupo. Reconferir o agente `004` como Windows no console.
 3. Se o Dashboard não mostrar o SO, a sincronização ou a **ordem** dos grupos, marcar o campo como `NÃO VERIFICADO`. **Não inferir ordem alfabética como prioridade**. Solicitar ao responsável pelo ambiente confirmação por meio autorizado, sem mudar permissões para acessar o dado.
-4. As capturas ficam somente na pasta privada `.lab/`, sem hostname, IP, nomes de pessoas, tokens ou conteúdo de logs. Publicar exclusivamente contagens e estado dos controles. Os quatro registros precisam ser coletados em até **30 minutos** entre o primeiro e último (política local M1); cada observação precisa ter fuso explícito e no máximo 24h de idade.
+4. As capturas ficam somente na pasta privada `.lab/`, sem hostname, IP, nomes de pessoas, tokens ou conteúdo de logs. Publicar exclusivamente contagens e estado dos controles. Os três registros precisam ser coletados em até **30 minutos** entre o primeiro e último (política local M1); cada observação precisa ter fuso explícito e no máximo 24h de idade.
 
 **Quando houver agente desconectado ou faltarem grupo, sync e horário**, usar primeiro o [roteiro de triagem do agente 001 e observações parciais](m1-agent-001-disconnection-triage.md). Ele aceita estados não ideais, registra desconhecidos e nunca autoriza implantação; **não inserir dados presumidos no CSV de aceite final**.
 
@@ -27,7 +27,7 @@ Preparar `.lab/m1-agent-inventory.csv` (nunca versionar) com cabeçalho exato:
 id,os,groups,status,sync,observed_at,evidence_ref
 ```
 
-**Preencher quatro linhas reais.** Em `groups`, separar nomes por `;`, respeitando a ordem do Dashboard. `observed_at` em ISO 8601 com fuso, por exemplo `2026-11-03T15:00:00-03:00` **somente como exemplo de formato, não como evidência real**. `evidence_ref` é a referência privada da captura, sem dados de rede.
+**Preencher três linhas reais para `002`, `004`, `005`.** Em `groups`, separar nomes por `;`, respeitando a ordem do Dashboard. `observed_at` em ISO 8601 com fuso, por exemplo `2026-11-03T15:00:00-03:00` **somente como exemplo de formato, não como evidência real**. `evidence_ref` é a referência privada da captura, sem dados de rede.
 
 Conferir sem alterações:
 
@@ -50,14 +50,14 @@ No Wazuh, um agente pode pertencer a múltiplos grupos, e o **último grupo atri
 - Confirmar a ordem dos grupos e identificar se há configuração centralizada FIM/log em mais de um grupo; revisar precedência conforme a documentação oficial
 - Comparar o escopo local vs. central sem supor substituição; preservar os **seis caminhos FIM locais previamente observados** no Windows `004`
 - Classificar se `os="^Linux"` excluiria a diretiva Unix do Windows e manteria a telemetria adequada nos Linux, anotando as limitações; a prévia regex não constitui demonstração de distribuição
-- Revisor independente registra `group_precedence_review` e `os_impact_review` somente após examinar os quatro agentes e os conflitos
+- O revisor registra `group_precedence_review` e `os_impact_review` somente após examinar os três agentes e os conflitos
 
 ## 4. Decisão formal de mudança: NO-GO até todos os gates
 
 | Gate | Estado atual | Critério de liberação |
 | --- | --- | --- |
 | Baseline e parser ativo | PASS somente leitura | Hash baseline e parser preservados antes da mudança |
-| Inventário individual `default` 4/4 | **PARCIAL — IDs/membership confirmados, 3/3 ativos synced, `001` histórico disconnected** | Decisão sobre `001`; contrato do gate revisto formalmente se mudar o escopo, registros atuais e revisor independente |
+| Inventário individual `default` 3/3 | **PARCIAL — IDs/membership e status/sync confirmados; OS/versão e ordem de grupos precisam ser renovados** | Registros recentes dos três agentes, precedência revisada e evidência privada |
 | Precedência e impacto por OS | **PENDENTE** | Grupos ordenados e conflitos avaliados por agente |
 | Backup real DPAPI, integridade e restauração isolada | PASS **somente no sandbox local** | Procedimento operacional com owner, gid, mode, hash e responsabilidade aprovado |
 | Revisão independente de código | **PENDENTE** | PRs #24/#25 revisados formalmente; CI verde não substitui aprovação |
@@ -68,4 +68,4 @@ No Wazuh, um agente pode pertencer a múltiplos grupos, e o **último grupo atri
 
 ## 5. Próxima atualização do repositório
 
-Ao concluir a conferência dos quatro agentes no console, atualizar **somente status agregados e evidências sanitizadas** nas Issues [#17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) e [#9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9). Evidências individualizadas permanecem privadas. O revisor deve apontar divergências e exigir nova coleta, se necessário. [Matriz de aceitação FIM](m1-fim-acceptance-matrix.md).
+Ao concluir a conferência dos três agentes no console, atualizar **somente status agregados e evidências sanitizadas** nas Issues [#17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) e [#9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9). Evidências individualizadas permanecem privadas. O revisor deve apontar divergências e exigir nova coleta, se necessário. [Matriz de aceitação FIM](m1-fim-acceptance-matrix.md).

@@ -4,11 +4,11 @@
 
 ## Por que existe
 
-Os quatro membros do grupo `default` precisam ser reconciliados individualmente antes de restringir uma diretiva Linux da configuração centralizada. A validação sintática `verify-agent-conf` feita em cópia isolada e testes com arquivos sintéticos **não** provam que a distribuição para todos os agentes é segura.
+Os três membros aprovados do grupo `default` (`002`, `004`, `005`) precisam ser reconciliados individualmente antes de restringir uma diretiva Linux da configuração centralizada. A validação sintática `verify-agent-conf` feita em cópia isolada e testes com arquivos sintéticos **não** provam que a distribuição para todos os agentes é segura.
 
 ## Fluxo técnico
 
-1. Obter inventário pelo **console autorizado** do Wazuh: quatro IDs distintos, OS/versão, grupos (incluindo `default`), status de sincronização e referência à evidência privada. Consultas previamente bloqueadas por controles de acesso **não devem ser contornadas**.
+1. Obter inventário pelo **console autorizado** do Wazuh: os IDs `002`, `004`, `005`, OS/versão, grupos (incluindo `default`), status de sincronização e referência à evidência privada. Consultas previamente bloqueadas por controles de acesso **não devem ser contornadas**.
 2. Registrar a revisão de impacto `os="^Linux"`, o hash da baseline e o resultado do verificador oficial em cópia isolada.
 3. Obter evidência de **backup real** preservando ownership/permissões, ensaio autorizado de restauração isolada sobre cópia real, aprovação de mudança e janela de execução.
 4. Executar o validador local. Saída `EVIDENCE_COMPLETENESS=REVIEW_READY` indica **somente completude declarada** e exige validação humana independente; `DEPLOYMENT_GATE=BLOCKED` é sempre exibido. Nenhum status dessa ferramenta autoriza aplicar a configuração.
@@ -19,7 +19,7 @@ Os quatro membros do grupo `default` precisam ser reconciliados individualmente 
 Crie um manifesto JSON privado em `.lab/` (pasta ignorada por Git). Campos requeridos:
 
 - `schema_version: 1`, `change_id: "M1-FIM-OS-SCOPE"`.
-- `agents`: lista de quatro objetos contendo `id`, `os`, `groups` (lista em ordem de prioridade observada, inclui `default`), `status: "active"`, `sync: "synced"`, `observed_at` (ISO 8601 com fuso, coleta das últimas 24h) e `evidence_ref`. O ID `004` deve ser revalidado como Windows.
+- `agents`: lista dos três objetos para `002`, `004`, `005`, contendo `id`, `os`, `groups` (lista em ordem de prioridade observada, inclui `default`), `status: "active"`, `sync: "synced"`, `observed_at` (ISO 8601 com fuso, coleta das últimas 24h) e `evidence_ref`. O ID `004` deve ser revalidado como Windows.
 - `checks`: objetos para `inventory_review`, `os_impact_review`, `group_precedence_review`, `baseline_integrity`, `parser_staging`, `backup_integrity_real`, `rollback_rehearsal_real`, `change_approval`, `approved_window`; cada objeto com `status: "verified"` e `evidence_ref` indicando uma referência a evidência privada revisada.
 - Para validação após mudança, acrescente `agents_resynced`, `windows_fim`, `linux_fim`, `manager_ingestion`, `indexer_ingestion`, `discover_visibility` com o mesmo formato.
 
@@ -59,7 +59,7 @@ Quando o operador obtiver o inventario **pelo console Wazuh autorizado**, pode p
 id,os,groups,status,sync,observed_at,evidence_ref
 ```
 
-Registre **quatro linhas reais** com IDs distintos, SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso observado nas **ultimas 24 horas** (maximo 5 minutos no futuro por desvio de relogio) e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
+Registre **três linhas reais** para `002`, `004`, `005`, com SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso observado nas **ultimas 24 horas** (maximo 5 minutos no futuro por desvio de relogio) e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
 
 Teste sem alterar arquivos:
 
@@ -67,7 +67,7 @@ Teste sem alterar arquivos:
 python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv
 ```
 
-Somente depois de revisar os quatro dados reais, importe para o manifesto privado:
+Somente depois de revisar os três dados reais, importe para o manifesto privado:
 
 ```powershell
 python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv --apply
@@ -89,7 +89,7 @@ A documentação informa que os agentes **recarregam automaticamente** a configu
 
 ## Prévia offline de impacto do seletor Linux
 
-Depois de obter quatro linhas **reais e autorizadas** no CSV privado `.lab/m1-agent-inventory.csv`, o analista pode conferir o efeito **hipotético** do regex `^Linux` sem conexão ao Manager:
+Depois de obter três linhas **reais e autorizadas** no CSV privado `.lab/m1-agent-inventory.csv`, o analista pode conferir o efeito **hipotético** do regex `^Linux` sem conexão ao Manager:
 
 ```powershell
 python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv
@@ -107,7 +107,7 @@ Ver os critérios completos em [Matriz de aceitação FIM por OS](m1-fim-accepta
 
 ## Coerência temporal do inventário (política local M1)
 
-Além do limite de recência de 24 horas por linha, os quatro agentes devem ter sido observados dentro de uma **janela conjunta de até 30 minutos**. O importador CSV e o gate de revisão conferem a mesma regra. Isso reduz o risco de misturar capturas de estados diferentes dos membros do grupo; **é uma política de validação deste laboratório, não um requisito oficial do Wazuh**. Se a coleta ultrapassar a janela, repetir a observação pelo console autorizado.
+Além do limite de recência de 24 horas por linha, os três agentes devem ter sido observados dentro de uma **janela conjunta de até 30 minutos**. O importador CSV e o gate de revisão conferem a mesma regra. Isso reduz o risco de misturar capturas de estados diferentes dos membros do grupo; **é uma política de validação deste laboratório, não um requisito oficial do Wazuh**. Se a coleta ultrapassar a janela, repetir a observação pelo console autorizado.
 
 A lista ordenada `groups` precisa conter `default` uma única vez e não pode repetir outro grupo. O importador e o gate rejeitam duplicações; a ordem observada deve ser mantida, pois influencia a análise de precedência. Mesmo um manifesto válido estruturalmente **não constitui atestado independente** nem libera a implantação.
 
@@ -135,10 +135,10 @@ A coluna `os` do CSV guarda a **string de sistema operacional exibida no Dashboa
 
 A [documentação oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html) informa que o atributo `os` do `agent.conf` consulta **informações do sistema operacional do agente**, cujo formato pode incluir um prefixo `Linux |...`. O nome comercial mostrado no Dashboard **não é equivalente** à string usada na seleção. Assim, a prévia FIM calcula **somente a quantidade hipotética de endpoints da família Linux**, não testa o regex contra a informação OS interna nem certifica que `^Linux` selecionará cada agente. Seu resultado declara `agent_config_os_regex_checked=false` e `wazuh_runtime_selection_confirmed=false`.
 
-O importador e o gate exigem que os quatro membros de `default` estejam individualmente identificados e `active/synced` em observação autorizada. Um endpoint marcado `disconnected` é **inaceitável** no inventário final e não deve ser convertido manualmente para `active`. A associação e a ordem dos grupos, assim como a string interna de SO quando disponível na interface autorizada, permanecem dependentes de verificação humana. Nenhuma regra, grupo, serviço ou diretiva FIM foi alterada.
+O importador e o gate exigem que os três membros aprovados de `default` estejam individualmente identificados e `active/synced` em observação autorizada. Um endpoint marcado `disconnected` é **inaceitável** no inventário final e não deve ser convertido manualmente para `active`. A associação e a ordem dos grupos, assim como a string interna de SO quando disponível na interface autorizada, permanecem dependentes de verificação humana. Nenhuma regra, grupo, serviço ou diretiva FIM foi alterada.
 
 ## Referências de revisão e aprovação humana — reforço em 03/11
 
 As entradas `checks.*.evidence_ref` do manifesto privado devem estar preenchidas com rótulos verificáveis pelo responsável: até 256 caracteres, sem caracteres de controle, sem espaço nas pontas e sem marcadores como `UNVERIFIED`, `PENDING`, `TBD` ou `placeholder`. O gate agora **recusa** `status=verified` associado a uma dessas referências inválidas, inclusive em `change_approval` e `group_precedence_review`.
 
-Essa é apenas uma **checagem sintática, não uma assinatura, auditoria de identidade ou validação do conteúdo referenciado**. Mesmo uma referência com formato válido e `EVIDENCE_COMPLETENESS=REVIEW_READY` permanece `EVIDENCE_SOURCE=PRIVATE_UNATTESTED` e `DEPLOYMENT_GATE=BLOCKED`. A aprovação humana independente e o inventário real dos quatro agentes do grupo `default` ainda são requisitos externos.
+Essa é apenas uma **checagem sintática, não uma assinatura, auditoria de identidade ou validação do conteúdo referenciado**. Mesmo uma referência com formato válido e `EVIDENCE_COMPLETENESS=REVIEW_READY` permanece `EVIDENCE_SOURCE=PRIVATE_UNATTESTED` e `DEPLOYMENT_GATE=BLOCKED`. A aprovação do escopo foi registrada com limitação de segregação; o inventário real dos três agentes e os demais requisitos externos continuam obrigatórios.

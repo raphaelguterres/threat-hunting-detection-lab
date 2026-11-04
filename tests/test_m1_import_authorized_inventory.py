@@ -25,7 +25,7 @@ def rows():
             "observed_at": datetime.now(timezone.utc).isoformat(),
             "evidence_ref": "synthetic-private-review",
         }
-        for i in (1, 2, 3, 4)
+        for i in (2, 4, 5)
     ]
 
 
@@ -69,7 +69,7 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("MANIFEST_UPDATED=True", result.stdout)
         updated = json.loads(self.manifest.read_text(encoding="utf-8"))
-        self.assertEqual(len(updated["agents"]), 4)
+        self.assertEqual(len(updated["agents"]), 3)
         self.assertEqual(updated["checks"], original["checks"])
 
     def test_new_inventory_revokes_dependent_approvals(self):
@@ -148,7 +148,7 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
         self.assertFalse(self.manifest.exists())
 
     def test_wrong_agent_count_rejected(self):
-        self.write_csv(rows()[:3])
+        self.write_csv(rows()[:2])
         self.assertEqual(self.invoke("--apply").returncode, 2)
 
     def test_agent_004_must_be_windows(self):
@@ -166,8 +166,8 @@ class AuthorizedInventoryImportTests(unittest.TestCase):
     def test_dashboard_amazon_kali_and_microsoft_os_labels_are_accepted(self):
         entries = rows()
         entries[0]["os"] = "Amazon Linux 2023"
-        entries[1]["os"] = "Kali GNU/Linux 2025.3"
-        entries[3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        entries[2]["os"] = "Kali GNU/Linux 2025.3"
+        entries[1]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
         self.write_csv(entries)
         result = self.invoke()
         self.assertEqual(result.returncode, 0, result.stderr)

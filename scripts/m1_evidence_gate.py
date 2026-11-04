@@ -8,6 +8,7 @@ from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
 MAX_MANIFEST_BYTES = 65536
+EXPECTED_DEFAULT_AGENT_IDS = frozenset(("002", "004", "005"))
 PRECHANGE = (
     "inventory_review", "os_impact_review", "group_precedence_review", "baseline_integrity",
     "parser_staging", "backup_integrity_real", "rollback_rehearsal_real",
@@ -70,8 +71,8 @@ def assess(data, stage="prechange"):
     if data.get("change_id") != "M1-FIM-OS-SCOPE":
         missing.append("change_id")
     agents = data.get("agents")
-    if not isinstance(agents, list) or len(agents) != 4:
-        missing.append("agents_exactly_four")
+    if not isinstance(agents, list) or len(agents) != len(EXPECTED_DEFAULT_AGENT_IDS):
+        missing.append("agents_exactly_three")
         agents = []
     seen = set()
     checked_at = datetime.now(timezone.utc)
@@ -120,9 +121,11 @@ def assess(data, stage="prechange"):
                 or any(ord(c) < 32 or ord(c) == 127 for c in evidence)
                 or re.search(r"(?i)(?:unknown|unverified|pending|placeholder|tbd)", evidence)):
             missing.append(key + "_evidence")
-    if len(agents) == 4 and "004" not in seen:
+    if len(agents) == len(EXPECTED_DEFAULT_AGENT_IDS) and "004" not in seen:
         missing.append("agent_004_not_reconciled")
-    if len(observed_times) == 4 and max(observed_times) - min(observed_times) > timedelta(minutes=30):
+    if len(agents) == len(EXPECTED_DEFAULT_AGENT_IDS) and seen != EXPECTED_DEFAULT_AGENT_IDS:
+        missing.append("default_scope_expected_ids")
+    if len(observed_times) == len(EXPECTED_DEFAULT_AGENT_IDS) and max(observed_times) - min(observed_times) > timedelta(minutes=30):
         missing.append("inventory_time_coherence")
     checks = data.get("checks")
     if not isinstance(checks, dict):

@@ -8,7 +8,9 @@ import argparse
 import json
 from pathlib import Path
 
-from m1_import_authorized_inventory import parse_rows, contained, os_display_family
+from m1_import_authorized_inventory import (
+    EXPECTED_DEFAULT_AGENT_IDS, contained, os_display_family, parse_rows,
+)
 
 # The Wazuh selector evaluates the internal agent OS info (e.g. 'Linux |...'),
 # not the distro display label in the Dashboard. Do not regex-match display OS.
@@ -16,8 +18,8 @@ from m1_import_authorized_inventory import parse_rows, contained, os_display_fam
 
 def preview(agents):
     """Summarize hypothetical selector effect; not a Wazuh runtime assertion."""
-    if len(agents) != 4:
-        raise ValueError("exactly four default agents required")
+    if len(agents) != len(EXPECTED_DEFAULT_AGENT_IDS):
+        raise ValueError("exactly three approved default agents required")
     affected = [a for a in agents if os_display_family(a["os"]) == "Linux"]
     excluded = [a for a in agents if os_display_family(a["os"]) != "Linux"]
     multi_groups = [a for a in agents if len(a["groups"]) > 1]

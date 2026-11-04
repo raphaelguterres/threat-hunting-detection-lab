@@ -21,7 +21,7 @@ def example():
          "groups": ["default"], "sync": "synced", "status": "active",
          "observed_at": datetime.now(timezone.utc).isoformat(),
          "evidence_ref": "private review"}
-        for i in (1, 2, 3, 4)
+        for i in (2, 4, 5)
     ]
     checks = {name: {"status": "verified", "evidence_ref": "private review"}
               for name in gate.PRECHANGE + gate.POSTCHANGE}
@@ -42,10 +42,10 @@ class M1GateTests(unittest.TestCase):
         del document["checks"]["discover_visibility"]
         self.assertFalse(gate.assess(document, "postchange")[0])
 
-    def test_three_agents_are_blocked(self):
+    def test_two_agents_are_blocked(self):
         document = example()
         document["agents"].pop()
-        self.assertIn("agents_exactly_four", gate.assess(document)[1])
+        self.assertIn("agents_exactly_three", gate.assess(document)[1])
 
     def test_duplicate_id_is_blocked(self):
         document = example()
@@ -61,7 +61,7 @@ class M1GateTests(unittest.TestCase):
         document = example()
         document["agents"][0]["os"] = "Amazon Linux 2023"
         document["agents"][1]["os"] = "Kali GNU/Linux 2025.3"
-        document["agents"][3]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
+        document["agents"][1]["os"] = "Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587"
         self.assertTrue(gate.assess(document)[0])
         document["agents"][0]["status"] = "disconnected"
         self.assertIn("agent_1_status", gate.assess(document)[1])
@@ -120,13 +120,18 @@ class M1GateTests(unittest.TestCase):
 
     def test_wrong_004_os_is_blocked(self):
         document = example()
-        document["agents"][-1]["os"] = "Linux"
+        document["agents"][1]["os"] = "Linux"
         self.assertIn("agent_004_windows_expected", gate.assess(document)[1])
 
     def test_missing_004_is_blocked(self):
         document = example()
-        document["agents"][-1]["id"] = "005"
+        document["agents"][1]["id"] = "005"
         self.assertIn("agent_004_not_reconciled", gate.assess(document)[1])
+
+    def test_unapproved_default_scope_is_blocked(self):
+        document = example()
+        document["agents"][-1]["id"] = "001"
+        self.assertIn("default_scope_expected_ids", gate.assess(document)[1])
 
     def test_group_precedence_review_is_required_even_if_single_group(self):
         document = example()
