@@ -3,7 +3,7 @@
 **Data da solicitação:** 04/11/2026, BRT. **Registro de governança:** [Issue #29 — exceção de autoavaliação](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/29).
 **Mudança:** **C** — somente Windows Server / Wazuh agente `004`, proposta de FIM realtime em diretório de laboratório isolado.
 **Modelo de trabalho:** proprietário e mantenedor individual, sem segundo revisor disponível.
-**Status de governança:** `SOLO_EXCEPTION_REQUESTED_BY_OWNER=true`, `INDEPENDENT_REVIEW_PERFORMED=false`, `RISK_ACCEPTANCE_OF_SPECIFIC_TERMS=PENDING_RATIFICATION`, `CHANGE_C_EXECUTION=NO_GO`.
+**Status de governança:** `SOLO_EXCEPTION_REQUESTED_BY_OWNER=true`, `INDEPENDENT_REVIEW_PERFORMED=false`, `RISK_ACCEPTANCE_OF_SPECIFIC_TERMS=RATIFIED_BY_OWNER_20261104_1757_BRT`, `CHANGE_C_EXECUTION=NO_GO`.
 
 ## Fundamentação
 
@@ -22,7 +22,7 @@ A exceção tem finalidade legítima: permitir a avaliação pelo próprio propr
 **Aceitação formal proposta ao proprietário:**
 > Como proprietário e único mantenedor do laboratório SOC, aceito explicitamente os cinco riscos residuais documentados acima e autorizo substituir **apenas na Mudança C** a revisão independente por uma autoavaliação formal com controles compensatórios. Reconheço que nenhuma revisão independente ocorreu. Mantenho todos os requisitos técnicos, de backup, janela, rollback e validação da configuração ativa. Não autorizo nesta exceção criar/alterar/executar o binário H03, modificar outros agentes, nem liberar automaticamente a implantação.
 
-**Essa declaração só será considerada ratificada** quando o proprietário a confirmar explicitamente em registro verificável, após ter acesso à lista de riscos. O pedido de operar individualmente, isoladamente, não significa que cada risco detalhado já foi aceito.
+**Ratificação recebida:** após receber a lista dos cinco riscos, o proprietário respondeu expressamente **“sim, eu confirmo”** em 04/11/2026 às **17h57 BRT**. Registrado na [Issue #29, comentário 6641930893](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/29#issuecomment-6641930893). É uma **aceitação formal dos riscos descritos para a mudança C**, não uma revisão independente e não uma aprovação de implantação.
 
 ## Controles compensatórios obrigatórios (não dispensáveis)
 
@@ -35,7 +35,7 @@ A exceção tem finalidade legítima: permitir a avaliação pelo próprio propr
 | SC-05 | Política ACL mínima | DACL proposta protegida de herança, SYSTEM + Administrators + operador SID real, sem escrita genérica | **Simulada e aprovada**; alvo inexistente |
 | SC-06 | Gate de contrato | Testes locais e CI validado na versão que será implantada; bloqueio para falhas | **Testes locais anteriores aprovados; revalidar no cutover** |
 | SC-07 | Janela e condições de parada | Autorização condicional do proprietário para 04/11/2026 18h–19h BRT; sem início automático | **Autorização condicional registrada** |
-| SC-08 | Autoavaliação documentada e riscos específicos | Checklist assinado pelo próprio proprietário, com aceitação expressa acima | **Pendente ratificação** |
+| SC-08 | Autoavaliação documentada e riscos específicos | Checklist assinado pelo próprio proprietário, com aceitação expressa acima | **RATIFICADO PELO PROPRIETÁRIO** (Issue #29, comentário 6641930893) |
 | SC-09 | Rollback restrito, monitoramento e limpeza | Checksum antes/depois, rollback aprovado da configuração local, saúde WazuhSvc | **Plano documentado; execução ainda não autorizada** |
 | SC-10 | Separação de mudanças | Mudanças A/Linux e B/4698 fora do escopo; teste binário H03 fora da autorização | **Exigência mantida** |
 
@@ -50,6 +50,6 @@ A exceção tem finalidade legítima: permitir a avaliação pelo próprio propr
 
 A exceção **resolve somente a falta de segunda pessoa na governança da Mudança C**, sob responsabilidade consciente do proprietário. Não libera o deploy sem configuração Syscheck ativa atestada, confirmação do SID/ACL no destino, backup e janela válidos no instante da mudança, integridade de configuração e critérios de parada. O primeiro teste de binário H03 requer autorização específica **à parte**.
 
-**Decisão atual:** `OWNER_CONDITIONAL_CHANGE_APPROVAL=RECORDED` · `SOLO_EXCEPTION_REQUESTED=YES` · `RISK_ACCEPTANCE_RATIFIED=NO` · `INDEPENDENT_REVIEW=NOT_PERFORMED` · `H03_BINARY_TEST_APPROVAL=NO` · `DEPLOYMENT_GATE=BLOCKED`.
+**Decisão atual:** `OWNER_CONDITIONAL_CHANGE_APPROVAL=RECORDED` · `SOLO_EXCEPTION_REQUESTED=YES` · `RISK_ACCEPTANCE_RATIFIED=YES_C_ONLY` · `INDEPENDENT_REVIEW=NOT_PERFORMED` · `H03_BINARY_TEST_APPROVAL=NO` · `DEPLOYMENT_GATE=BLOCKED`.
 
 Referências: [pacote de aprovação da mudança C](m1-change-c-approval-cutover-package-20261104.md), [runbook de ACL/FIM](m1-h03-three-gates-acl-fim-sequence-20261104.md), [Issue H03 #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9).
