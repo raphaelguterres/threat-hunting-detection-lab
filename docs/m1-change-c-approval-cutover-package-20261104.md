@@ -26,7 +26,7 @@ Este documento registra evidências reais coletadas em somente leitura e um back
 
 ## Configuração ativa observada — pendências de exclusões e cobertura
 
-**Atualização 04/11:** o Dashboard foi consultado na visão **Endpoints → agente 004 → Configuration → Integrity monitoring → General/Monitored**, e o Manager confirmou a identidade do agente. Syscheck aparece **enabled**, frequência **43200 s**, e a configuração ativa exibiu `C:\opt\wazuh-lab\monitorado` com `realtime=yes`. A leitura independente de `default/agent.conf` comprovou que essa entrada vem de `/opt/wazuh-lab/monitorado`, uma **diretiva Linux central herdada pelo Windows**, não um alvo H03 aprovado. Ver [checkpoint de FIM ativo](m1-agent004-dashboard-active-fim-20261104.md). **Ainda pendentes:** aba Ignored, existência física da pasta e comprovação de detecção. Consulta por API `GET /agents/004/config/syscheck/syscheck` não executada; a navegação adicional remota foi bloqueada e não foi contornada.
+**Atualização 04/11:** o Dashboard foi consultado na visão **Endpoints → agente 004 → Configuration → Integrity monitoring → General/Monitored**, e o Manager confirmou a identidade do agente. Syscheck aparece **enabled**, frequência **43200 s**, e a configuração ativa exibiu `C:\opt\wazuh-lab\monitorado` com `realtime=yes`. A leitura independente de `default/agent.conf` comprovou que essa entrada vem de `/opt/wazuh-lab/monitorado`, uma **diretiva Linux central herdada pelo Windows**, não um alvo H03 aprovado. Ver [checkpoint de FIM ativo](m1-agent004-dashboard-active-fim-20261104.md). **Novas evidências (18h16–18h18 BRT):** aba Ignored consultada e `Test-Path` no Windows 004 confirmou **inexistentes** o caminho herdado `C:\opt\wazuh-lab\monitorado` e o alvo isolado `C:\SecurityLab\H03`. Não há filtro explícito de `.exe` na lista Ignored, mas **não há cobertura efetiva H03**. Ver [checkpoint detalhado](m1-agent004-ignored-and-path-existence-20261104.md). **Ainda pendentes:** diretório isolado e FIM ativo aprovados e aplicados, observabilidade de eventos FIM reais e prova de correlação H03. Consulta API `GET /agents/004/config/syscheck/syscheck` não executada; Dashboard General/Monitored/Ignored já foi inspecionado.
 
 ## Plano de corte (não executar antes de GO)
 
@@ -66,7 +66,7 @@ flowchart TD
 - **Janela aprovada pelo proprietário:** `2026-11-04 18:00–19:00 America/Sao_Paulo`, expira ao término; **não é autorização de início automático**.
 - **Evidência da autorização de proprietário:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9), comentário ID `6641318793`, registrada em 04/11 às 17h28 BRT; `OWNER_APPROVAL=GRANTED_CONDITIONAL`.
 - **Aprovação do revisor independente com referência verificável:** `PENDING`.
-- **Consulta da configuração Syscheck ativa:** `DASHBOARD_GENERAL_AND_MONITORED_OBSERVED`, identidade do `004` confirmada no Manager; **aba Ignored, caminho físico e cobertura operacional ainda pendentes**. Ver [checkpoint](m1-agent004-dashboard-active-fim-20261104.md).
+- **Consulta da configuração Syscheck ativa:** `DASHBOARD_GENERAL_AND_MONITORED_OBSERVED`, identidade do `004` confirmada no Manager; **aba Ignored e caminhos físicos já inspecionados: Linux herdado e H03 isolado inexistentes; cobertura operacional H03 ainda pendente**. Ver [checkpoint](m1-agent004-dashboard-active-fim-20261104.md).
 - **Aprovação adicional para alterar/executar binário H03:** `EXPLICITLY_NOT_GRANTED`.
 - **Decisão formal de execução:** `NO-GO` / `DEPLOYMENT_GATE=BLOCKED`.
 
