@@ -4,7 +4,7 @@
 **Ambiente:** laboratório Windows Server 2022 / agente Wazuh `004`.  
 **Natureza:** desenho de mudança e critérios de aceite. **Este documento não autoriza alteração ativa nem geração de eventos.**
 
-**Revisão técnica posterior:** [checkpoint de baseline local/central, serviço e riscos de ACL em 04/11](m1-h03-change-c-baseline-acl-checkpoint-20261104.md) e [runbook dos três gates: ACL simulada, precedência FIM e ordem da implantação](m1-h03-three-gates-acl-fim-sequence-20261104.md). O diretório proposto não existe; não há configuração FIM nem ACL efetiva para o alvo; mudança C permanece NO-GO.
+**Revisão técnica posterior:** [checkpoint de baseline local/central, serviço e riscos de ACL em 04/11](m1-h03-change-c-baseline-acl-checkpoint-20261104.md), [runbook dos três gates](m1-h03-three-gates-acl-fim-sequence-20261104.md) e [pacote de aprovação/cutover com backup real DPAPI verificado](m1-change-c-approval-cutover-package-20261104.md). O diretório proposto não existe; não há configuração FIM nem ACL efetiva para o alvo; mudança C permanece NO-GO.
 
 ## Motivação e evidência existente
 
