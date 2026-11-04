@@ -2,6 +2,8 @@
 
 **Checklist e gate reconferidos em 04/11/2026, 13h17 BRT.** A conectividade de diagnóstico com o Kali não pôde ser renovada nesta passagem; dados de telemetria abaixo mantêm as datas originais de observação. Ver [reconciliação read-only de 04/11](m1-readonly-reconciliation-20261104.md).
 
+**Leitura adicional (relógio do Kali 11h23, ainda não normalizado):** o Dashboard Wazuh voltou a carregar o Ruleset (4.523 regras). As regras FIM de arquivo `550`/`553`/`554` foram verificadas nos níveis 7/7/5, respectivamente; isso não comprova um evento do `004` nem altera o gate. Acesso SSH e metadados locais de archives no Manager continuam não verificados.
+
 > **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
 
 ## Visão resumida

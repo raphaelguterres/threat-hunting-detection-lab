@@ -21,7 +21,7 @@ alternativo de acesso.
 | Progresso e gate | `8/8` histórico, `11/17` M1; gate retornou código 2 com `BLOCKED` | O bloqueio fail-closed está ativo e a contagem não mudou | Não é uma métrica de prontidão operacional |
 | Checkpoint Manager para `004` | `AGENT_004_SYNC=UNKNOWN_OR_FAILED`; parser ativo e hash também `UNKNOWN_OR_FAILED`/`UNKNOWN` | Não há confirmação remota renovada de sync, parser ou baseline | Renovar somente pelo acesso autorizado quando a conectividade voltar |
 | Conectividade Kali | SSH retornou `Permission denied` na porta 22; TCP 443, 9200 e 55000 não conectaram | A rota de diagnóstico usada pelo checkpoint não estava utilizável no instante da coleta | Não determina causa, saúde dos contêineres ou estado das VMs |
-| Regras FIM efetivas | Não consultadas nesta passagem | Níveis efetivos para alteração, adição, exclusão e Registro continuam `UNVERIFIED` | Leitura autorizada do ruleset carregado, registrando apenas IDs, níveis e categorias |
+| Regras FIM efetivas de arquivo | Ruleset carregado no Dashboard no relógio exibido pelo Kali, 11:22–11:23: `550` modificação, nível 7; `553` exclusão, nível 7; `554` adição, nível 5; todas no arquivo `0015-ossec_rules.xml` | Para eventos **de arquivo** que atinjam essas regras, todos os níveis observados superam o limiar histórico de armazenamento 3 | Relógio/fuso do Kali ainda não foi normalizado; a leitura não prova que ocorreu alteração, que o caminho do `004` é coberto ou que a cadeia de ingestão recebeu o evento; regras equivalentes de Registro continuam `UNVERIFIED` |
 | Configuração de archives no Manager | Não consultada nesta passagem | `archives.json`, `archives.log`, `alerts.json`, `logall_json` e `jsonout_output` continuam `UNVERIFIED` localmente | Inventário sanitizado de existência, datas, tamanho, rotação e permissões quando o acesso autorizado estiver disponível |
 | FIM de arquivo no `004` | Nenhuma nova telemetria foi gerada ou consultada | H03 permanece `INCONCLUSIVE` | Exigir alteração de arquivo autorizada e Sysmon Event ID 1 do mesmo artefato/endpoint, em até 20 minutos, mais controle negativo |
 
@@ -40,6 +40,25 @@ Os seguintes dados continuam referências datadas de 03/11, e não observações
 - O Dashboard havia mostrado `002`, `004` e `005` sincronizados e `001` desconectado.
   A evidência excedeu a janela de recência do gate e não deve ser reutilizada como
   inventário atual.
+
+## Atualização do Ruleset — 04/11, relógio exibido pelo Kali 11:22–11:23
+
+O Dashboard Wazuh voltou a carregar e a página **Rules** exibiu `4.523` regras. O
+relógio/fuso do Kali não foi normalizado nesta leitura. A
+leitura visual, sem editar regras ou arquivos, confirmou as regras FIM de arquivo a
+seguir:
+
+| ID | Evento | Nível | Categorias exibidas |
+| --- | --- | ---: | --- |
+| `550` | Alteração de checksum/integridade | 7 | `syscheck`, `syscheck_entry_modified`, `syscheck_file`, `ossec` |
+| `553` | Arquivo excluído | 7 | `syscheck`, `syscheck_entry_deleted`, `syscheck_file`, `ossec` |
+| `554` | Arquivo adicionado | 5 | `syscheck`, `syscheck_entry_added`, `syscheck_file`, `ossec` |
+
+O limiar de armazenamento visto em 03/11 era 3. Logo, a hipótese de que uma regra
+FIM de arquivo observada estava abaixo desse limiar não explica, por si só, o recorte
+histórico sem caminhos de arquivo. Permanecem alternativas não verificadas: não ter
+havido alteração observável, caminho fora de cobertura ou exclusão, periodicidade,
+pipeline e escopo temporal.
 
 ## Mudanças em preparação
 
