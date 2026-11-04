@@ -52,7 +52,9 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-  A["Escolher executável benigno descartável"] --> B{"Dentro de regra FIM local, sem ignore/restrict?"}
+  A["Escolher executável benigno descartável"] --> S{"Diretório não crítico e sem autorun?"}
+  S -->|"não: Startup do 004"| N["NO-GO: reavaliar o escopo"]
+  S -->|"sim, após verificação"| B{"Dentro de regra FIM local, sem ignore/restrict?"}
   B -->|"não ou incerto"| N["NO-GO: reavaliar o escopo"]
   B -->|"sim"| C{"Modo de detecção?"}
   C -->|"periodic 12h"| D["Latência potencial >20min: rever plano"]
@@ -84,6 +86,7 @@ flowchart TD
 
 - [Reconciliação efetiva FIM do agente 004](m1-agent004-effective-fim-reconciliation-20261104.md)
 - [Pré-gate H03 de cobertura de artefato](m1-h03-artifact-coverage-preflight-20261104.md)
+- [Checkpoint realtime Startup: NO-GO para executável de teste](m1-h03-startup-realtime-no-go-20261104.md)
 - [Auditoria do `alerts.json` ativo — agente 004 em 04/11](m1-h03-readonly-active-alerts-audit-20261104.md)
 - [Contrato H01/H02/H03](m1-three-hunting-hypotheses.md)
 - [Pacote FIM Linux](m1-fim-change-approval-package.md)

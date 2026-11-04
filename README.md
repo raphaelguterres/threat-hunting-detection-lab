@@ -14,7 +14,7 @@ O foco não é gerar alertas em massa: é provar que cada alerta pode ser invest
 
 ## M1 — Evolução de Threat Hunting (02/11/2026)
 
-**Escopos e diagramas:** [mapa do M1, fluxo de evidências H03 e gate de teste benigno (Mermaid)](docs/m1-scope-and-h03-diagrams-20261104.md). [Pré-gate do artefato H03](docs/m1-h03-artifact-coverage-preflight-20261104.md). **M1 11/17 (64,7%); implantação BLOCKED**, sem aprovação para alterar o laboratório.
+**Escopos e diagramas:** [mapa do M1, fluxo de evidências H03 e gate de teste benigno (Mermaid)](docs/m1-scope-and-h03-diagrams-20261104.md). [Pré-gate do artefato H03](docs/m1-h03-artifact-coverage-preflight-20261104.md). [Risco confirmado: diretiva realtime na pasta Startup — NO-GO para teste executável](docs/m1-h03-startup-realtime-no-go-20261104.md). **M1 11/17 (64,7%); implantação BLOCKED**, sem aprovação para alterar o laboratório.
 
 Foi iniciado um incremento **separado dos cinco casos históricos**, com [três hipóteses de investigação](docs/m1-three-hunting-hypotheses.md): PowerShell seguido de tarefa agendada, criação de conta seguida de sessão privilegiada e alteração FIM seguida da execução do artefato. O [correlacionador Python offline](scripts/hunt_correlations.py) testa sequências com janelas temporais, chaves pseudonimizadas e controles negativos. Os testes em [fixtures sintéticas](tests/fixtures/m1-synthetic.jsonl) não representam detecções reais nem incidentes.
 
