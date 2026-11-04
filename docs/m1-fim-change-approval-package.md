@@ -2,6 +2,8 @@
 
 **Mudança proposta:** restringir ao Linux um único bloco centralizado de `default/agent.conf` atualmente entregue também ao Windows. **Estado:** `NO-GO` — pacote de pré-mudança; sem implantação, sem solicitação de aprovação automática.
 
+**Atualização de evidências (03/11):** [checkpoint FIM 004, archives e dois gates de autorização](m1-fim-004-archives-and-approvals-checkpoint-20261103.md). O Indexer não listou índices `wazuh-archives-*` (HTTP 200, `[]`), as regras Syscheck efetivas seguem sem níveis comprovados, e o gate permanece `BLOCKED`. Este registro **não** é aprovação para modificar `default/agent.conf`.
+
 ## Por que a mudança é necessária
 
 O Dashboard autorizado exibiu no agente Windows `004` diretivas de monitoramento de diretórios Unix (incluindo `/opt/wazuh-lab/monitorado`). Os agentes Linux nativos receberam a configuração correspondente; nos três agentes ativos a página Configuration exibia `SYNCHRONIZED`.

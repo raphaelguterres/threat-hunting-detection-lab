@@ -4,6 +4,8 @@
 
 **Escopo:** VM WindowsServer do laboratório autorizado, agente Wazuh identificado como `004` durante os testes anteriores. **Não se aplica automaticamente a ambientes de produção.** [Controle da mudança — Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15).
 
+**Atualização de preparação (03/11):** [checkpoint FIM 004, archives e condições independentes de aprovação](m1-fim-004-archives-and-approvals-checkpoint-20261103.md). O Manager armazena alertas a partir do nível 3, e o Indexer não listou `wazuh-archives-*`; isso não prova a recepção de 4698 nem de eventos FIM sem alerta. A aprovação, janela e validação de ingestão desta mudança continuam **PENDENTES**; nenhuma política de auditoria foi alterada.
+
 ## 1. Baseline observado remotamente (somente leitura)
 
 | Área | Estado confirmado | Implicação |
