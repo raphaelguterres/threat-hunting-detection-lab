@@ -2,7 +2,13 @@
 
 **Checklist e gate reconferidos em 04/11/2026, 13h17 BRT.** A conectividade de diagnóstico com o Kali não pôde ser renovada nesta passagem; dados de telemetria abaixo mantêm as datas originais de observação. Ver [reconciliação read-only de 04/11](m1-readonly-reconciliation-20261104.md).
 
-**Leitura adicional (relógio do Kali 11h23, ainda não normalizado):** o Dashboard Wazuh voltou a carregar o Ruleset (4.523 regras). As regras FIM de arquivo `550`/`553`/`554` foram verificadas nos níveis 7/7/5, respectivamente; isso não comprova um evento do `004` nem altera o gate. Acesso SSH e metadados locais de archives no Manager continuam não verificados.
+**Leitura adicional (relógio do Kali 11h23, ainda não normalizado):** o Dashboard Wazuh voltou a carregar o Ruleset (4.523 regras). As regras FIM de arquivo `550`/`553`/`554` foram verificadas nos níveis 7/7/5; as regras de Registro `594`/`597`/`598` e `750`/`751`/`752`, todas no nível 5. Isso não comprova um evento do `004` nem altera o gate. O SSH pelo host continua indisponível; os metadados locais de archives foram verificados depois, no checkpoint abaixo.
+
+**Checkpoint do Manager em 16:32 UTC:** `alerts.json` estava atualizado, com `jsonout_output=yes` e `log_alert_level=3`. `logall_json=no`; `archives.json` existia, mas sua última modificação era de 01/11 e `archives.log` estava vazio. Portanto archives não é fonte atual de evidência nesta janela; nenhuma configuração foi alterada.
+
+**Agregação local ativa:** `archives.json` e `alerts.json` retornaram zero `syscheck.path` do `004`, separadamente para Registro e arquivos, sem linhas JSON inválidas. A conclusão limita-se aos arquivos locais ativos, que podem ter rotacionado; não contradiz a consulta histórica do Indexer nem conclui ausência de FIM.
+
+**Inventário de rotação:** os padrões dos três logs retornaram somente os arquivos ativos; não havia cópias rotacionadas ou comprimidas acessíveis no Manager. O recorte histórico de sete dias permanece verificável somente no Indexer observado, sem alteração de retenção ou logs.
 
 > **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
 

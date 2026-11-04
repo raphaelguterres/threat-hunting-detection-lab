@@ -21,8 +21,9 @@ alternativo de acesso.
 | Progresso e gate | `8/8` histórico, `11/17` M1; gate retornou código 2 com `BLOCKED` | O bloqueio fail-closed está ativo e a contagem não mudou | Não é uma métrica de prontidão operacional |
 | Checkpoint Manager para `004` | `AGENT_004_SYNC=UNKNOWN_OR_FAILED`; parser ativo e hash também `UNKNOWN_OR_FAILED`/`UNKNOWN` | Não há confirmação remota renovada de sync, parser ou baseline | Renovar somente pelo acesso autorizado quando a conectividade voltar |
 | Conectividade Kali | SSH retornou `Permission denied` na porta 22; TCP 443, 9200 e 55000 não conectaram | A rota de diagnóstico usada pelo checkpoint não estava utilizável no instante da coleta | Não determina causa, saúde dos contêineres ou estado das VMs |
-| Regras FIM efetivas de arquivo | Ruleset carregado no Dashboard no relógio exibido pelo Kali, 11:22–11:23: `550` modificação, nível 7; `553` exclusão, nível 7; `554` adição, nível 5; todas no arquivo `0015-ossec_rules.xml` | Para eventos **de arquivo** que atinjam essas regras, todos os níveis observados superam o limiar histórico de armazenamento 3 | Relógio/fuso do Kali ainda não foi normalizado; a leitura não prova que ocorreu alteração, que o caminho do `004` é coberto ou que a cadeia de ingestão recebeu o evento; regras equivalentes de Registro continuam `UNVERIFIED` |
-| Configuração de archives no Manager | Não consultada nesta passagem | `archives.json`, `archives.log`, `alerts.json`, `logall_json` e `jsonout_output` continuam `UNVERIFIED` localmente | Inventário sanitizado de existência, datas, tamanho, rotação e permissões quando o acesso autorizado estiver disponível |
+| Regras FIM efetivas | Arquivo: `550` modificação nível 7, `553` exclusão nível 7, `554` adição nível 5. Registro: `594`/`597`/`598` e `750`/`751`/`752`, todos nível 5; regras no arquivo `0015-ossec_rules.xml` | Para eventos de arquivo ou Registro que atinjam essas regras, todos os níveis observados superam o limiar histórico de armazenamento 3 | Não prova que ocorreu alteração, que o caminho do `004` é coberto ou que a cadeia de ingestão recebeu o evento; relógio/fuso do Kali ainda não foi normalizado |
+| Archives e alertas no Manager | Check UTC `2026-11-04T16:32:39Z`: `archives.json` existe (1.832.766 bytes; modificado em `2026-11-01T22:33:58Z`); `archives.log` existe, 0 bytes, modificado em `2026-11-04T00:00:02Z`; `alerts.json` existe (1.177.261 bytes; modificado em `2026-11-04T16:30:09Z`); todos `640 wazuh:wazuh` | Metadados locais de arquivos foram verificados; `alerts.json` estava atual no checkpoint, mas `archives.json` não era uma fonte atual | Tamanhos/datas não provam integridade, rotação completa ou ingestão no Indexer; nenhuma linha de log foi lida |
+| Opções efetivas do Manager | `jsonout_output=yes`, `logall_json=no`, `log_alert_level=3` | O Manager produz JSON de alertas e somente alertas de nível 3 ou superior são armazenados; o arquivamento JSON completo não está ativo | Não muda a política sem autorização; ausência de archive recente não prova ausência de evento nem falha de FIM |
 | FIM de arquivo no `004` | Nenhuma nova telemetria foi gerada ou consultada | H03 permanece `INCONCLUSIVE` | Exigir alteração de arquivo autorizada e Sysmon Event ID 1 do mesmo artefato/endpoint, em até 20 minutos, mais controle negativo |
 
 ## Evidências históricas preservadas, não renovadas
@@ -59,6 +60,62 @@ FIM de arquivo observada estava abaixo desse limiar não explica, por si só, o 
 histórico sem caminhos de arquivo. Permanecem alternativas não verificadas: não ter
 havido alteração observável, caminho fora de cobertura ou exclusão, periodicidade,
 pipeline e escopo temporal.
+
+### Regras de Registro
+
+Uma leitura local read-only do mesmo ruleset confirmou seis regras de Registro, todas
+no nível 5: `594` (checksum de chave alterado), `597` (entrada de chave excluída),
+`598` (entrada de chave adicionada), `750` (checksum de valor alterado), `751`
+(valor excluído) e `752` (valor adicionado). Portanto a hipótese de nível abaixo de
+3 também não explica os alertas de Registro observados historicamente. A consulta
+não prova que tais regras foram acionadas pelo `004` na janela atual.
+
+## Checkpoint local de archives e alertas — 04/11, 16:32:39 UTC
+
+O operador executou no Manager um comando exclusivamente de metadados, sem abrir ou
+imprimir o conteúdo de qualquer log. O resultado sanitizado foi:
+
+| Artefato | Existência e estado observado | Interpretação limitada |
+| --- | --- | --- |
+| `archives.json` | Presente, 1.832.766 bytes, última modificação `2026-11-01T22:33:58Z`, modo `640`, owner/grupo `wazuh:wazuh` | Há arquivo local legível pelo serviço, porém a data não o torna fonte atual para a janela de 04/11 |
+| `archives.log` | Presente, 0 bytes, última modificação `2026-11-04T00:00:02Z`, modo `640`, owner/grupo `wazuh:wazuh` | Metadado compatível com arquivo vazio/recém-rotacionado; não permite inferir causa ou saúde de rotação |
+| `alerts.json` | Presente, 1.177.261 bytes, última modificação `2026-11-04T16:30:09Z`, modo `640`, owner/grupo `wazuh:wazuh` | Confirma atualização recente do artefato local de alertas antes do checkpoint, não a entrega individual de um evento FIM |
+
+As flags efetivas retornaram `jsonout_output=yes`, `logall_json=no` e
+`log_alert_level=3`. Em conjunto com a ausência anterior de índices
+`wazuh-archives-*`, essa fotografia sustenta apenas que o pipeline de alertas JSON
+estava configurado e que o arquivamento JSON completo não estava ativo. Ela não
+autoriza habilitar `logall_json`, alterar Filebeat/Indexer, nem declarar causa para
+os zero alertas de arquivo.
+
+## Contagem sanitizada por caminho — arquivos locais ativos
+
+O operador executou uma agregação local read-only que percorreu `archives.json` e
+`alerts.json` sem exibir nenhuma linha, caminho, hash, usuário ou outro conteúdo de
+evento. Para o agente `004`, o resultado foi:
+
+| Fonte local | Syscheck total | Caminhos de Registro | Caminhos de arquivo | JSON inválido | Faixa de timestamps |
+| --- | ---: | ---: | ---: | ---: | --- |
+| `archives.json` | 0 | 0 | 0 | 0 | Ausente |
+| `alerts.json` | 0 | 0 | 0 | 0 | Ausente |
+
+Essa é uma fotografia dos **arquivos locais ativos** em 04/11 e não uma consulta de
+sete dias. Ela não contradiz os 488 documentos históricos observados no Indexer:
+`alerts.json` é sujeito a rotação e o Manager está com `logall_json=no`, portanto
+`archives.json` não é uma fonte completa nem atual para a investigação. O resultado
+também não prova ausência de FIM no endpoint, ausência de alertas fora do arquivo
+atual ou falha de pipeline. A inventariação read-only de rotação é o próximo gate.
+
+## Inventário de rotação acessível
+
+O inventário read-only com os padrões `alerts.json*`, `archives.json*` e
+`archives.log*` encontrou somente os três arquivos ativos já descritos. Não havia
+arquivos rotacionados nem comprimidos correspondentes no diretório do Manager no
+instante da consulta. Assim, não há uma fonte local acessível para reproduzir o
+recorte histórico de sete dias; o Indexer permanece a única fonte observada para
+aquele período. Esta ausência não descarta retenção em outro destino, configuração
+externa de rotação ou dados que já tenham sido removidos, e não autoriza qualquer
+limpeza ou reconfiguração.
 
 ## Mudanças em preparação
 
