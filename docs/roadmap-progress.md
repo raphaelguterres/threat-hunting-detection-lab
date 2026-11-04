@@ -1,6 +1,6 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
-**Checkpoint de CI, checklist e gate reconferido em 03/11/2026, 22h37 BRT.** Dados de telemetria abaixo mantêm as datas originais de observação.
+**Checklist e gate reconferidos em 04/11/2026, 13h17 BRT.** A conectividade de diagnóstico com o Kali não pôde ser renovada nesta passagem; dados de telemetria abaixo mantêm as datas originais de observação. Ver [reconciliação read-only de 04/11](m1-readonly-reconciliation-20261104.md).
 
 > **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
 
@@ -10,7 +10,7 @@
 | --- | --- | --- | --- |
 | **Fases históricas 1–6** | **Concluídas no roadmap original** | **8/8 entregas** e **6/6 fases** | [Issues #1–#8](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues?q=is%3Aissue+is%3Aclosed), todas encerradas em 26/10 ou antes |
 | **M1 — Threat Hunting por hipóteses** | **Em andamento** | **11/17 marcados (64,7%); 6 pendentes** | Critérios reais de aceitação ainda incompletos |
-| **CI e contratos offline M1** | **PASS no checkpoint** | 202/202 testes locais e 160 subtestes PASS; Actions #79 SUCCESS (3/3 jobs), commit ce557d4 | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
+| **CI e contratos offline M1** | **PASS local em 04/11** | 198 testes aprovados, 4 ignorados e 160 subtestes aprovados; Actions #79 SUCCESS (3/3 jobs), commit ce557d4, é histórico | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 | **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: 4 membros conferidos no Dashboard; 3/3 ativos sincronizados, `001` histórico desconectado; gate formal ainda incompleto | Backup/rollback e revisão operacional não substituem autorização |
 | **Jornada de 03/11** | Acompanhada em arquivo privado | Controle de horário separado de progresso | Tempo de sessão não mede porcentagem do roadmap |
