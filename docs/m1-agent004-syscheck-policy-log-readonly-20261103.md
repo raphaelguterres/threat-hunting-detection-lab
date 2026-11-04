@@ -25,6 +25,8 @@ Consulta XML **direta e atual** na VM Windows Server, `ossec.conf` local, sem ex
 
 A auditoria privada anterior verificou 6 caminhos locais existentes, sendo 5 agendados e 1 realtime; 23 diretivas de Registro. No grupo central `default`, há um bloco sem escopo OS com diretiva FIM UnixStyle inexistente no Windows. Configuração central e local podem ter precedência relevante; **cobertura efetiva não está demonstrada**. A ausência de opções explícitas exige consideração dos defaults por versão, não representa status `no`.
 
+**Rechecagem da VM às 23h05 BRT:** a inspeção direta das seis diretivas confirmou 5 entradas sem `realtime=yes` e 1 com `realtime=yes`. Uma tentativa adicional de classificar as duas exclusões não foi concluída; não foi avaliado o texto dos padrões de exclusão. Não tratar a checagem parcial como validação da política efetiva.
+
 **Ainda não verificados no Manager:** `<alerts><log_alert_level>`, `jsonout_output`, `auto_ignore` efetivo, regras que geram/filtram alertas de arquivo, e possibilidade de supressão pelo pipeline. Não presumir valores padrão como configuração em execução.
 
 ## 3. Registro do agente e varreduras
