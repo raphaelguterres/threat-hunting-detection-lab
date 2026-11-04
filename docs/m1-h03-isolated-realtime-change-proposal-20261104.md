@@ -4,6 +4,8 @@
 **Ambiente:** laboratório Windows Server 2022 / agente Wazuh `004`.  
 **Natureza:** desenho de mudança e critérios de aceite. **Este documento não autoriza alteração ativa nem geração de eventos.**
 
+**Revisão técnica posterior:** [checkpoint de baseline local/central, serviço e riscos de ACL em 04/11](m1-h03-change-c-baseline-acl-checkpoint-20261104.md). O diretório proposto não existe; não há configuração FIM nem ACL efetiva para o alvo; mudança C permanece NO-GO.
+
 ## Motivação e evidência existente
 
 H03 busca uma alteração FIM de **arquivo** seguida da execução do **mesmo artefato**, no mesmo ativo, em ordem cronológica e no máximo **20 minutos** depois. O alerta FIM deve ser confrontado com Sysmon Event ID 1 e com as fontes originais, não apenas contagens.
