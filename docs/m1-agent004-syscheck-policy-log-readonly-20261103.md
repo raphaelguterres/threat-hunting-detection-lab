@@ -9,6 +9,10 @@
 - Isso valida **presença e capacidade de pesquisa do campo** nos alertas visualizados. **Não foi consultado diretamente** `/_mapping/field/syscheck.path` no Indexer, portanto tipo exato do mapping, eventual subcampo `.keyword` e equivalência de busca por prefixo continuam **NÃO VERIFICADOS**.
 - `wazuh-alerts-*` contém somente alertas gerados pelo Manager, **não** todos os registros internos de arquivo/arquivamento. Zero hits não autoriza a conclusão de que não existem arquivos monitorados.
 
+**Revisão visual adicional em 03/11 ~23h12 BRT (Index Management → índice do dia 03/11 → Mappings → JSON Editor):** o JSON apresentado continha `dynamic_templates` com a regra `string_as_keyword` (`match_mapping_type: string`, mapping `type: keyword`), `date_detection: false` e `properties: {}`. **Não havia declaração explícita de `syscheck.path` no conteúdo visível.** Isso apoia a hipótese de indexação dinâmica como `keyword`, mas **não prova o field mapping efetivo de `syscheck.path`** nem equivalência de wildcard/negação DQL. Nenhuma ação de salvar/aplicar mapeamento foi executada.
+
+**Conferência adicional em 03/11 ~23h15–23h18 BRT:** o botão `See previous mappings` abriu o **mapeamento anterior efetivamente exibido no Index Management**. Diferentemente do JSON Editor principal, a visualização anterior incluía propriedades materializadas, entre elas `@timestamp` (`date`), `@version` (`text`) e campos estruturados (`GeoLocation`, `gcp`). **A seção específica `syscheck.path` não foi localizada nem teve seu tipo identificado** nesta revisão visual. A tentativa seguinte de navegação foi bloqueada pelo controle de segurança remoto; a inspeção foi interrompida sem contornar o bloqueio. Não usar o template `string_as_keyword` como prova do tipo do campo real.
+
 ## 2. Configuração e política de alertas
 
 Consulta XML **direta e atual** na VM Windows Server, `ossec.conf` local, sem exibir conteúdo privado:
