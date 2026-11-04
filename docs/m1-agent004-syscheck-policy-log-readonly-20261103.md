@@ -6,12 +6,14 @@
 
 - Data view `wazuh-alerts-*`, Discover autenticado: `agent.id:004 and syscheck.path:*` retornou **488 hits** em *Last 7 days*; os documentos exibidos tinham `syscheck.path` iniciado por `HKEY_LOCAL_MACHINE` (Registro do Windows).
 - No mesmo período, `agent.id:004 and syscheck.path:* and not syscheck.path:HKEY*` retornou **0 hits**; contagens em janelas móveis adjacentes.
-- Isso valida **presença e capacidade de pesquisa do campo** nos alertas visualizados. **Não foi consultado diretamente** `/_mapping/field/syscheck.path` no Indexer, portanto tipo exato do mapping, eventual subcampo `.keyword` e equivalência de busca por prefixo continuam **NÃO VERIFICADOS**.
+- Isso valida **presença e capacidade de pesquisa do campo** nos alertas visualizados. O tipo exato foi **confirmado posteriormente** no índice de 03/11 como `keyword` pela API de mapping (veja atualização cronológica abaixo). A equivalência do filtro de negação DQL com uma consulta DSL agregada ainda não foi verificada.
 - `wazuh-alerts-*` contém somente alertas gerados pelo Manager, **não** todos os registros internos de arquivo/arquivamento. Zero hits não autoriza a conclusão de que não existem arquivos monitorados.
 
 **Revisão visual adicional em 03/11 ~23h12 BRT (Index Management → índice do dia 03/11 → Mappings → JSON Editor):** o JSON apresentado continha `dynamic_templates` com a regra `string_as_keyword` (`match_mapping_type: string`, mapping `type: keyword`), `date_detection: false` e `properties: {}`. **Não havia declaração explícita de `syscheck.path` no conteúdo visível.** Isso apoia a hipótese de indexação dinâmica como `keyword`, mas **não prova o field mapping efetivo de `syscheck.path`** nem equivalência de wildcard/negação DQL. Nenhuma ação de salvar/aplicar mapeamento foi executada.
 
 **Conferência adicional em 03/11 ~23h15–23h18 BRT:** o botão `See previous mappings` abriu o **mapeamento anterior efetivamente exibido no Index Management**. Diferentemente do JSON Editor principal, a visualização anterior incluía propriedades materializadas, entre elas `@timestamp` (`date`), `@version` (`text`) e campos estruturados (`GeoLocation`, `gcp`). **A seção específica `syscheck.path` não foi localizada nem teve seu tipo identificado** nesta revisão visual. A tentativa seguinte de navegação foi bloqueada pelo controle de segurança remoto; a inspeção foi interrompida sem contornar o bloqueio. Não usar o template `string_as_keyword` como prova do tipo do campo real.
+
+**Confirmação definitiva do tipo do campo para o índice de 03/11, ~23h25 BRT:** Dev Tools do Wazuh Indexer executou exclusivamente `GET wazuh-alerts-4.x-2026.11.03/_mapping/field/syscheck.path`. Resposta HTTP **200 OK**: o objeto `syscheck.path` exibe `full_name: "syscheck.path"` e `mapping.path.type: "keyword"`. Portanto **`syscheck.path` é `keyword` nesse índice**, não uma dedução baseada em `dynamic_templates`. A investigação de outros índices/dias e a comparação com artefatos arquivados continuam pendentes. Não houve operação de escrita no Indexer.
 
 ## 2. Configuração e política de alertas
 
@@ -31,7 +33,9 @@ A auditoria privada anterior verificou 6 caminhos locais existentes, sendo 5 age
 
 **Rechecagem da VM às 23h05 BRT:** a inspeção direta das seis diretivas confirmou 5 entradas sem `realtime=yes` e 1 com `realtime=yes`. Uma tentativa adicional de classificar as duas exclusões não foi concluída; não foi avaliado o texto dos padrões de exclusão. Não tratar a checagem parcial como validação da política efetiva.
 
-**Ainda não verificados no Manager:** `<alerts><log_alert_level>`, `jsonout_output`, `auto_ignore` efetivo, regras que geram/filtram alertas de arquivo, e possibilidade de supressão pelo pipeline. Não presumir valores padrão como configuração em execução.
+**Verificação autenticada do Manager às ~23h22 BRT, Server Management → Settings → Alerts → General:** nível mínimo para armazenar alertas = **3**; nível mínimo para envio por e-mail = **12**; GeoIP = **no**. São valores mostrados pela interface e não uma autorização para editar as opções.
+
+**Ainda não verificados no Manager:** `jsonout_output`, `auto_ignore` efetivo, regras FIM aplicáveis com seus respectivos níveis, e outras possíveis etapas de filtragem no pipeline. Eventos correspondentes a regras abaixo do limite de armazenamento podem não aparecer em `wazuh-alerts-*`; isso é uma hipótese a testar por evidência, não a explicação confirmada para os zero alertas de arquivo.
 
 ## 3. Registro do agente e varreduras
 
@@ -58,4 +62,4 @@ Leitura direta do `ossec.log` atual na VM Windows Server:
 - https://documentation.wazuh.com/current/user-manual/wazuh-indexer/wazuh-indexer-indices.html
 - https://documentation.wazuh.com/current/user-manual/capabilities/file-integrity/how-to-configure-fim.html
 
-**Estado:** `MAPPING_FIELD_PRESENT=YES`; `EXACT_MAPPING_TYPE=UNVERIFIED`; `FIM_LOCAL_ENABLED=YES`; `AGENT_SERVICE_RUNNING=YES`; `CURRENT_LOG_FIM_MENTIONS=0`; `SCAN_COMPLETION=UNVERIFIED`; `H03=INCONCLUSIVE`; `DEPLOYMENT_GATE=BLOCKED`.
+**Estado:** `MAPPING_FIELD_PRESENT=YES`; `EXACT_MAPPING_TYPE_20261103=keyword`; `FIM_LOCAL_ENABLED=YES`; `AGENT_SERVICE_RUNNING=YES`; `CURRENT_LOG_FIM_MENTIONS=0`; `SCAN_COMPLETION=UNVERIFIED`; `H03=INCONCLUSIVE`; `DEPLOYMENT_GATE=BLOCKED`.
