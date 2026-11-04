@@ -6,8 +6,8 @@
 
 - Em 04/11, o proprietário aprovou condicionalmente **a mudança C** do Windows 004 para a janela 18h–19h BRT, sujeita aos demais gates.
 - Depois, solicitou expressamente **o teste benigno de binário H03**. Isto constitui intenção de realizar o teste, não comprovação dos pré-requisitos técnicos nem liberação automática do gate.
-- [Exceção de autoavaliação para projeto individual](m1-change-c-solo-owner-review-exception-20261104.md) preparada na [Issue #29](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/29); **aceitação específica dos riscos listados ainda não foi ratificada**.
-- A configuração **ativa** Syscheck do agente 004 via Dashboard/API continua **não atestada**; o novo diretório de teste não existe e **não está coberto** atualmente.
+- [Exceção de autoavaliação para projeto individual](m1-change-c-solo-owner-review-exception-20261104.md) registrada na [Issue #29](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/29); **aceitação dos cinco riscos ratificada pelo proprietário**. Os controles técnicos continuam obrigatórios.
+- O Dashboard **General/Monitored do agente 004** foi observado: FIM habilitado, frequência 43200 s e entrada `C:\opt\wazuh-lab\monitorado` realtime. Essa entrada provém da diretiva Linux compartilhada `/opt/wazuh-lab/monitorado` no grupo `default`; **não prova pasta Windows existente ou detecção de arquivo**. [Checkpoint](m1-agent004-dashboard-active-fim-20261104.md). A aba Ignored e a cobertura real continuam pendentes; o novo diretório H03 não existe e não está coberto.
 - **Não usar a pasta Startup monitorada em tempo real**: criar executável ali pode produzir inicialização automática e persistência não intencional.
 - Status: `BINARY_TEST_REQUESTED=YES`, `H03_LIVE_TEST_READY=NO`, `DEPLOYMENT_GATE=BLOCKED`.
 
