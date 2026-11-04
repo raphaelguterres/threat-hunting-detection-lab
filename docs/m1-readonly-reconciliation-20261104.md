@@ -19,7 +19,7 @@ alternativo de acesso.
 | --- | --- | --- | --- |
 | Estado do repositório | Branch `feat/m1-readiness-gate-fail-closed`, HEAD `f51b55e`, árvore limpa | Nenhuma mudança local preexistente precisava ser reconciliada | O branch não tem upstream configurado; o SHA remoto não foi consultado nesta passagem |
 | Progresso e gate | `8/8` histórico, `11/17` M1; gate retornou código 2 com `BLOCKED` | O bloqueio fail-closed está ativo e a contagem não mudou | Não é uma métrica de prontidão operacional |
-| Checkpoint Manager para `004` | `AGENT_004_SYNC=UNKNOWN_OR_FAILED`; parser ativo e hash também `UNKNOWN_OR_FAILED`/`UNKNOWN` | Não há confirmação remota renovada de sync, parser ou baseline | Renovar somente pelo acesso autorizado quando a conectividade voltar |
+| Checkpoint Manager para `004` | Coleta posterior no Manager: `agent_groups -S -i 004` retornou sincronizado; `verify-agent-conf -f default/agent.conf` retornou `OK` | Sync do `004` e validade sintática da configuração central foram renovados em modo read-only | O hash contra a baseline privada não foi recalculado; parser não prova distribuição, precedência ou cobertura FIM em runtime |
 | Conectividade Kali | SSH retornou `Permission denied` na porta 22; TCP 443, 9200 e 55000 não conectaram | A rota de diagnóstico usada pelo checkpoint não estava utilizável no instante da coleta | Não determina causa, saúde dos contêineres ou estado das VMs |
 | Regras FIM efetivas | Arquivo: `550` modificação nível 7, `553` exclusão nível 7, `554` adição nível 5. Registro: `594`/`597`/`598` e `750`/`751`/`752`, todos nível 5; regras no arquivo `0015-ossec_rules.xml` | Para eventos de arquivo ou Registro que atinjam essas regras, todos os níveis observados superam o limiar histórico de armazenamento 3 | Não prova que ocorreu alteração, que o caminho do `004` é coberto ou que a cadeia de ingestão recebeu o evento; relógio/fuso do Kali ainda não foi normalizado |
 | Archives e alertas no Manager | Check UTC `2026-11-04T16:32:39Z`: `archives.json` existe (1.832.766 bytes; modificado em `2026-11-01T22:33:58Z`); `archives.log` existe, 0 bytes, modificado em `2026-11-04T00:00:02Z`; `alerts.json` existe (1.177.261 bytes; modificado em `2026-11-04T16:30:09Z`); todos `640 wazuh:wazuh` | Metadados locais de arquivos foram verificados; `alerts.json` estava atual no checkpoint, mas `archives.json` não era uma fonte atual | Tamanhos/datas não provam integridade, rotação completa ou ingestão no Indexer; nenhuma linha de log foi lida |
@@ -116,6 +116,15 @@ recorte histórico de sete dias; o Indexer permanece a única fonte observada pa
 aquele período. Esta ausência não descarta retenção em outro destino, configuração
 externa de rotação ou dados que já tenham sido removidos, e não autoriza qualquer
 limpeza ou reconfiguração.
+
+## Checkpoint de sync e parser do `004`
+
+Em leitura posterior no Manager, `agent_groups -S -i 004` informou que o agente
+`004` está sincronizado e `verify-agent-conf -f
+/var/ossec/etc/shared/default/agent.conf` retornou `OK`. Nenhuma configuração foi
+editada. Esse resultado renova apenas a sincronização do `004` e a validade do XML
+central no Manager; não substitui o inventário atual 4/4, a revisão de precedência,
+a comparação com o backup privado ou a validação funcional de FIM.
 
 ## Mudanças em preparação
 

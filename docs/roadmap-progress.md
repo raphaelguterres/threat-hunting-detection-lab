@@ -10,6 +10,8 @@
 
 **Inventário de rotação:** os padrões dos três logs retornaram somente os arquivos ativos; não havia cópias rotacionadas ou comprimidas acessíveis no Manager. O recorte histórico de sete dias permanece verificável somente no Indexer observado, sem alteração de retenção ou logs.
 
+**Checkpoint renovado do `004`:** o Manager retornou agente sincronizado e `verify-agent-conf` aprovou o `default/agent.conf`. Isso é uma validação sintática e de sync, não confirma hash, distribuição efetiva ou cobertura FIM em runtime.
+
 > **Fonte da contagem:** caixas de seleção do [ROADMAP.md](../ROADMAP.md), não percentuais de segurança, de produtividade, de CI ou de implantação. Conferir a contagem atualizada com `python scripts/roadmap_progress.py`. Evidência de runtime, aprovação humana e change control são requisitos separados.
 
 ## Visão resumida
