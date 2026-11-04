@@ -34,6 +34,17 @@ M1 deployment FIM     BLOQUEADO — não expressar como porcentagem
 
 Essas conclusões históricas são sobre **entregas do roadmap original** e não equivalem à correlação real das **três novas hipóteses M1**. O [status operacional mais antigo](STATUS_ATUAL_LAB.md) permanece como registro datado, não uma afirmação sobre disponibilidade atual das VMs.
 
+### Checkpoint M1 — 03/11/2026, 23h30 BRT
+
+- O Discover autenticado do `004`, data view `wazuh-alerts-*`, exibiu **488 hits** para `agent.id:004 and syscheck.path:*` na janela móvel *Last 7 days*, e **0** para a consulta que exclui `HKEY*`. Não houve comprovação de evento de alteração de arquivo.
+- O Indexer confirmou via `GET wazuh-alerts-4.x-2026.11.03/_mapping/field/syscheck.path` (**HTTP 200**) o mapeamento **`syscheck.path: keyword`** nesse índice específico.
+- O Manager exibiu **nível mínimo 3 para armazenar alertas** e **12 para envio de e-mail**; níveis efetivos das regras FIM relevantes e disponibilidade de archives ainda precisam de revisão.
+- A VM WindowsServer `004` tinha `WazuhSvc=Running`, seis diretivas FIM (cinco agendadas, uma realtime), frequência de 12h e duas entradas de exclusão. O `ossec.log` atual não continha menções `syscheck`/`fim` no recorte de 377 linhas; isso **não** comprova ausência de varredura.
+- A questão do agente histórico `001`, as mudanças FIM e auditoria `4698`, a revisão independente dos PRs e as correlações H01/H02/H03 **permanecem abertas**. Gate de pré-mudança reexecutado: `EVIDENCE_COMPLETENESS=INCOMPLETE`, `DEPLOYMENT_GATE=BLOCKED`.
+- Jornada privada de 03/11: **6h00 registradas**, controle pausado; o tempo não muda o percentual do roadmap.
+
+Detalhes sanitizados: [auditoria FIM e política do Indexer](m1-agent004-syscheck-policy-log-readonly-20261103.md) e [consulta de sete dias](m1-agent004-fim-seven-day-discover-20261103.md).
+
 ## M1 — 11 itens marcados e seis entregas ainda abertas
 
 | Prioridade | Pendente no checklist M1 | Dependências e critério |
