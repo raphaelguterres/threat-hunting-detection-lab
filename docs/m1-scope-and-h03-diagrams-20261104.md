@@ -84,6 +84,7 @@ flowchart TD
 
 - [Reconciliação efetiva FIM do agente 004](m1-agent004-effective-fim-reconciliation-20261104.md)
 - [Pré-gate H03 de cobertura de artefato](m1-h03-artifact-coverage-preflight-20261104.md)
+- [Auditoria do `alerts.json` ativo — agente 004 em 04/11](m1-h03-readonly-active-alerts-audit-20261104.md)
 - [Contrato H01/H02/H03](m1-three-hunting-hypotheses.md)
 - [Pacote FIM Linux](m1-fim-change-approval-package.md)
 - [Change control Windows 4698](m1-change-control-4698-fim-agent004.md)
