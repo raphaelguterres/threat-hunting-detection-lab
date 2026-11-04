@@ -120,6 +120,33 @@ class HypothesisTests(unittest.TestCase):
         rows[1]["asset_key"] = "other-vm"
         self.assertEqual(self.count(rows, "H03_FIM_EXECUTION"), 0)
 
+    def test_h03_rejects_different_artifact_on_same_host(self):
+        rows = [
+            raw("file_change", "wazuh_fim", "fim", obj="artifact-a"),
+            raw("file_execution", "sysmon_eid1", "exec",
+                "2026-11-02T12:05:00Z", obj="artifact-b"),
+        ]
+        self.assertEqual(self.count(rows, "H03_FIM_EXECUTION"), 0)
+
+    def test_h03_rejects_execution_before_change(self):
+        rows = [
+            raw("file_change", "wazuh_fim", "fim",
+                "2026-11-02T12:05:00Z", obj="artifact-a"),
+            raw("file_execution", "sysmon_eid1", "exec",
+                "2026-11-02T12:04:59Z", obj="artifact-a"),
+        ]
+        self.assertEqual(self.count(rows, "H03_FIM_EXECUTION"), 0)
+
+    def test_h03_20_minute_boundary_and_over_window(self):
+        rows = [
+            raw("file_change", "wazuh_fim", "fim", obj="artifact-a"),
+            raw("file_execution", "sysmon_eid1", "exec",
+                "2026-11-02T12:20:00Z", obj="artifact-a"),
+        ]
+        self.assertEqual(self.count(rows, "H03_FIM_EXECUTION"), 1)
+        rows[1]["timestamp"] = "2026-11-02T12:20:00.001Z"
+        self.assertEqual(self.count(rows, "H03_FIM_EXECUTION"), 0)
+
     def test_timezone_equivalence(self):
         self.events[0]["timestamp"] = "2026-11-02T04:00:00-0800"
         self.assertEqual(self.count(self.events), 1)
