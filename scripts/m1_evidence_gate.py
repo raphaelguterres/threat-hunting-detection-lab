@@ -139,6 +139,49 @@ def assess(data, stage="prechange"):
     return len(missing) == 0, missing
 
 
+LAB_CONTINUATION_SCOPE = "isolated_lab_offline_and_readonly_continuation"
+WAIVABLE_ONLY = frozenset(("manager_ingestion",))
+
+
+def valid_owner_continuation(waiver, missing, checked_at=None):
+    """Owner's *declared* risk exception: never claims final change acceptance.
+
+    This is not proof of identity or an independent review. It is a scoped
+    workflow continuation decision, not permission to deploy/restart services.
+    """
+    if not isinstance(waiver, dict) or set(missing) != WAIVABLE_ONLY:
+        return False
+    expected = {
+        "schema_version": 1,
+        "change_id": "M1-FIM-OS-SCOPE",
+        "scope": LAB_CONTINUATION_SCOPE,
+        "authorized_by": "project_owner_in_chat",
+        "source": "explicit_owner_instruction_2026-11-05",
+        "environment": "local_isolated_lab",
+        "pending_checks": ["manager_ingestion"],
+        "manager_ingestion_verified": False,
+        "independent_review_verified": False,
+        "rollback_preserved": True,
+        "configuration_changes_authorized": False,
+        "production_deployment_authorized": False,
+    }
+    if any(type(waiver.get(k)) is not type(v) or waiver.get(k) != v
+           for k, v in expected.items()):
+        return False
+    try:
+        start = datetime.fromisoformat(waiver["approved_at"])
+        end = datetime.fromisoformat(waiver["expires_at"])
+        if (start.tzinfo is None or start.utcoffset() is None
+                or end.tzinfo is None or end.utcoffset() is None):
+            return False
+        start = start.astimezone(timezone.utc)
+        end = end.astimezone(timezone.utc)
+        now = checked_at or datetime.now(timezone.utc)
+        return (start <= now <= end and timedelta(0) < end - start <= timedelta(hours=48))
+    except (ValueError, KeyError, TypeError, OverflowError):
+        return False
+
+
 def private_or_fixture(path, fixture):
     """Accept only small regular files in the allowed private/fixture directory."""
     try:
@@ -161,6 +204,8 @@ def main():
     parser.add_argument("--manifest", type=Path)
     parser.add_argument("--stage", choices=("prechange", "postchange"), default="prechange")
     parser.add_argument("--fixture", action="store_true", help="Synthetic CI fixture only")
+    parser.add_argument("--owner-continuation", type=Path,
+                        help="Private, time-limited owner exception for isolated-lab continuation; not acceptance")
     args = parser.parse_args()
     if args.manifest is None or not private_or_fixture(args.manifest, args.fixture):
         print("EVIDENCE=UNAVAILABLE_OR_DISALLOWED")
@@ -184,11 +229,30 @@ def main():
         completeness = "REVIEW_READY" if complete else "INCOMPLETE"
     print("EVIDENCE_COMPLETENESS=" + completeness)
     print("MISSING_OR_UNVERIFIED=" + (",".join(missing) if missing else "none"))
-    print("DEPLOYMENT_GATE=BLOCKED")
+    continuation = False
+    if args.owner_continuation is not None and not args.fixture:
+        if private_or_fixture(args.owner_continuation, False):
+            try:
+                waiver = json.loads(args.owner_continuation.read_text(encoding="utf-8-sig"),
+                                    object_pairs_hook=reject_duplicate_keys,
+                                    parse_constant=reject_nonfinite_constant)
+                continuation = valid_owner_continuation(waiver, missing)
+            except (OSError, UnicodeError, ValueError, RecursionError):
+                continuation = False
+    if continuation:
+        print("DEPLOYMENT_GATE=OWNER_SCOPED_LAB_CONTINUATION")
+        print("PROJECT_CONTINUATION_GATE=OPEN")
+        print("CHANGE_A_FINAL_ACCEPTANCE=PENDING_MANAGER_AND_REVIEW")
+        print("PRODUCTION_DEPLOYMENT_GATE=BLOCKED")
+        print("LIVE_CONFIGURATION_CHANGE_GATE=BLOCKED")
+    else:
+        print("DEPLOYMENT_GATE=BLOCKED")
+        print("PROJECT_CONTINUATION_GATE=BLOCKED" if not complete else "PROJECT_CONTINUATION_GATE=REVIEW_READY_ONLY")
     print("MANUAL_INDEPENDENT_APPROVAL_REQUIRED=true")
     print("NO_REMOTE_CONNECTION_NO_CONFIGURATION_CHANGE=true")
-    # Success indicates document completeness only, NEVER deploy authorization.
-    return 0 if complete else 2
+    # This bypasses ONLY the workflow block for lab documentation/offline/read-only
+    # continuation. It never turns an unverified check into verified evidence.
+    return 0 if complete or continuation else 2
 
 
 if __name__ == "__main__":
