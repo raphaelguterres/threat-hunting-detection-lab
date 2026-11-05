@@ -2,6 +2,8 @@
 
 **Mudança proposta:** restringir ao Linux um único bloco centralizado de `default/agent.conf` atualmente entregue também ao Windows. **Estado:** `NO-GO` — pacote de pré-mudança; sem implantação, sem solicitação de aprovação automática.
 
+**Preparação mais recente (04/11, ~22h17 BRT):** [cópia real do Manager em `.lab/`, candidato Linux com diff estritamente limitado, 10 novos testes positivos/negativos e tabela de ações manuais](m1-change-a-staging-and-manual-gates-20261104.md). O hash ativo permaneceu igual ao backup. **O parser oficial da candidata permanece pendente** e a prévia offline não comprova a seleção por OS em runtime.
+
 **Checkpoint atualizado (04/11, ~22h03 BRT):** [inventário 3/3, regex aplicada aos metadados reais dos agentes, hash e owner/mode conferidos, backup DPAPI e rollback isolado PASS, janela de 05/11 APROVADA CONDICIONALMENTE pelo proprietário](m1-fim-three-agent-prechange-approval-proposal-20261104.md). [Registro da autorização da janela — Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17#issuecomment-6646704047). **Não constitui aprovação para implantação nem revisão independente.**
 
 **Atualização de evidências (03/11):** [checkpoint FIM 004, archives e dois gates de autorização](m1-fim-004-archives-and-approvals-checkpoint-20261103.md). O Indexer não listou índices `wazuh-archives-*` (HTTP 200, `[]`), as regras Syscheck efetivas seguem sem níveis comprovados, e o gate permanece `BLOCKED`. Este registro **não** é aprovação para modificar `default/agent.conf`.

@@ -4,7 +4,7 @@
 
 Laboratório prático de **monitoramento, engenharia de detecção e investigação** com Wazuh. O ambiente usa uma VM Kali Linux como servidor Wazuh em Docker, um agente Linux e um Windows Server 2022 em rede privada isolada.
 
-**Visão técnica atual (04/11/2026):** [checkpoint pré-mudança A: inventário, FIM por OS e rollback](docs/m1-fim-three-agent-prechange-approval-proposal-20261104.md) · [checkpoint pós-Codex: inventário 3/3, CI e gates](docs/m1-codex-continuation-20261104.md) · [arquitetura e exposição pública](docs/architecture-network-public-exposure-20261104.md) · [roadmap autoral completo de Cyber Defense Engineering](docs/cyber-defense-authorial-lab-roadmap-20261104.md) · [preparo do binário benigno H03](docs/m1-h03-benign-binary-test-plan-20261104.md). **M1 11/17; H03 ainda não comprovado em operação; gate BLOCKED.**
+**Visão técnica atual (04/11/2026):** [checkpoint pré-mudança A: inventário, FIM por OS e rollback](docs/m1-fim-three-agent-prechange-approval-proposal-20261104.md) · [checkpoint pós-Codex: inventário 3/3, CI e gates](docs/m1-codex-continuation-20261104.md) · [arquitetura e exposição pública](docs/architecture-network-public-exposure-20261104.md) · [roadmap autoral completo de Cyber Defense Engineering](docs/cyber-defense-authorial-lab-roadmap-20261104.md) · [preparo do binário benigno H03](docs/m1-h03-benign-binary-test-plan-20261104.md). **M1 11/17; H03 ainda não comprovado em operação; gate BLOCKED.** [Pré-candidato Linux real validado offline e pendências manuais da mudança A](docs/m1-change-a-staging-and-manual-gates-20261104.md).
 
 > Todos os eventos deste projeto são simulações inofensivas. Não há exploração, malware ou tentativa de acesso a sistemas de terceiros.
 
