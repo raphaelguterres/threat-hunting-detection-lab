@@ -33,6 +33,8 @@ A ferramenta nova [`scripts/m1_stage_linux_os_scope_readonly.py`](../scripts/m1_
 4. **Impacto declarado:** adicionar o atributo ao bloco central **restringirá tanto FIM Linux como a fonte de logs Unix `localfile`**, que continuará no arquivo mas deixará de ser oferecida ao Windows. A escolha precisa de aceite humano como parte da mudança A.
 5. **Teste negativo de escopo:** a expressão `^Linux` corresponde aos metadados observados de `002/005`, não aos de `004`. Isso não é prova de seleção real pós-distribuição.
 
+**Nova governança:** [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31) e [exceção individual proposta especificamente para A](m1-change-a-solo-owner-review-exception-20261104.md). O proprietário autorizou **preparar** a exceção, mas ainda falta aceitar expressamente os cinco riscos, atestar inventário/impacto e dar autorização final; nenhuma revisão de terceiro foi registrada.
+
 ## O que falta fazer manualmente
 
 | Ação | Responsável | Evidência exigida | Status |
