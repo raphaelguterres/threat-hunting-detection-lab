@@ -2,7 +2,7 @@
 
 **Mudança proposta:** restringir ao Linux um único bloco centralizado de `default/agent.conf` atualmente entregue também ao Windows. **Estado:** `NO-GO` — pacote de pré-mudança; sem implantação, sem solicitação de aprovação automática.
 
-**Governança individual da mudança A (04/11, ~22h22 BRT):** o proprietário autorizou **preparar** uma exceção de autoavaliação exclusiva da mudança A, registrada na [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31) e [documento específico](m1-change-a-solo-owner-review-exception-20261104.md). **Os cinco riscos ainda não foram ratificados; não há revisão independente nem GO operacional.** A exceção de C/H03 não é reutilizada.
+**Governança individual da mudança A (04/11, ~22h26 BRT):** o proprietário **ratificou os cinco riscos específicos** da autoavaliação exclusiva da mudança A, na [Issue #31 — comentário 6647042764](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764) e [documento de exceção](m1-change-a-solo-owner-review-exception-20261104.md). **A exceção resolve somente o modelo de revisão para A; não houve revisor independente, não há GO operacional e os controles técnicos continuam obrigatórios.** A exceção C/H03 não é reutilizada.
 
 **Preparação mais recente (04/11, ~22h17 BRT):** [cópia real do Manager em `.lab/`, candidato Linux com diff estritamente limitado, 10 novos testes positivos/negativos e tabela de ações manuais](m1-change-a-staging-and-manual-gates-20261104.md). O hash ativo permaneceu igual ao backup. **O parser oficial da candidata permanece pendente** e a prévia offline não comprova a seleção por OS em runtime.
 

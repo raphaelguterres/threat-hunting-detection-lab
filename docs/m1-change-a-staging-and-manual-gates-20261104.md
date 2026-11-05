@@ -33,15 +33,18 @@ A ferramenta nova [`scripts/m1_stage_linux_os_scope_readonly.py`](../scripts/m1_
 4. **Impacto declarado:** adicionar o atributo ao bloco central **restringirá tanto FIM Linux como a fonte de logs Unix `localfile`**, que continuará no arquivo mas deixará de ser oferecida ao Windows. A escolha precisa de aceite humano como parte da mudança A.
 5. **Teste negativo de escopo:** a expressão `^Linux` corresponde aos metadados observados de `002/005`, não aos de `004`. Isso não é prova de seleção real pós-distribuição.
 
-**Nova governança:** [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31) e [exceção individual proposta especificamente para A](m1-change-a-solo-owner-review-exception-20261104.md). O proprietário autorizou **preparar** a exceção, mas ainda falta aceitar expressamente os cinco riscos, atestar inventário/impacto e dar autorização final; nenhuma revisão de terceiro foi registrada.
+**Nova governança:** [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31) e [exceção específica para A, ratificada pelo proprietário](m1-change-a-solo-owner-review-exception-20261104.md). Os cinco riscos foram **aceitos expressamente** na [Issue #31 — comentário 6647042764](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764); **não** há revisão independente. Ainda faltam o atestado de inventário/impacto e o GO operacional final; nenhuma autorização de implantação foi concedida.
+
+**Read-only adicional 04/11, ~22h27 BRT:** no contêiner do agente Linux `002`, o arquivo `ossec.conf` possui **dois blocos raiz `ossec_config`** (normal para arquivos que contêm múltiplos blocos), um bloco `syscheck`, **dois nós de diretórios FIM locais**, **zero diretivas locais realtime**. O bloco central `default/agent.conf` possui uma diretiva Unix realtime adicional. O XML foi analisado com uma raiz de análise temporária **em memória**, sem modificar arquivo. Na VM Kali nativa, `ossec.conf` do agente `005` não é legível pela conta remota atual; **não alterar ACL nem usar elevação para contornar permissão**. A comprovação de sua configuração local exigirá acesso autorizado do operador ou consulta por interface já permitida. Essas observações **não comprovam FIM efetivo pós-mudança**.
 
 ## O que falta fazer manualmente
 
 | Ação | Responsável | Evidência exigida | Status |
 | --- | --- | --- | --- |
 | **A-01 — Atestar inventário 3/3** | Proprietário/revisor | Conferir os registros privados e registrar decisão na Issue #17 | **Pendente** |
+| **A-01b — Conferir FIM local do agente Linux 005** | Operador com acesso autorizado ao agente 005 ou Dashboard | Confirmar diretórios, realtime, exclusões, precedência com `default`; não contornar ACL de `/var/ossec` | **Pendente de conferência manual autorizada** |
 | **A-02 — Aceitar impacto do bloco inteiro** | Proprietário/revisor | Reconhecer que FIM realtime e fonte `localfile` Unix passarão a ser exclusivos dos agentes Linux | **Pendente** |
-| **A-03 — Revisão da mudança A** | Revisor independente ou exceção **específica** formalizada para A pelo proprietário | Revisão do diff, riscos e controles; **a exceção da mudança C não é transferível** | **Pendente** |
+| **A-03 — Revisão da mudança A** | Autoavaliação formal do proprietário (sem revisor externo) | Cinco riscos da exceção A aceitos na Issue #31; revisão técnica independente não ocorreu e controle de CI/diff ainda obrigatório | **Exceção RATIFICADA; restantes controles NÃO dispensados** |
 | **A-04 — Parser oficial em staging temporário** | Operador autorizado | Validação da cópia candidata real com `verify-agent-conf -f` num **arquivo temporário que não seja a configuração ativa**, seguida de remoção/checagem | **Pendente de autorização para staging na VM** |
 | **A-05 — Pré-check em janela** | Operador | Revalidar 3/3, backup DPAPI, sha256/UID/GID/mode, logs, rollback, parser e tempo disponível para revert | **Pendente da janela** |
 | **A-06 — Autorização operacional final** | Proprietário | Aprovar **execução** de mudança A com referência rastreável, não apenas agendar a janela | **Pendente** |
