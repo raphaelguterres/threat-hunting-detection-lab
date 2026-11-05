@@ -1,5 +1,7 @@
 # M1 — H01: PowerShell → tarefa agendada (teste benigno real de 05/11/2026)
 
+> **Diagnóstico posterior — a lacuna do alerta tem explicação de regras:** [checagem da configuração ativa do Manager](m1-h01-active-rule-scope-diagnosis-20261105.md) encontrou `61603` (Sysmon EID1) com **nível 0** e `log_alert_level=3`; a regra `110100` com nível 12 exige `-enc`/`-EncodedCommand`, mas o processo benigno deste ensaio usou **`-File`**. Com `logall_json=no`, a ausência deste alerta no `wazuh-alerts-*` é **compatível com filtragem esperada**, não prova falha de coleta. A chegada bruta do Sysmon ao Manager ainda não foi atestada. O resultado de H01 ponta a ponta continua **INCOMPLETE**; nenhuma configuração foi alterada. O script offline de auditoria passou em 11 testes novos.
+
 **Status:** `H01_NATIVE_PAIR=PASS`; `H01_4698_INDEXER_DISCOVER=PASS`; `H01_SYSMON_EID1_INDEXER_DISCOVER=NOT_VERIFIED`; **correlação Wazuh completa ainda pendente**.
 
 ## Autorização, limites e método
