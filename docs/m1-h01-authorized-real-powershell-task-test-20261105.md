@@ -60,6 +60,14 @@ Com o correlacionador `python scripts/hunt_correlations.py --input .lab/m1-h01-n
 
 **Essa execução não transforma registros nativos em dois documentos comprovados do Indexer** e não equivale a um sign-off independente.
 
+## Conferência complementar da configuração Sysmon do agente 004
+
+Em verificação **somente leitura** após o teste, o `ossec.conf` local do Windows mostrou **um** coletor `Microsoft-Windows-Sysmon/Operational` em `log_format=eventchannel`, **sem cláusula explícita `query`**. O canal nativo Sysmon estava habilitado e `WazuhSvc` permanecia em execução.
+
+Esse resultado confirma que **existe fonte Sysmon configurada no agente**, mas **não demonstra** que o evento de processo nativo `RecordID=173036` tenha sido transformado em alerta indexado ou enviado ao Dashboard. A causa da ausência do documento específico no `wazuh-alerts-*` continua **indeterminada**; futuras verificações deverão distinguir regra/nível de alerta, normalização, canal e indexação por interfaces autorizadas, sem contornar a restrição ao acesso bruto do Manager.
+
+O snapshot privado `.lab/m1-h01-sysmon-source-review-20261105-private.json` preserva os hashes do script e da captura de tela. Nenhuma configuração foi editada.
+
 ## Proveniência, riscos e decisão
 
 O snapshot privado `.lab/m1-h01-controlled-correlation-20261105-private.json` guarda **SHA-256 de dez artefatos** (scripts, capturas, normalização), autorização, pré/pós-checks, identidade de cada evento e lacunas. Dados de usuário, SID, host, IP, paths completos e capturas brutas não são publicados.
