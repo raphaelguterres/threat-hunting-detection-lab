@@ -1,5 +1,7 @@
 # Threat Hunting & Detection Lab — Wazuh
 
+**Retomada 05/11, ~13h BRT:** [VMs restauradas e roteiro de validação da mudança A](docs/m1-change-a-postresume-observability-plan-20261105.md). Agentes `002/004/005` 3/3 ativos e sincronizados; hash/parser e rollback conferidos; **224 testes offline OK (4 skipped)**. Eventos pós-cutover em Manager → Indexer → Discover ainda não comprovados, M1 11/17 e gate de implantação BLOCKED. Nenhuma alteração ativa adicional.
+
 [![Validate lab configuration](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/workflows/validate-lab.yml/badge.svg)](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/workflows/validate-lab.yml)
 
 Laboratório prático de **monitoramento, engenharia de detecção e investigação** com Wazuh. O ambiente usa uma VM Kali Linux como servidor Wazuh em Docker, um agente Linux e um Windows Server 2022 em rede privada isolada.
