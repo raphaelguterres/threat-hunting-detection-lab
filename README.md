@@ -1,5 +1,7 @@
 # Threat Hunting & Detection Lab — Wazuh
 
+**Teste FIM autorizado (05/11, 13h22 BRT):** [execução benigna no agente 002 e limitações de verificação](docs/m1-change-a-benign-fim-test-20261105.md). Criar, modificar e apagar arquivo descartável **PASS**, limpeza e agentes ativos 3/3 confirmados; **alertas Manager/Indexer/Discover ainda NÃO verificados**. Agente nativo 005 não foi alterado por falta de acesso de escrita autorizado. **Aceite final da mudança A pendente; rollback mantido.**
+
 **Retomada 05/11, ~13h BRT:** [VMs restauradas e roteiro de validação da mudança A](docs/m1-change-a-postresume-observability-plan-20261105.md). Agentes `002/004/005` 3/3 ativos e sincronizados; hash/parser e rollback conferidos; **224 testes offline OK (4 skipped)**. Eventos pós-cutover em Manager → Indexer → Discover ainda não comprovados, M1 11/17 e gate de implantação BLOCKED. Nenhuma alteração ativa adicional.
 
 [![Validate lab configuration](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/workflows/validate-lab.yml/badge.svg)](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/workflows/validate-lab.yml)
