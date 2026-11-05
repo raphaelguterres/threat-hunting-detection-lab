@@ -1,5 +1,7 @@
 # Threat Hunting & Detection Lab — Wazuh
 
+**FIM pós-mudança A validado no Indexer/Discover (05/11):** [nove alertas reais, três por agente `002`, `004` e `005`](docs/m1-change-a-three-agent-fim-evidence-20261105.md), abrangendo `added`, `modified` e `deleted` de arquivos benignos descartáveis. Limpeza e integridade da configuração foram conferidas. **Log local do Manager e revisão independente ainda pendentes; aceite final e `DEPLOYMENT_GATE` seguem bloqueados.** M1 **11/17**.
+
 **Nova janela de validação FIM (05/11, 13h55–14h25 BRT):** [Windows `004` apresentou 3 novos eventos reais no Indexer/Discover](docs/m1-change-a-second-authorized-fim-window-20261105.md), um por tipo `added`, `modified`, `deleted`, gerados por arquivo de dados inerte criado/modificado/excluído com limpeza confirmada. O Linux `002` já tinha 3 eventos comprovados anteriormente. **Linux `005` ainda exige autenticação local legítima** para teste; consulta direta ao log do Manager e revisão independente pendentes. Mudança A mantém rollback e `DEPLOYMENT_GATE=BLOCKED`, M1 **11/17**.
 
 **Conferência adicional (05/11):** [Discovery read-only dos agentes `004/005`](docs/m1-change-a-benign-fim-test-20261105.md) mostrou **35 registros FIM de Registro do Windows no `004`**, sem registros de **arquivo** após excluir `HKEY*`; `005` teve **0 registros FIM** nas últimas 24h, sem teste ativo realizado. Ausência não comprova falha. **Agente `002` segue com três eventos reais indexados e visíveis no Discover**; validação independente do Manager ainda pendente. `DEPLOYMENT_GATE=BLOCKED`.
