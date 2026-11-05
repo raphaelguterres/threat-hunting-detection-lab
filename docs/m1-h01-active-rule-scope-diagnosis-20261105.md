@@ -1,5 +1,7 @@
 # M1 — diagnóstico confirmado do Sysmon EID1 ausente em `wazuh-alerts-*` (05/11/2026)
 
+**Verificação reproduzível adicionada:** `python scripts/m1_h01_rule_scope_audit.py --rule .lab/m1-h01-active-rule110100-20261105-private.xml`. A cópia do XML veio de leitura autorizada do arquivo de regras do Manager, permaneceu em `.lab/` e passou no validador **exit 0**: regra `110100` nível 12, dependências esperadas, condição de PowerShell codificado e **5 vetores sintéticos PASS** (incluindo `-File` negativo). [Onze testes de regressão](../tests/test_m1_h01_rule_scope_audit.py) passaram; nenhum processo novo, regra ou serviço foi alterado. O validador intencionalmente retorna `event_ingestion_verified=false` e `runtime_rule_loading_attested=false`: um snapshot não é inspeção do pipeline vivo.
+
 **Ambiente:** Wazuh Manager 4.14.9 single-node Docker, Windows Server agente `004`.  
 **Modo:** leitura autorizada de **arquivos de configuração e regras**, sem abrir `alerts.json` ou `archives.json`, sem consultar dados brutos restritos, sem reinicialização e sem mudança ativa.  
 **Diagnóstico:** `EXPECTED_RULE_FILTERING_FOR_PREVIOUS_BENIGN_POWERSHELL_INVOCATION`.  
