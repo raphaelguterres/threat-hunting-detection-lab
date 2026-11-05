@@ -59,7 +59,7 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [x] Revisar **disponibilidade de telemetria real** do Windows Security, Sysmon e FIM em modo read-only; [análise de 02/11](docs/m1-native-windows-wazuh-visibility-review-20261102.md).
 - [ ] **Correlacionar as três hipóteses em eventos reais completos**, com mesmos atores/ativos/artefatos e revisão manual — contagens e ausência de pares não encerram a investigação.
 - [x] Registrar **três estudos de caso reais de FIM autorizado**, com timelines, investigação, classificação benigna, ações e limitações documentadas. [Evidências 05/11/2026](docs/m1-three-real-fim-investigation-case-studies-20261105.md).
-- [ ] Revisar tuning, falsos positivos e cobertura ATT&CK com evidência por hipótese.
+- [x] **Revisar tuning, falsos candidatos de correlação e cobertura ATT&CK para H01/H02/H03**, com recortes reais, controles disponíveis e decisões sem alteração ativa. [Parecer técnico 05/11/2026](docs/m1-hunting-tuning-fp-attack-review-20261105.md) · [registro FP](docs/false-positive-register.md) · [matriz ATT&CK](docs/mitre-coverage.md). **Revisão concluída, não validação operacional:** H01 sem `4698`, H02 sem vínculo SID/logon, H03 com FIM real mas sem execução comprovada do mesmo arquivo; H03 não teve controle negativo independente, e nenhuma regra/supressão foi alterada.
 - [ ] Encerrar o M1 somente com revisão independente e evidência sanitizada, sem confundir simulação com operação.
 
 - [x] Elaborar [change control do 4698 e revisão FIM 004](docs/m1-change-control-4698-fim-agent004.md), com baseline read-only, riscos de retenção, scripts privados de dry-run e rollback.
