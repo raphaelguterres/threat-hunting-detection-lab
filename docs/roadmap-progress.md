@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Progresso confirmado em 05/11/2026: M1 15/17 (88,2%), duas entregas pendentes.** [Mudança Windows Security 4698 aprovada, aplicada e validada por evento nativo + documento idêntico no Indexer/Discover](m1-4698-approved-cutover-real-ingestion-20261105.md). No agente `004`, auditoria **Success** ativada, um `4698` real de tarefa benigna, **RecordID 15301** igual na origem e no índice, limpeza confirmada, retenção Security 20 MiB/circular observada e rollback local pronto. O risco de sobreposição de **dois** coletores Security **não foi mitigado**, e o log local do Manager não foi revisado independentemente. Restam a correlação real completa H01/H02/H03 e o encerramento independente do M1. **O aceite global de implantação continua bloqueado**, e o percentual é apenas do checklist. Checkpoints abaixo são históricos.
+
 **Progresso verificado em 05/11/2026: M1 14/17 (82,4%), três entregas pendentes.** Concluída a [revisão por hipótese de tuning, possíveis falsos candidatos de correlação e cobertura MITRE ATT&CK](m1-hunting-tuning-fp-attack-review-20261105.md), com registros complementares em [FP](false-positive-register.md) e [ATT&CK](mitre-coverage.md). **H01** tem amostra real em ordem temporal inválida e `4698` ausente; **H02** tem um `4720` real sem `4624/4672` do mesmo SID nos 30 min; **H03** tem 9 FIM benignos reais sem execução do mesmo arquivo comprovada e sem controle negativo independente. **A revisão está concluída, mas nenhuma das três correlações foi validada operacionalmente**, não houve tuning implantado nem alteração de gate de produção. Os checkpoints abaixo são históricos.
 
 **Progresso verificado em 05/11/2026: M1 13/17 (76,5%), quatro entregas pendentes.** Concluída a [revisão de inventário 3/3, possível sobreposição Security e cobertura FIM Windows 004](m1-inventory-security-overlap-fim004-closure-20261105.md). Os três agentes permanecem ativos/sincronizados e o Windows 004 teve eventos benignos `added/modified/deleted` realmente indexados. **O risco de coleta Security sobreposta foi identificado, não eliminado**; correção, auditoria 4698, prova direta do Manager e revisão independente continuam separadas. Os checkpoints históricos abaixo preservam suas datas originais.
@@ -57,7 +59,7 @@
 | Trilho | Estado | Contagem | Evidência/limite |
 | --- | --- | --- | --- |
 | **Fases históricas 1–6** | **Concluídas no roadmap original** | **8/8 entregas** e **6/6 fases** | [Issues #1–#8](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues?q=is%3Aissue+is%3Aclosed), todas encerradas em 26/10 ou antes |
-| **M1 — Threat Hunting por hipóteses** | **Em andamento** | **14/17 marcados (82,4%); 3 pendentes** | Tuning/FP/ATT&CK revisados com evidência real por hipótese; correlações reais completas, 4698 e revisão final ainda abertos |
+| **M1 — Threat Hunting por hipóteses** | **Em andamento** | **15/17 marcados (88,2%); 2 pendentes** | Mudança 4698 comprovada no Windows/Indexer/Discover; correlação real completa e revisão independente ainda abertas |
 | **CI e contratos offline M1** | **PASS local em 04/11** | **210 testes aprovados, 4 pulados, 160 subtestes aprovados; Actions #104 SUCCESS, commit `a137c51`** | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 | **Mudança A — FIM por OS no Manager** | **Cutover aplicado; validação pós-change incompleta** | `002/004/005` 3/3 sincronizados; FIM configurado por OS exibido conforme esperado no Dashboard | [Handoff 05/11](m1-change-a-cutover-postcheck-handoff-20261105.md): não há ainda mesma identidade de evento novo no Manager, Indexer e Discover; rollback preservado; gate automático continua BLOCKED |
@@ -65,7 +67,7 @@
 
 ```text
 Laboratório original  ████████████████████  8/8 entregas documentadas
-M1 checklist          ████████████████░░░░ 14/17 (82,4%)
+M1 checklist          ██████████████████░░ 15/17 (88,2%)
 M1 deployment FIM     BLOQUEADO — não expressar como porcentagem
 ```
 
@@ -93,15 +95,14 @@ Essas conclusões históricas são sobre **entregas do roadmap original** e não
 
 Detalhes sanitizados: [auditoria FIM e política do Indexer](m1-agent004-syscheck-policy-log-readonly-20261103.md) e [consulta de sete dias](m1-agent004-fim-seven-day-discover-20261103.md).
 
-## M1 — 14 itens marcados e três entregas ainda abertas
+## M1 — 15 itens marcados e duas entregas ainda abertas
 
 | Prioridade | Pendente no checklist M1 | Dependências e critério |
 | --- | --- | --- |
-| **1** | Aprovar, executar e validar change control Windows `4698` | Aprovação e janela separadas, retenção, ingestão Wazuh, rollback e evidências pós-mudança; [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) |
-| **2** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
-| **3** | Encerrar M1 com revisão independente e evidência sanitizada | PRs revisados por terceiro habilitado, aprovação documentada e critérios técnicos satisfeitos; [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
+| **1** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
+| **2** | Encerrar M1 com revisão independente e evidência sanitizada | PRs revisados por terceiro habilitado, aprovação documentada e critérios técnicos satisfeitos; [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 
-A relação acima **reordena os três itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
+A relação acima **reordena os dois itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
 ### Telemetria nativa real — nova consulta em 03/11 (~20h25 BRT)
 
