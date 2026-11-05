@@ -4,7 +4,7 @@
 
 **Change ID:** `M1-FIM-OS-SCOPE` — **somente seletor Linux no grupo `default`**.
 
-**Status:** `OWNER_INVENTORY_AND_IMPACT_ATTESTATION=PENDING`, `CHANGE_A_EXECUTION=NO_GO`, `DEPLOYMENT_GATE=BLOCKED`.
+**Status:** `OWNER_INVENTORY_AND_IMPACT_ATTESTATION=PENDING`, `CHANGE_A_EXECUTION=NO_GO`, `DEPLOYMENT_GATE=BLOCKED`. [Leia também a matriz GO/NO-GO com os nove checks do manifesto](m1-change-a-go-nogo-readiness-20261104.md).
 
 > Este cartão **não é um atestado assinado**. O proprietário precisa revisar os itens e confirmar explicitamente. A exceção de autoavaliação ratificada na [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764) é **separada** da autorização operacional de implantação, que ainda não foi fornecida.
 
