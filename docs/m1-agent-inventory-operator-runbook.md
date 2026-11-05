@@ -8,7 +8,7 @@
 
 Na consulta autorizada ao Dashboard, foram confirmados **quatro membros do grupo `default`** (`001`, `002`, `004`, `005`). Os agentes ativos `002`, `004` e `005` exibiram **`SYNCHRONIZED`** na aba de configuração. O `001` permaneceu **desconectado**, mantido como registro histórico por decisão do operador, sem exclusão. O Wazuh listou somente um grupo centralizado, `default`; resta analisar formalmente a interação com configurações locais e o escopo de mudança. O Manager passou no checkpoint de parser, baseline e sync do `004` às 19h46 BRT.
 
-Em 04/11, `001` foi removido formalmente e o revisor aprovou o escopo atual de três agentes (`002`, `004`, `005`), com limitação de segregação registrada na [emenda de escopo](m1-inventory-scope-amendment-20261104.md). O inventário recente, grupos ordenados e demais gates ainda precisam ser renovados antes de qualquer alteração FIM.
+Em 04/11, `001` foi removido formalmente e o revisor aprovou o escopo atual de três agentes (`002`, `004`, `005`), com limitação de segregação registrada na [emenda de escopo](m1-inventory-scope-amendment-20261104.md). **Na nova coleta das 21h34 BRT**, os três agentes foram confirmados `Active/synchronized`, pertencendo somente ao grupo `default`, com SO e versão registrados privadamente e CSV importado sem atestar checks humanos. [Evidência técnica de escopo e baseline](m1-fim-three-agent-prechange-approval-proposal-20261104.md). A revisão formal do inventário, impactos por OS, autorizações e demais gates continuam necessários.
 
 ## 1. Coleta autorizada, três membros do default
 
