@@ -1,5 +1,7 @@
 # M1 — Matriz de aceitação FIM por sistema operacional
 
+> **Atualização pós-cutover — 05/11/2026:** a mudança A foi aplicada ao grupo `default` com autorização específica. Os agentes `002`, `004` e `005` tiveram **nove documentos FIM reais no Indexer/Discover** (3 × `added/modified/deleted`); detalhes no [parecer de evidências](m1-change-a-formal-evidence-review-20261105.md). Ainda falta verificação direta autorizada do log local do Manager e revisão independente. **`DEPLOYMENT_GATE=BLOCKED` e aceite final PENDENTE**, sem descarte do rollback. Os parágrafos abaixo que se referem a `não houve implantação` descrevem a fase de proposta **antes de 05/11**, não o estado atual.
+
 > **Estado:** pendente de evidências e autorização. Não é um procedimento de implantação automática.
 >
 > **Escopo contratual original:** grupo Wazuh `default` (quatro agentes no checkpoint de 03/11). Um agente sem grupo foi observado separadamente e **não faz parte** desta avaliação do `default`. O estado operacional posterior e a revisão necessária do escopo estão registrados abaixo.
