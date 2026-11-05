@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Checkpoint mais recente — 04/11/2026, ~21h35 BRT:** [retomada após Codex, três agentes e evidência privada](m1-codex-continuation-20261104.md). O grupo `default` foi reconfirmado com `002`, `004` e `005` **ativos e sincronizados**; `001` não consta e `003` está fora do grupo. O contrato de três agentes passou na validação estrutural, o manifesto `.lab/` foi atualizado com backup prévio (evidência ainda **não atestada independentemente**), e o parser central retornou `OK`. **210 testes passaram, 4 pulados, 160 subtestes passaram; GitHub Actions #104: success, commit `a137c51`. M1 11/17; `DEPLOYMENT_GATE=BLOCKED`.** Os checkpoints antigos abaixo mantêm a data original e não representam o estado atual.
+
 **Checklist e gate reconferidos em 04/11/2026, 13h17 BRT.** A conectividade de diagnóstico com o Kali não pôde ser renovada nesta passagem; dados de telemetria abaixo mantêm as datas originais de observação. Ver [reconciliação read-only de 04/11](m1-readonly-reconciliation-20261104.md).
 
 **Leitura adicional (relógio do Kali 11h23, ainda não normalizado):** o Dashboard Wazuh voltou a carregar o Ruleset (4.523 regras). As regras FIM de arquivo `550`/`553`/`554` foram verificadas nos níveis 7/7/5; as regras de Registro `594`/`597`/`598` e `750`/`751`/`752`, todas no nível 5. Isso não comprova um evento do `004` nem altera o gate. O SSH pelo host continua indisponível; os metadados locais de archives foram verificados depois, no checkpoint abaixo.
@@ -22,9 +24,9 @@
 | --- | --- | --- | --- |
 | **Fases históricas 1–6** | **Concluídas no roadmap original** | **8/8 entregas** e **6/6 fases** | [Issues #1–#8](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues?q=is%3Aissue+is%3Aclosed), todas encerradas em 26/10 ou antes |
 | **M1 — Threat Hunting por hipóteses** | **Em andamento** | **11/17 marcados (64,7%); 6 pendentes** | Critérios reais de aceitação ainda incompletos |
-| **CI e contratos offline M1** | **PASS local em 04/11** | 198 testes aprovados, 4 ignorados e 160 subtestes aprovados; Actions #79 SUCCESS (3/3 jobs), commit ce557d4, é histórico | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
+| **CI e contratos offline M1** | **PASS local em 04/11** | **210 testes aprovados, 4 pulados, 160 subtestes aprovados; Actions #104 SUCCESS, commit `a137c51`** | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
-| **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: três membros atuais, todos ativos/sincronizados; `001` removido formalmente; contrato original 4/4 ainda aguarda emenda revisada | Backup/rollback e revisão operacional não substituem autorização |
+| **Mudança ativa de FIM no Manager** | **NO-GO** | Grupo `default`: `002`, `004`, `005` ativos/sincronizados; contrato **3/3** adotado no commit `a137c51`; inventário atual em `.lab/`, revisão humana ainda pendente | Backup/rollback, impacto real por OS e janela aprovada continuam exigidos |
 | **Jornada de 03/11** | Acompanhada em arquivo privado | Controle de horário separado de progresso | Tempo de sessão não mede porcentagem do roadmap |
 
 ```text

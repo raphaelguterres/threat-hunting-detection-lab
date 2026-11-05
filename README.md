@@ -4,7 +4,7 @@
 
 Laboratório prático de **monitoramento, engenharia de detecção e investigação** com Wazuh. O ambiente usa uma VM Kali Linux como servidor Wazuh em Docker, um agente Linux e um Windows Server 2022 em rede privada isolada.
 
-**Visão técnica atual (04/11/2026):** [arquitetura e exposição pública](docs/architecture-network-public-exposure-20261104.md) · [roadmap autoral completo de Cyber Defense Engineering](docs/cyber-defense-authorial-lab-roadmap-20261104.md) · [preparo do binário benigno H03 e critérios de evidência real](docs/m1-h03-benign-binary-test-plan-20261104.md). **M1 11/17; H03 ainda não comprovado em operação; gate BLOCKED.**
+**Visão técnica atual (04/11/2026):** [checkpoint pós-Codex: inventário 3/3, CI e gates](docs/m1-codex-continuation-20261104.md) · [arquitetura e exposição pública](docs/architecture-network-public-exposure-20261104.md) · [roadmap autoral completo de Cyber Defense Engineering](docs/cyber-defense-authorial-lab-roadmap-20261104.md) · [preparo do binário benigno H03](docs/m1-h03-benign-binary-test-plan-20261104.md). **M1 11/17; H03 ainda não comprovado em operação; gate BLOCKED.**
 
 > Todos os eventos deste projeto são simulações inofensivas. Não há exploração, malware ou tentativa de acesso a sistemas de terceiros.
 
@@ -24,7 +24,7 @@ Foi iniciado um incremento **separado dos cinco casos históricos**, com [três 
 
 ### Segurança do M1: evidências antes de implantação
 
-O [gate de evidências M1](docs/m1-evidence-gate.md) confere a completude declarada do inventário dos quatro agentes, revisão de impacto, backup real, rollback e aprovações, **sem acesso às VMs e sem autorizar deploy**. Consulte também a [matriz de aceitação FIM por OS](docs/m1-fim-acceptance-matrix.md), o [roteiro manual de conciliação 4/4 no Wazuh Dashboard](docs/m1-agent-inventory-operator-runbook.md) e a prévia offline do impacto do seletor Linux antes da revisão humana. Ausência de evidência retorna erro; o estado operacional permanece bloqueado até revisão independente.
+O [gate de evidências M1](docs/m1-evidence-gate.md) confere a completude declarada do inventário dos **três agentes atuais do grupo `default` (`002`, `004`, `005`)**, revisão de impacto, backup real, rollback e aprovações, **sem acesso às VMs e sem autorizar deploy**. Consulte também a [matriz de aceitação FIM por OS](docs/m1-fim-acceptance-matrix.md), o [roteiro de conciliação 3/3 no Wazuh](docs/m1-agent-inventory-operator-runbook.md) e a prévia offline do impacto do seletor Linux antes da revisão humana. Os dados privados foram recapturados em 04/11, mas ainda exigem atestado humano dos checks; ausência de evidência mantém o deployment bloqueado.
 
 ## O que este laboratório demonstra
 
