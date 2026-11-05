@@ -1,5 +1,7 @@
 # Threat Hunting & Detection Lab — Wazuh
 
+**Revisão formal de evidências (05/11):** [relatório técnico, cadeia de custódia e gates abertos](docs/m1-change-a-formal-evidence-review-20261105.md). O teste benigno gerou **9 alertas FIM reais** nos três agentes, confirmados em Indexer/Discover; snapshot privado registrou **SHA-256 de 10 evidências**. **Manager local e revisor independente ainda pendentes**, `DEPLOYMENT_GATE=BLOCKED`, rollback retido. CI #133: **3/3 SUCCESS**.
+
 **FIM pós-mudança A validado no Indexer/Discover (05/11):** [nove alertas reais, três por agente `002`, `004` e `005`](docs/m1-change-a-three-agent-fim-evidence-20261105.md), abrangendo `added`, `modified` e `deleted` de arquivos benignos descartáveis. Limpeza e integridade da configuração foram conferidas. **Log local do Manager e revisão independente ainda pendentes; aceite final e `DEPLOYMENT_GATE` seguem bloqueados.** M1 **11/17**.
 
 **Nova janela de validação FIM (05/11, 13h55–14h25 BRT):** [Windows `004` apresentou 3 novos eventos reais no Indexer/Discover](docs/m1-change-a-second-authorized-fim-window-20261105.md), um por tipo `added`, `modified`, `deleted`, gerados por arquivo de dados inerte criado/modificado/excluído com limpeza confirmada. O Linux `002` já tinha 3 eventos comprovados anteriormente. **Linux `005` ainda exige autenticação local legítima** para teste; consulta direta ao log do Manager e revisão independente pendentes. Mudança A mantém rollback e `DEPLOYMENT_GATE=BLOCKED`, M1 **11/17**.
