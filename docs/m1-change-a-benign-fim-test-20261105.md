@@ -1,5 +1,21 @@
 # M1 — teste FIM benigno autorizado após mudança A (05/11/2026)
 
+## Atualização: evidência no Indexer/Discover após o teste (05/11, ~13h49 BRT)
+
+A sessão Wazuh foi desbloqueada pelo operador. No **Discover**, data view `wazuh-alerts-*`, a pesquisa DQL `agent.id: 002 and syscheck.path: *` na janela `Last 24 hours` retornou **3 documentos de FIM**, todos com o mesmo `syscheck.path` do arquivo descartável do teste `002`, agente `002` e campo de origem `manager.name`.
+
+| Evento FIM observado | Horário exibido no Discover | Correspondência com ação no host |
+| --- | --- | --- |
+| `added` | 11:22:50.977 | criação 13:22:29 BRT |
+| `modified` | 11:22:58.379 | modificação 13:22:36 BRT |
+| `deleted` | 11:23:05.711 | exclusão 13:22:43 BRT |
+
+Os horários do Dashboard usam apresentação diferente do host BRT (deslocamento de aproximadamente 2 horas) e o relógio do guest já apresentava deriva de cerca de **22 segundos**. A sequência, identidade do agente e artefato de teste correspondem; **a configuração de horário e a deriva não foram alteradas**. Captura e correlação detalhada são **privadas em `.lab/`**, sem publicar IDs internos, hostname ou caminho completo.
+
+**Aceitação delimitada:** `AGENT_002_FIM_INDEXER=CONFIRMED`; `AGENT_002_FIM_DISCOVER=CONFIRMED`, com **3 ocorrências reais**. O campo `manager.name` identifica o processamento esperado, mas **não substitui a inspeção independente dos alertas locais do Manager**: `MANAGER_DIRECT_LOG=NOT_VERIFIED`. O teste FIM do `005` e uma prova nova de FIM no Windows `004` continuam pendentes. O gate global mantém `DEPLOYMENT_GATE=BLOCKED` e o M1 **11/17**.
+
+**Janela encerrada às 13h48min53s BRT:** nenhuma nova alteração de arquivo ou teste ativo é autorizada por esta janela. Continuar em modo somente leitura até existir nova autorização específica, com rollback da mudança A preservado.
+
 **Situação:** teste de arquivo descartável **concluído no agente Linux 002**, sem comprovação ainda de alertas ponta a ponta. **Agente Linux 005 não testado** por falta de permissão de escrita aprovada no diretório monitorado. **Mudança A não aceita operacionalmente** apenas por este teste.
 
 ## Autorização e delimitação
