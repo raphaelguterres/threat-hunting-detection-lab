@@ -69,7 +69,7 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [x] Preparar [proposta de segmentação FIM por OS](docs/m1-fim-os-scoped-remediation-plan.md) e testes offline sintéticos para impedir caminhos Linux em blocos Windows.
 - [x] Adicionar gate offline de **diff mínimo** para permitir apenas inclusão de escopo Linux em agent.conf proposto; impedir alterações inadvertidas de caminhos, fontes, regras FIM ou comentários.
 - [x] Validar oficialmente no Manager uma proposta mínima `os="^Linux"` em **cópia isolada fora do diretório distribuído**; `verify-agent-conf` aprovado, original inalterado e cópia removida.
-- [ ] Confirmar inventário/OS dos demais agentes, possível duplicidade Security e a **cobertura FIM efetiva** do agente 004 antes de solicitar alteração no grupo compartilhado.
+- [x] **Concluir revisão do inventário/OS do grupo atual (3/3), do risco de sobreposição dos coletores Security e da cobertura FIM efetiva do Windows `004`** — [parecer de 05/11/2026](docs/m1-inventory-security-overlap-fim004-closure-20261105.md). A sobreposição potencial **não foi mitigada** e segue vinculada à mudança `4698` (Issue #15); Manager direto e revisão independente continuam pendentes. A conferência atual foi pós-cutover, não deve ser descrita retroativamente como pré-mudança.
 - [ ] **Aprovar, executar e validar** a mudança 4698 (ainda não aplicada), somente após avaliar retenção e confirmar ingestão Wazuh.
 
 **Acompanhamento:** [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) · [Três hipóteses M1](docs/m1-three-hunting-hypotheses.md).
