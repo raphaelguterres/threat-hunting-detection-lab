@@ -35,15 +35,15 @@ A autorização/risco ratificados para a **mudança C** na [Issue #29](https://g
 | A-W01 | Propriedade e escopo 3/3 | Agentes `002/004/005` consultados no Manager, `Active/synchronized` e somente `default` | PASS técnico; **atestado humano ainda pendente** |
 | A-W02 | Diff mínimo e impacto do bloco | Candidata privada com única alteração `os="^Linux"`; `localfile` Unix e FIM preservados | PASS offline; **aceitação do impacto ainda pendente** |
 | A-W03 | Precedência e cobertura real por SO | Somente grupo `default`; FIM local Windows inventariado. **Read-only adicional 04/11:** agente Linux `002` possui dois blocos raiz `ossec_config`, um bloco `syscheck`, dois nós de diretórios locais e **nenhum realtime local**; no agente Linux nativo `005`, a conta remota não tem permissão para ler `ossec.conf` | **Parcial: `002` conferido por leitura; `005` exige consulta autenticada no Dashboard ou revisão manual autorizada, sem contornar permissões** |
-| A-W04 | Segurança da candidata | Dez testes offline positivos e negativos; fonte 221 B e candidata 233 B com diff reversível | PASS offline; **parser oficial da candidata pendente** |
+| A-W04 | Segurança da candidata | Dez testes offline, fonte 221 B, candidata 233 B e diff reversível; `verify-agent-conf: OK` em staging temporário não ativo ([evidência](m1-change-a-parser-ci-20261104.md)) | **PASS técnico**, revalidar hashes/CI na janela |
 | A-W05 | Backup e restauração | Backup DPAPI real e hash/UID/GID/modo confrontados; ensaio isolado PASS | PASS observado; **revalidar na janela** |
-| A-W06 | Testes e CI do commit de execução | Suite local 220 passed, 4 skipped, 160 subtests no preparo; CI do commit específico precisa ser confirmado | **Revalidar na janela** |
+| A-W06 | Testes e CI do commit de execução | Suite local 220 passed, 4 skipped, 160 subtests; CI do commit `73d50b3` [3/3 jobs SUCCESS](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/runs/41948975719) | **PASS para SHA verificado**; revalidar no commit de execução |
 | A-W07 | Janela válida | 05/11/2026 18h–19h BRT, aprovada **condicionalmente** pelo proprietário ([Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17#issuecomment-6646704047)) | Janela autorizada; **não é GO** |
 | A-W08 | Ratificação dos riscos e autoavaliação | [Issue #31 — confirmação explícita](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764) | **RATIFICADO PELO PROPRIETÁRIO**; revisão independente NÃO realizada |
 | A-W09 | GO operacional explícito | Decisão separada, após revisar A-W01 a A-W08; executor e rollback identificados | **PENDENTE** |
 | A-W10 | Pós-mudança e abort/rollback | 3/3 sync, Linux FIM presente, Windows sem diretiva Unix; Manager, Indexer e Dashboard verificáveis | **Não executado** |
 
-O `verify-agent-conf` no **arquivo ativo original** já retornou `OK`. A tentativa de validação da candidata por `/dev/stdin` falhou por limitação de entrada **sem determinar se o XML é aceito**; o candidato deverá ser validado em arquivo temporário real e não ativo, autorizado, e removido depois, preservando evidências privadas.
+O `verify-agent-conf` no arquivo ativo original e na **candidata real em staging temporário não ativo** retornou `OK`. Na segunda verificação, os temporários foram removidos, o hash ativo permaneceu inalterado e nenhum deployment ocorreu ([registro técnico](m1-change-a-parser-ci-20261104.md)). A validação de parser e CI **não comprova distribuição real**, que continua condicionada a GO e observabilidade.
 
 ## Fluxo de decisão
 

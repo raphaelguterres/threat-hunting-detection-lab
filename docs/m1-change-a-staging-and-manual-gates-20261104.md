@@ -19,11 +19,11 @@ A ferramenta nova [`scripts/m1_stage_linux_os_scope_readonly.py`](../scripts/m1_
 | Comparação byte a byte reversa | **PASS** — remover o atributo proposto recupera todos os bytes originais |
 | SHA-256 no Manager após staging | **Sem alteração** |
 | Testes da ferramenta | **10 PASS**, incluindo casos negativos e recusa de overwrite |
-| Wazuh parser oficial na candidata | **PENDENTE** — o método sem arquivo em `/dev/stdin` foi recusado |
+| Wazuh parser oficial na candidata | **PASS (04/11, ~22h35 BRT)** — `verify-agent-conf: OK` em arquivo temporário não ativo, com limpeza e hash ativo intacto; [evidência](m1-change-a-parser-ci-20261104.md) |
 | Seleção real `^Linux` distribuída aos agentes | **Não testada** |
 | Implantação | **NÃO EXECUTADA** |
 
-**Limite importante:** foi feita uma tentativa read-only de passar a candidata ao `verify-agent-conf -f /dev/stdin`; a ferramenta recusou a entrada como arquivo inválido. **Isso não é validação de parser e não deve ser classificado como sucesso ou falha da sintaxe da candidata.** A documentação oficial do Wazuh orienta usar um arquivo temporário real, validá-lo com `verify-agent-conf -f <caminho>` e só depois promover a versão aprovada. [Fonte oficial](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html).
+**Atualização após o bloqueio de `/dev/stdin`:** a candidata foi validada **com sucesso** pelo parser oficial `verify-agent-conf -f` sobre uma **cópia temporária exclusiva**, fora de `default/agent.conf`. Resultado `verify-agent-conf: OK`; arquivos temporários eliminados e hash do Manager ativo inalterado. A tentativa anterior por `/dev/stdin` foi somente uma limitação do método e não uma rejeição de sintaxe. [Evidência técnica e CI](m1-change-a-parser-ci-20261104.md). **Isso ainda não prova seleção OS ou eventos FIM em runtime.**
 
 ## Validações que agora podem ser consideradas concluídas tecnicamente
 
@@ -45,7 +45,7 @@ A ferramenta nova [`scripts/m1_stage_linux_os_scope_readonly.py`](../scripts/m1_
 | **A-01b — Conferir FIM local do agente Linux 005** | Operador com acesso autorizado ao agente 005 ou Dashboard | Confirmar diretórios, realtime, exclusões, precedência com `default`; não contornar ACL de `/var/ossec` | **Pendente de conferência manual autorizada** |
 | **A-02 — Aceitar impacto do bloco inteiro** | Proprietário/revisor | Reconhecer que FIM realtime e fonte `localfile` Unix passarão a ser exclusivos dos agentes Linux | **Pendente** |
 | **A-03 — Revisão da mudança A** | Autoavaliação formal do proprietário (sem revisor externo) | Cinco riscos da exceção A aceitos na Issue #31; revisão técnica independente não ocorreu e controle de CI/diff ainda obrigatório | **Exceção RATIFICADA; restantes controles NÃO dispensados** |
-| **A-04 — Parser oficial em staging temporário** | Operador autorizado | Validação da cópia candidata real com `verify-agent-conf -f` num **arquivo temporário que não seja a configuração ativa**, seguida de remoção/checagem | **Pendente de autorização para staging na VM** |
+| **A-04 — Parser oficial em staging temporário** | Executado no Manager com cópia temporária segregada | `verify-agent-conf: OK`, hash ativo preservado, cópia temporária removida de Kali e Manager | **PASS técnico em 04/11**; revalidar em janela e atestar evidência privada |
 | **A-05 — Pré-check em janela** | Operador | Revalidar 3/3, backup DPAPI, sha256/UID/GID/mode, logs, rollback, parser e tempo disponível para revert | **Pendente da janela** |
 | **A-06 — Autorização operacional final** | Proprietário | Aprovar **execução** de mudança A com referência rastreável, não apenas agendar a janela | **Pendente** |
 | **A-07 — Validação pós-mudança** | Operador | Configuração aplicada em `002/005`, ausência do bloco no Windows `004`, sincronização e cadeia Manager → Indexer → Dashboard | **Pendente de deployment** |
@@ -75,4 +75,4 @@ O validador `m1_evidence_gate.py` continua exibindo `EVIDENCE_SOURCE=PRIVATE_UNA
 
 Nenhum arquivo em `.lab/` deve ser publicado; o relatório versionado contém somente contagens e estados. Mudança C/H03 e Windows `4698` estão explicitamente fora deste escopo.
 
-**Lembrete agendado:** 05/11 às 17h45 BRT para pré-checks. **Próximo progresso seguro:** documentação revisada, CI atualizado e, se houver aprovação específica, validação de parser em staging temporário seguida de consulta pós-validação.
+**Lembrete agendado:** 05/11 às 17h45 BRT para pré-checks. **Próximo progresso seguro:** parser oficial em staging **concluído**; CI do [PR #25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) confirmado **3/3 SUCCESS** no SHA `73d50b3`. Ainda faltam FIM local do `005`, atestados humanos, validações novamente na janela e GO operacional. [Checkpoint atualizado](m1-change-a-parser-ci-20261104.md).
