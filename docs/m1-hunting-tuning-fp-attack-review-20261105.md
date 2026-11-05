@@ -1,5 +1,7 @@
 # M1 — revisão de tuning, falsos positivos e cobertura MITRE ATT&CK por hipótese (05/11/2026)
 
+> **Atualização posterior em 05/11 — H01:** após a revisão retrospectiva descrita abaixo, uma janela específica foi autorizada e executada: [H01 benigno real no Windows `004`](m1-h01-authorized-real-powershell-task-test-20261105.md), com Sysmon EID1 → Security 4698 do mesmo ator e ativo, **1,34 s** e limpeza comprovada. O `4698` está no Indexer/Discover; o **Sysmon EID1 dessa execução não foi localizado no índice de alertas**, logo H01 ponta a ponta segue incompleto. As observações abaixo sobre `4698` ausente referem-se ao **baseline histórico anterior ao cutover** e não à configuração atual. Sem reclassificar H01 como incidente, sem alterar tuning e sem marcar as três correlações como validadas.
+
 **Entrega:** revisão técnica de H01, H02 e H03 com evidências observadas, critérios negativos e decisões de tuning.  
 **Status desta revisão:** **CONCLUÍDA COM LACUNAS OPERACIONAIS EXPLÍCITAS**. Nenhuma hipótese foi promovida a detecção correlacionada validada, nenhum incidente foi declarado, nenhum limiar/regra Wazuh foi alterado e **nenhum falso-positivo percentual foi estimado**.  
 **Escopo:** recortes reais anteriormente preservados e revisados (02–05/11), casos FIM benignos autorizados, contrato do correlacionador e controles negativos sintéticos rotulados. Sem novas simulações nem acesso a canais de log restringidos.
