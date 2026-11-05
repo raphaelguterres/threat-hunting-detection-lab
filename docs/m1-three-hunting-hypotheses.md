@@ -1,5 +1,7 @@
 # M1 — Três hipóteses de Threat Hunting com correlação offline
 
+> **Checkpoint 05/11, H01:** a [auditoria de escopo da regra ativa](m1-h01-active-rule-scope-diagnosis-20261105.md) confirmou que `110100` só eleva PowerShell Sysmon EID1 quando `commandLine` contém `-enc`/`-EncodedCommand`; a regra-base `61603` está nível 0 e o limite de alertas é 3. Um ensaio real com PowerShell `-File` e Security `4698` criou um par benigno **nativo** dentro de 1,34 s, mas o EID1 específico não gerou alerta indexado. Não confundir o evento Sysmon nativo com um alerta `110100` validado; próximos testes precisam alinhar o comando à regra, sob nova janela aprovada. H02 e H03 continuam com lacunas próprias.
+
 **Início:** 02/11/2026. **Estado:** especificação e validação sintética; triagem de novos eventos reais **não executada**. Este incremento não comprova novos incidentes nem classifica as três hipóteses como detecções implantadas.
 
 O laboratório já contém cinco estudos de caso históricos, Sysmon IDs 1, 3 e 11, auditoria Windows e FIM Linux/Windows. Este M1 cria hipóteses **adicionais**, em vez de renomear os estudos antigos.
