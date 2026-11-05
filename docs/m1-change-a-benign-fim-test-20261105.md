@@ -59,3 +59,17 @@ O teste pode, ou não, ter produzido alertas FIM. A execução local do arquivo 
 5. Caso a janela acima tenha expirado, uma nova janela e autorização serão necessárias **antes de qualquer novo teste ativo**. Nenhuma alteração B/C ou merge do PR está autorizada aqui.
 
 **Estado final documentado:** `M1=11/17`; `DEPLOYMENT_GATE=BLOCKED` (fail-closed intencional); `CHANGE_A_POSTCHANGE_ACCEPTANCE=PENDING`. Consultar [handoff da madrugada](m1-change-a-cutover-postcheck-handoff-20261105.md), [plano de observabilidade da retomada](m1-change-a-postresume-observability-plan-20261105.md) e [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17).
+
+## Comparação adicional, somente leitura, dos agentes 004 e 005 (05/11)
+
+No mesmo Discover autorizado, data view `wazuh-alerts-*`, período **Last 24 hours**:
+
+| Agente | Consulta sanitizada | Resultado observado | Limite |
+| --- | --- | --- | --- |
+| `004` / Windows | `agent.id: 004 and syscheck.path: *` | **35 registros FIM** | Caminhos exibidos são **Registro do Windows** (`HKEY*`), não evidência de arquivo Windows |
+| `004` / Windows | filtro acima **excluindo** `syscheck.path: HKEY*` | **0 registros de arquivo** | Falta criar/validar evento benigno de arquivo no Windows em janela própria |
+| `005` / Kali | `agent.id: 005 and syscheck.path: *` | **0 registros** | Teste ativo do `005` não ocorreu por restrição de permissão; ausência de evento **não prova falha** |
+
+As capturas e a folha de comparação ficam somente no diretório privado `.lab/`. Nenhuma consulta alterou sistema, arquivos, regras ou serviços. **A validação independente do Manager continua pendente**, assim como o teste FIM ativo e autorizado em `005` e um novo evento de arquivo em `004`.
+
+A janela já estava encerrada; nenhuma operação de teste ativo foi executada durante esta comparação.
