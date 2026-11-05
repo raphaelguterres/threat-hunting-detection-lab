@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Checkpoint FIM 005 (04/11, ~22h52–22h55 BRT):** [Dashboard General/Monitored/Ignored do agente `005` verificado, sete diretórios, FIM realtime em `/opt/wazuh-lab/monitorado`, nenhuma exclusão para essa pasta; existência física confirmada em `002` e `005`](m1-agent005-fim-ignored-and-path-checkpoint-20261104.md). Consulta delimitada indica possível desvio de relógio Kali ~+22 s em relação ao host; investigar antes de validar correlação temporal. **Configuração e caminho confirmados, telemetria real ainda pendente; M1 11/17, gate BLOCKED.**
+
 **Pré-gate A (04/11, ~22h35 BRT):** [parser oficial Wazuh da candidata PASS, hash ativo preservado e arquivos temporários removidos; GitHub Actions 3/3 SUCCESS para SHA `73d50b3`](m1-change-a-parser-ci-20261104.md). O Manager exibe três agentes ativos no grupo `default`. A reconfirmação individual da sincronização foi bloqueada na sessão atual; a evidência anterior continua datada. **FIM local do `005` exige conferência autorizada; GO operacional não recebido, `DEPLOYMENT_GATE=BLOCKED`.**
 
 **Governança de autoavaliação (04/11, ~22h26 BRT):** [exceção individual da mudança A ratificada pelo proprietário](m1-change-a-solo-owner-review-exception-20261104.md), [Issue #31 e declaração expressa](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764). Cinco riscos específicos aceitos, **sem revisão de terceiro nem autorização de implantação**. Controles técnicos e gate preservados: `DEPLOYMENT_GATE=BLOCKED`, **M1 11/17**.
