@@ -72,17 +72,17 @@ A leitura do `default/agent.conf` ativo no Manager retornou:
 | Recuperação isolada e corrupção negativa | **PASS** | Plano operacional de rollback ainda requer aceite |
 | Revisão PR/código e efeito de filtrar `localfile` | **Pendente** | NO-GO |
 | Autorização específica para `M1-FIM-OS-SCOPE` | **Não recebida** | NO-GO |
-| Janela nova | **Somente proposta** | NO-GO |
+| Janela nova | **Aprovada condicionalmente pelo proprietário em 04/11 às ~22h03 BRT**, para 05/11 18h–19h BRT ([Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17#issuecomment-6646704047)) | **Ainda NO-GO:** aprovação de janela não é autorização operacional final nem atestado dos demais gates |
 | FIM Linux/Windows após mudança → Manager → Indexer → Discover | **Não executado** | NO-GO |
 
 **Gate automático observado após importação:** `EVIDENCE_COMPLETENESS=INCOMPLETE`; `MISSING_OR_UNVERIFIED=inventory_review,os_impact_review,group_precedence_review,baseline_integrity,parser_staging,backup_integrity_real,rollback_rehearsal_real,change_approval,approved_window`; `DEPLOYMENT_GATE=BLOCKED`.
 
 O status `verified` do manifesto **não foi inventado**: os checks pendentes só podem ser promovidos após uma revisão rastreável e autorização de mudança, considerando as limitações da autoavaliação do proprietário.
 
-## 5. Nova janela proposta — NÃO APROVADA
+## 5. Janela de mudança A — APROVADA CONDICIONALMENTE PELO PROPRIETÁRIO
 
 **Mudança A — somente seletor Linux na configuração central:**
-- **Proposta:** quinta-feira, **05/11/2026, 18h00–19h00 BRT** (`America/Sao_Paulo`).
+- **Aprovada condicionalmente pelo proprietário:** quinta-feira, **05/11/2026, 18h00–19h00 BRT** (`America/Sao_Paulo`), resposta expressa **“sim”**, registrada em [Issue #17, comentário 6646704047](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17#issuecomment-6646704047) em 04/11, ~22h03 BRT. **Não inicia automaticamente às 18h; expira às 19h se não houver GO formal.**
 - **Executor/owner proposto:** operador responsável pelo laboratório; nomeação e aceitação explícita ainda pendentes.
 - **Escopo exato:** modificar somente a abertura do bloco Linux de `<agent_config>` para `<agent_config os="^Linux">`, sem alterações em logs, regras, diretivas Windows, `4698`, grupos ou agentes.
 - **Observação:** aplicar o seletor no bloco existente altera a elegibilidade de **todas** as diretivas do bloco, inclusive o `localfile` Unix. O revisor deve aceitar este impacto expressamente.
@@ -104,11 +104,11 @@ O status `verified` do manifesto **não foi inventado**: os checks pendentes só
 `WAZUH_RUNTIME_OS_SCOPE_TEST=NOT_PERFORMED`
 `ACTIVE_BASELINE_HASH_MODE_UID_GID=PASS`
 `REAL_BACKUP_ISOLATED_RESTORE=PASS`
-`CHANGE_A_WINDOW=PROPOSED_NOT_APPROVED`
+`CHANGE_A_WINDOW=OWNER_APPROVED_CONDITIONAL_20261105_1800_1900_BRT`
 `CHANGE_A_DEPLOYED=NO`
 `DEPLOYMENT_GATE=BLOCKED`
 
-**Próxima decisão:** proprietário deve revisar e aprovar explicitamente o escopo e a janela da mudança A, registrar o tratamento da ausência de segundo revisor conforme o contrato do projeto e confirmar que os controles de rollback e observabilidade podem ser executados. Não registrar assinatura ou evidência como se uma segunda pessoa tivesse revisado.
+**Próxima decisão:** a janela foi aprovada **condicionalmente**, mas proprietário ainda deve decidir separadamente a autorização de **execução** após revisar o escopo completo (inclusive `localfile`), os gates humanos, o tratamento da ausência de segundo revisor, os checks técnicos e o plano de rollback. Esta decisão não ocorreu neste checkpoint. Não registrar assinatura ou evidência como se uma segunda pessoa tivesse revisado.
 
 ### Referências
 
