@@ -4,6 +4,8 @@
 
 **Governança individual da mudança A (04/11, ~22h26 BRT):** o proprietário **ratificou os cinco riscos específicos** da autoavaliação exclusiva da mudança A, na [Issue #31 — comentário 6647042764](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764) e [documento de exceção](m1-change-a-solo-owner-review-exception-20261104.md). **A exceção resolve somente o modelo de revisão para A; não houve revisor independente, não há GO operacional e os controles técnicos continuam obrigatórios.** A exceção C/H03 não é reutilizada.
 
+**Revisão mais recente (04/11, ~23h28 BRT):** [precedência por agente, integridade de backup, restauração isolada e pré-check repetível](m1-change-a-precedence-backup-preflight-20261104.md). Sete controles de evidência agora estão verificados tecnicamente ou por autoatestado explícito; `approved_window` e `change_approval` permanecem pendentes. **Não houve GO nem implantação.**
+
 **Matriz operacional de decisão GO/NO-GO (04/11, ~23h07 BRT):** [nove checks pendentes no manifesto, evidências já capturadas, serviço de horário do host e próximo critério humano](m1-change-a-go-nogo-readiness-20261104.md). O script fail-closed imprime `DEPLOYMENT_GATE=BLOCKED` intencionalmente, mesmo quando o manifesto está pronto para revisão; nunca considerá-lo um sinal para contornar aprovações.
 
 **Para revisão manual do proprietário (04/11, ~23h BRT):** [cartão com inventário 3/3, precedência, impacto de FIM + `localfile` Unix e texto de atestado não assinado](m1-change-a-owner-inventory-impact-attestation-20261104.md). **Nenhuma aprovação individual foi inferida do documento**; owner deverá confirmar especificamente A1/B1, e o GO operacional é uma decisão posterior.

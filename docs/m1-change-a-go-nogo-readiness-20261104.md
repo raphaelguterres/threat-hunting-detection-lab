@@ -6,6 +6,8 @@
 
 **Decisão:** `NO-GO / DEPLOYMENT_GATE=BLOCKED`.
 
+**Atualização posterior (04/11, ~23h28 BRT):** [revisão técnica de precedência, backup, rollback e script privado de pré-check](m1-change-a-precedence-backup-preflight-20261104.md). O manifesto passou de **2/9** para **7/9 controles com evidências revisadas**; faltam `approved_window` e `change_approval`, sem GO. As nove pendências abaixo refletem o estado anterior deste relatório.
+
 ## Entenda o GO
 
 **GO** = autorização operacional explícita para uma alteração controlada; não é referência à linguagem de programação Go. **NO-GO** = não executar enquanto requisitos pendentes ou divergências bloqueadoras permanecerem.
