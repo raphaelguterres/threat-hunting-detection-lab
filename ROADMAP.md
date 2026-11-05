@@ -58,7 +58,7 @@ Este M1 é um **incremento novo**, separado das seis fases históricas concluíd
 - [x] Criar fixtures sintéticas e testes de contrato em GitHub Actions Linux/Windows (**sujeito a confirmação do CI no PR**).
 - [x] Revisar **disponibilidade de telemetria real** do Windows Security, Sysmon e FIM em modo read-only; [análise de 02/11](docs/m1-native-windows-wazuh-visibility-review-20261102.md).
 - [ ] **Correlacionar as três hipóteses em eventos reais completos**, com mesmos atores/ativos/artefatos e revisão manual — contagens e ausência de pares não encerram a investigação.
-- [ ] Registrar estudos de caso adicionais com timelines e decisões documentadas.
+- [x] Registrar **três estudos de caso reais de FIM autorizado**, com timelines, investigação, classificação benigna, ações e limitações documentadas. [Evidências 05/11/2026](docs/m1-three-real-fim-investigation-case-studies-20261105.md).
 - [ ] Revisar tuning, falsos positivos e cobertura ATT&CK com evidência por hipótese.
 - [ ] Encerrar o M1 somente com revisão independente e evidência sanitizada, sem confundir simulação com operação.
 
