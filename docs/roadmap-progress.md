@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Progresso verificado em 05/11/2026: M1 13/17 (76,5%), quatro entregas pendentes.** Concluída a [revisão de inventário 3/3, possível sobreposição Security e cobertura FIM Windows 004](m1-inventory-security-overlap-fim004-closure-20261105.md). Os três agentes permanecem ativos/sincronizados e o Windows 004 teve eventos benignos `added/modified/deleted` realmente indexados. **O risco de coleta Security sobreposta foi identificado, não eliminado**; correção, auditoria 4698, prova direta do Manager e revisão independente continuam separadas. Os checkpoints históricos abaixo preservam suas datas originais.
+
 **Progresso atualizado de 05/11/2026: M1 12/17 (70,6%), cinco pendências.** Foi concluído o item de [três estudos de caso reais de FIM com timelines e decisões](m1-three-real-fim-investigation-case-studies-20261105.md), baseados nos **9 eventos observados em Indexer/Discover** nos agentes `002`, `004` e `005`. Cada caso registra contexto de autorização, classificação benigna, triagem, evidências, limpeza e limitações. **Esse aceite é documental, não conclui H01/H02/H03, Manager local, revisão independente nem implantação.** A contagem é calculada exclusivamente das caixas do [ROADMAP.md](../ROADMAP.md). Os checkpoints antigos abaixo preservam suas contagens históricas.
 
 **Entrega offline adicional em 05/11:** [comparação determinística e privada Manager × Indexer](m1-fim-offline-manager-indexer-compare-20261105.md), executável por `scripts/M1_COMPARAR_EXPORTS_FIM.bat` após disponibilização de exportações legítimas; checa o mesmo ID/regra/artefato/evento/agente e tolerância de horário para **9 eventos / 3 agentes**. 11 testes novos de contrato; nenhuma exportação de Manager foi feita, portanto `manager_ingestion=pending`, aceitação global bloqueada e revisão independente exigida. Checklist M1 permanece **11/17**.
@@ -53,7 +55,7 @@
 | Trilho | Estado | Contagem | Evidência/limite |
 | --- | --- | --- | --- |
 | **Fases históricas 1–6** | **Concluídas no roadmap original** | **8/8 entregas** e **6/6 fases** | [Issues #1–#8](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues?q=is%3Aissue+is%3Aclosed), todas encerradas em 26/10 ou antes |
-| **M1 — Threat Hunting por hipóteses** | **Em andamento** | **12/17 marcados (70,6%); 5 pendentes** | Três novos casos reais FIM documentados; H01/H02/H03 e aceite final permanecem abertos |
+| **M1 — Threat Hunting por hipóteses** | **Em andamento** | **13/17 marcados (76,5%); 4 pendentes** | Inventário 3/3, revisão de risco Security e FIM Windows 004 documentados; H01/H02/H03, 4698 e revisão final seguem abertos |
 | **CI e contratos offline M1** | **PASS local em 04/11** | **210 testes aprovados, 4 pulados, 160 subtestes aprovados; Actions #104 SUCCESS, commit `a137c51`** | A aprovação de testes sintéticos não prova evento real nem autoriza deploy |
 | **Revisão/merge do código M1** | **Pendente** | PRs [#24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) e [#25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) abertos, sem review formal | `main` sem esses commits; proteção de `main` pendente na [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 | **Mudança A — FIM por OS no Manager** | **Cutover aplicado; validação pós-change incompleta** | `002/004/005` 3/3 sincronizados; FIM configurado por OS exibido conforme esperado no Dashboard | [Handoff 05/11](m1-change-a-cutover-postcheck-handoff-20261105.md): não há ainda mesma identidade de evento novo no Manager, Indexer e Discover; rollback preservado; gate automático continua BLOCKED |
@@ -61,7 +63,7 @@
 
 ```text
 Laboratório original  ████████████████████  8/8 entregas documentadas
-M1 checklist          ██████████████░░░░░░ 12/17 (70,6%)
+M1 checklist          ███████████████░░░░░ 13/17 (76,5%)
 M1 deployment FIM     BLOQUEADO — não expressar como porcentagem
 ```
 
@@ -89,17 +91,16 @@ Essas conclusões históricas são sobre **entregas do roadmap original** e não
 
 Detalhes sanitizados: [auditoria FIM e política do Indexer](m1-agent004-syscheck-policy-log-readonly-20261103.md) e [consulta de sete dias](m1-agent004-fim-seven-day-discover-20261103.md).
 
-## M1 — 12 itens marcados e cinco entregas ainda abertas
+## M1 — 13 itens marcados e quatro entregas ainda abertas
 
 | Prioridade | Pendente no checklist M1 | Dependências e critério |
 | --- | --- | --- |
-| **1** | Aprovar a emenda de escopo, confirmar inventário/OS dos três agentes atuais, duplicidade Security e cobertura FIM efetiva do `004` | Revisão independente do contrato antigo 4/4; depois, três membros de `default` com ID, OS+versão, grupos **na ordem**, status, sync e captura autorizada; revisar precedência; [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) |
-| **2** | Aprovar, executar e validar change control Windows `4698` | Aprovação e janela separadas, retenção, ingestão Wazuh, rollback e evidências pós-mudança; [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) |
-| **3** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
-| **4** | Revisar tuning, falsos positivos e cobertura ATT&CK por hipótese | Comparar com controles negativos reais; documentar detecções ausentes e ajustes aprovados |
-| **5** | Encerrar M1 com revisão independente e evidência sanitizada | PRs revisados por terceiro habilitado, aprovação documentada e critérios técnicos satisfeitos; [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
+| **1** | Aprovar, executar e validar change control Windows `4698` | Aprovação e janela separadas, retenção, ingestão Wazuh, rollback e evidências pós-mudança; [Issue #15](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/15) |
+| **2** | Correlacionar H01/H02/H03 em eventos reais completos | Mesmos ativos/atores/artefatos e janelas, evidência Manager → Indexer → Discover, controle negativo e interpretação humana; [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9) |
+| **3** | Revisar tuning, falsos positivos e cobertura ATT&CK por hipótese | Comparar com controles negativos reais; documentar detecções ausentes e ajustes aprovados |
+| **4** | Encerrar M1 com revisão independente e evidência sanitizada | PRs revisados por terceiro habilitado, aprovação documentada e critérios técnicos satisfeitos; [Issue #26](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/26) |
 
-A relação acima **reordena os cinco itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
+A relação acima **reordena os quatro itens pendentes por dependência operacional**; não altera o checklist do [ROADMAP.md](../ROADMAP.md).
 
 ### Telemetria nativa real — nova consulta em 03/11 (~20h25 BRT)
 
