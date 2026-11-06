@@ -76,7 +76,8 @@ def compare(baseline_raw: bytes, proposal_raw: bytes) -> dict:
 
     new_matches = [
         node for node in new_sys.findall("./directories")
-        if normalized_path(node.text or "") == expected_path
+        if node.text and "," not in node.text
+        and normalized_path(node.text) == expected_path
     ]
     if len(new_matches) != 1:
         raise ValueError("candidate must add exactly one target directive")
