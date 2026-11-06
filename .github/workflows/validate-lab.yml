@@ -36,6 +36,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Report roadmap checklist progress (no operational approval)
+        run: python scripts/roadmap_progress.py
+      - name: Test roadmap progress accounting
+        run: python -m unittest discover -s tests -p test_roadmap_progress.py -v
       - name: Run synthetic M1 offline tests
         run: python -m unittest discover -s tests -p test_hunt_correlations.py -v
       - name: Verify fixture stays synthetic
@@ -48,6 +52,20 @@ jobs:
         run: python scripts/review_fim_scope_only.py --original tests/fixtures/m1-original-unscoped-synthetic.xml --proposed tests/fixtures/m1-proposed-scoped-synthetic.xml --fixture
       - name: Run minimal Wazuh agent.conf change guard tests
         run: python -m unittest discover -s tests -p test_review_fim_scope_only.py -v
+      - name: Run M1 fail-closed evidence gate contract tests
+        run: python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
+      - name: Run offline authorized-inventory importer contract tests
+        run: python -m unittest discover -s tests -p test_m1_import_authorized_inventory.py -v
+      - name: Run FIM OS impact preview offline contracts
+        run: python -m unittest discover -s tests -p test_m1_fim_impact_preview.py -v
+      - name: Validate M1 operator CSV to private gate end-to-end (synthetic only)
+        run: python -m unittest discover -s tests -p test_m1_inventory_end_to_end.py -v
+      - name: Check fail-closed triage of partial agent observations (synthetic only)
+        run: python -m unittest discover -s tests -p test_m1_observed_agents_triage.py -v
+      - name: Test offline combined M1 status report (synthetic private fixtures)
+        run: python -m unittest discover -s tests -p test_m1_checkpoint_summary.py -v
+      - name: Run full offline M1 regression suite
+        run: python -m unittest discover -s tests -q
       - name: Test bounded H01 retrospective audit
         run: python -m unittest discover -s tests -p test_audit_h01_existing_evidence.py -v
       - name: Run H01 audit on synthetic six-event projection

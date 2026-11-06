@@ -1,0 +1,144 @@
+# M1 — Gate de evidências FIM por OS (fail-closed)
+
+**Estado inicial:** `BLOCKED`. Este gate é **somente leitura**, não altera regras, grupos, o Manager, o agente ou a política de auditoria Windows. Ele não é mecanismo de aprovação nem executor de deployment.
+
+## Por que existe
+
+Os três membros aprovados do grupo `default` (`002`, `004`, `005`) precisam ser reconciliados individualmente antes de restringir uma diretiva Linux da configuração centralizada. A validação sintática `verify-agent-conf` feita em cópia isolada e testes com arquivos sintéticos **não** provam que a distribuição para todos os agentes é segura.
+
+## Fluxo técnico
+
+1. Obter inventário pelo **console autorizado** do Wazuh: os IDs `002`, `004`, `005`, OS/versão, grupos (incluindo `default`), status de sincronização e referência à evidência privada. Consultas previamente bloqueadas por controles de acesso **não devem ser contornadas**.
+2. Registrar a revisão de impacto `os="^Linux"`, o hash da baseline e o resultado do verificador oficial em cópia isolada.
+3. Obter evidência de **backup real** preservando ownership/permissões, ensaio autorizado de restauração isolada sobre cópia real, aprovação de mudança e janela de execução.
+4. Executar o validador local. Saída `EVIDENCE_COMPLETENESS=REVIEW_READY` indica **somente completude declarada** e exige validação humana independente; `DEPLOYMENT_GATE=BLOCKED` é sempre exibido. Nenhum status dessa ferramenta autoriza aplicar a configuração.
+5. Se e somente se houver aprovação específica externa ao script, seguir procedimento controlado com backup e rollback. Para `--stage postchange`, incluir sincronização e evidência FIM real Windows/Linux → Manager → Indexer → Discover, sem declarar êxito a partir de contagens históricas.
+
+## Operação privada
+
+Crie um manifesto JSON privado em `.lab/` (pasta ignorada por Git). Campos requeridos:
+
+- `schema_version: 1`, `change_id: "M1-FIM-OS-SCOPE"`.
+- `agents`: lista dos três objetos para `002`, `004`, `005`, contendo `id`, `os`, `groups` (lista em ordem de prioridade observada, inclui `default`), `status: "active"`, `sync: "synced"`, `observed_at` (ISO 8601 com fuso, coleta das últimas 24h) e `evidence_ref`. O ID `004` deve ser revalidado como Windows.
+- `checks`: objetos para `inventory_review`, `os_impact_review`, `group_precedence_review`, `baseline_integrity`, `parser_staging`, `backup_integrity_real`, `rollback_rehearsal_real`, `change_approval`, `approved_window`; cada objeto com `status: "verified"` e `evidence_ref` indicando uma referência a evidência privada revisada.
+- Para validação após mudança, acrescente `agents_resynced`, `windows_fim`, `linux_fim`, `manager_ingestion`, `indexer_ingestion`, `discover_visibility` com o mesmo formato.
+
+Comandos:
+
+```powershell
+python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prechange
+python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage postchange
+python -m unittest discover -s tests -p test_m1_evidence_gate.py -v
+```
+
+Arquivos UTF-8 com ou sem BOM do Windows PowerShell são aceitos. O gate lê apenas arquivos regulares existentes e com no máximo **64 KiB**, dentro de `.lab/` ou da pasta de fixtures sintéticas autorizada. Chaves JSON duplicadas, constantes não finitas e estruturas profundamente aninhadas são rejeitadas com estado **BLOCKED** e saída controlada (sem traceback). Sem manifesto, manifesto fora de `.lab`, campos ausentes, dados incorretos, OS ambíguo ou evidência não confirmada: saída **BLOCKED** e código **2**. Fixtures usadas com `--fixture` são explicitamente rotuladas `EVIDENCE_SOURCE=SYNTHETIC_FIXTURE` e `EVIDENCE_COMPLETENESS=SYNTHETIC_VALIDATED` ou `SYNTHETIC_INCOMPLETE`, **nunca `REVIEW_READY`**. Um manifesto privado estruturalmente completo gera código 0 **apenas para a checagem de completude**, sem autenticar os registros (`EVIDENCE_SOURCE=PRIVATE_UNATTESTED`); o deployment permanece bloqueado para aprovação independente. Não usar esse código como gatilho de mudanças.
+
+**Atenção:** um `evidence_ref` preenchido não garante autenticidade por si só. O responsável deve verificar a fonte no console autorizado. Esta ferramenta não faz atestado criptográfico nem controle de acesso.
+
+## Evidências já existentes e limites
+
+- 73/73 testes anteriores passaram no host remoto antes desta melhoria; a nova suíte contém **34 testes do gate**, com validação de recência a cada execução e rejeição de agente inativo; a suíte geral está em **136/136 PASS** no checkpoint de 03/11/2026. Inclui JSON UTF-8 com BOM do Windows PowerShell, proteção contra chaves JSON duplicadas, valores não finitos, schema booleano, campos de aprovação vazios e tentativa de traversal fora das pastas permitidas. O CI executa agora a **suíte completa** em Ubuntu e Windows, além dos testes individuais.
+- Configuração local do agente 004: seis diretórios FIM existentes; um em tempo real, cinco por varredura.
+- 102 documentos FIM históricos do agente 004 no Indexer, mas zero na janela previamente analisada; isso **não demonstra a cobertura atual**.
+- O primeiro ensaio de restauração de 02/11 usou fixtures **sintéticas**, não o Manager.
+- Em checkpoint posterior de 02/11, a configuração central **real** foi copiada por operação somente leitura para backup privado criptografado via DPAPI do usuário Windows. Integridade da baseline e do original no Manager: PASS. Foi executado **ensaio de restauração isolada dos bytes reais**, com controle negativo de corrupção, verificação SHA-256 e descarte da pasta temporária: PASS. **Isso não comprova restauração operacional no Manager**, que ainda exige validação autorizada de owner/permissões/distribuição e aprovação humana. O backup DPAPI depende do mesmo perfil Windows e não é portável por padrão.
+- A auditoria Windows Security `4698` é outro change request e não deve ser alterada por esse gate.
+
+## Rastreabilidade
+
+- [Checkpoint M1 — PR #24](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/24) (aguardando revisão e incorporação à `main`)
+- [Plano FIM por SO](m1-fim-os-scoped-remediation-plan.md)
+- [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17)
+- [Issue #9](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/9)
+
+## Importacao segura de inventario autorizado (CSV privado)
+
+Quando o operador obtiver o inventario **pelo console Wazuh autorizado**, pode preparar um arquivo local ignorado pelo Git chamado `.lab/m1-agent-inventory.csv`. O CSV usa exatamente as colunas:
+
+```csv
+id,os,groups,status,sync,observed_at,evidence_ref
+```
+
+Registre **três linhas reais** para `002`, `004`, `005`, com SO e versao observados, os grupos separados por ponto e virgula (incluindo `default`), estado `active`, sync `synced`, timestamp ISO 8601 com fuso observado nas **ultimas 24 horas** (maximo 5 minutos no futuro por desvio de relogio) e uma referencia privada da evidencia. O ID `004` precisa ser reconfirmado no console como Windows. **Nao inventar linhas nem usar fixtures sinteticas como evidencia real.** Nao registrar hostname, IP, usuario ou credenciais.
+
+Teste sem alterar arquivos:
+
+```powershell
+python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv
+```
+
+Somente depois de revisar os três dados reais, importe para o manifesto privado:
+
+```powershell
+python scripts/m1_import_authorized_inventory.py --csv .lab/m1-agent-inventory.csv --apply
+python scripts/m1_evidence_gate.py --manifest .lab/m1-evidence.json --stage prechange
+```
+
+O gate revalida `status=active` e o timestamp `observed_at` de cada agente a cada execução (máximo 24 horas, tolerância de cinco minutos futuros), evitando que um manifesto previamente importado permaneça pronto indefinidamente. O importador recusa manifesto pré-existente malformado (JSON duplicado, schema ambíguo), sem sobrescrever o original. Nunca consulta VMs, nunca publica dados, nunca altera `agent.conf`, e sempre informa `DEPLOYMENT_GATE=BLOCKED`; a etapa de escrita exige `--apply` e permanece apenas em `.lab`. Quando o inventario muda, revisoes de inventario/impacto, aprovacao, janela e comprovacoes pos-mudanca anteriores sao **invalidada(s)**. O CSV e o manifesto nao autenticam por si mesmos a observacao; a verificacao independente continua obrigatoria.
+## Revisão de precedência de grupos e aceitação por SO
+
+Segundo a documentação oficial do Wazuh, o atributo `os` em `agent_config` aplica uma expressão regular sobre o sistema operacional declarado pelo agente. A própria documentação utiliza `os="^Linux"` como exemplo. Isso confirma **suporte do seletor**, não o impacto nos quatro membros atuais:
+https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html
+
+Um mesmo agente pode participar de vários grupos. A **ordem de atribuição importa**, porque a configuração do último grupo tem precedência quando há conflito. O `group_precedence_review` é obrigatório antes da mudança, **mesmo se o operador observar apenas o grupo default**: deve deixar registrada essa observação e a ausência/presença de conflitos. Fonte:
+https://documentation.wazuh.com/current/user-manual/agent/agent-management/grouping-agents.html
+
+Na evidência privada, conferir para cada agente: ID, string real do SO, versão, lista **ordenada** de grupos, status `active`, `synced`, horário da consulta (com fuso), qual bloco FIM se aplica e como a configuração compartilhada interage com a configuração local. Se houver vários grupos, confrontar a precedência efetiva de configurações. A mera contagem de membros do `default` não comprova esse gate. Mudança na lista ou na ordem dos grupos invalida a revisão anterior.
+
+A documentação informa que os agentes **recarregam automaticamente** a configuração centralizada quando a recebem; não planejar restart automático como etapa obrigatória. Conferir sincronização e logs pertinentes depois de uma mudança **especificamente aprovada**. Não enviar comandos de inventário por caminhos alternativos depois do bloqueio de segurança anterior, nem realizar a mudança nesta etapa.
+
+## Prévia offline de impacto do seletor Linux
+
+Depois de obter três linhas **reais e autorizadas** no CSV privado `.lab/m1-agent-inventory.csv`, o analista pode conferir o efeito **hipotético** do regex `^Linux` sem conexão ao Manager:
+
+```powershell
+python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv
+```
+
+O relatório imprime somente contagens agregadas: possíveis correspondências Linux, exclusões não Linux, quantidade de agentes com múltiplos grupos e aqueles em que `default` não é o último grupo. Para gerar um relatório **privado** sem sobrescrever arquivos existentes:
+
+```powershell
+python scripts/m1_fim_impact_preview.py --csv .lab/m1-agent-inventory.csv --output .lab/m1-impact-aggregate.json
+```
+
+Mesmo com todas as linhas válidas, o resultado informa `DEPLOYMENT_GATE=BLOCKED` e `WAZUH_RUNTIME_SELECTION_CONFIRMED=false`. **Não é prova de match em runtime, nem substitui revisão da ordem de grupos, aprovação e teste pós-mudança.** O importador CSV e a prévia nunca executam comandos no Wazuh.
+
+Ver os critérios completos em [Matriz de aceitação FIM por OS](m1-fim-acceptance-matrix.md).
+
+## Coerência temporal do inventário (política local M1)
+
+Além do limite de recência de 24 horas por linha, os três agentes devem ter sido observados dentro de uma **janela conjunta de até 30 minutos**. O importador CSV e o gate de revisão conferem a mesma regra. Isso reduz o risco de misturar capturas de estados diferentes dos membros do grupo; **é uma política de validação deste laboratório, não um requisito oficial do Wazuh**. Se a coleta ultrapassar a janela, repetir a observação pelo console autorizado.
+
+A lista ordenada `groups` precisa conter `default` uma única vez e não pode repetir outro grupo. O importador e o gate rejeitam duplicações; a ordem observada deve ser mantida, pois influencia a análise de precedência. Mesmo um manifesto válido estruturalmente **não constitui atestado independente** nem libera a implantação.
+
+## Validação estrita dos campos e proteção de arquivos — 03/11
+
+O importador de inventário e o gate **não** aceitam apenas o nome genérico de uma plataforma (`Linux`, `Windows`, `macOS`). O operador precisa incluir **família e versão** confirmadas, por exemplo no formato `Linux Ubuntu 24.04` (exemplo fictício, não representa um agente do ambiente). São recusadas strings sem separação válida, sem número de versão, campos contendo caracteres de controle e marcadores como `UNKNOWN`, `UNVERIFIED_001`, `PENDING`, `TBD` ou `placeholder`.
+
+Caminhos de CSV/manifesto e suas pastas ancestrais que contenham links simbólicos são recusados, mesmo que apontem novamente para `.lab/`. Isso evita ler ou sobrescrever evidências por meio de aliases. A importação continua limitada a arquivos locais privados e **não consulta o Manager**. O relatório de impacto é apenas uma hipótese baseada nos campos fornecidos; nenhum campo ou saída da ferramenta autentica o operador nem autoriza a mudança.
+
+## Contrato de integração offline — importador → manifesto → gate
+
+O CI executa `tests/test_m1_inventory_end_to_end.py` com **somente dados sintéticos** em uma pasta temporária dentro de `.lab/`, eliminada automaticamente após o teste. Ele confirma que:
+- o dry-run do CSV não escreve manifesto, enquanto `--apply` escreve somente o manifesto privado;
+- um manifesto com inventário estruturalmente válido **não** se converte em autorização: `EVIDENCE_SOURCE=PRIVATE_UNATTESTED`, `EVIDENCE_COMPLETENESS=INCOMPLETE` e `DEPLOYMENT_GATE=BLOCKED`;
+- mudanças na **ordem de grupos** revogam revisões dependentes anteriores, preservando a evidência independente de integridade do backup;
+- CSV incompleto não sobrescreve o manifesto existente;
+- a prévia de impacto apresenta apenas **contagens agregadas** e segue bloqueando o deployment;
+- uma string de OS sem versão é rejeitada pelo importador e pela prévia.
+
+A condição `PRIVATE_UNATTESTED` se refere apenas à origem local do arquivo de **teste**; não quer dizer que a evidência sintética seja real. Esses testes não interagem com VMs, Wazuh, dados privados reais nem autorizações.
+
+## Compatibilidade de rótulos de SO do Dashboard — 03/11
+
+A coluna `os` do CSV guarda a **string de sistema operacional exibida no Dashboard**, não o campo interno completo de OS utilizado pelo mecanismo de seleção `agent_config os="^Linux"`. Entre os rótulos agora reconhecidos pelo importador e pelo gate estão `Amazon Linux 2023`, `Kali GNU/Linux 2025.3`, `Linux Ubuntu 24.04` e `Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587` (valores usados em testes sintéticos, **não confirmação de vínculo ao grupo `default`**). A validação continua exigindo versão e rejeita placeholders.
+
+A [documentação oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html) informa que o atributo `os` do `agent.conf` consulta **informações do sistema operacional do agente**, cujo formato pode incluir um prefixo `Linux |...`. O nome comercial mostrado no Dashboard **não é equivalente** à string usada na seleção. Assim, a prévia FIM calcula **somente a quantidade hipotética de endpoints da família Linux**, não testa o regex contra a informação OS interna nem certifica que `^Linux` selecionará cada agente. Seu resultado declara `agent_config_os_regex_checked=false` e `wazuh_runtime_selection_confirmed=false`.
+
+O importador e o gate exigem que os três membros aprovados de `default` estejam individualmente identificados e `active/synced` em observação autorizada. Um endpoint marcado `disconnected` é **inaceitável** no inventário final e não deve ser convertido manualmente para `active`. A associação e a ordem dos grupos, assim como a string interna de SO quando disponível na interface autorizada, permanecem dependentes de verificação humana. Nenhuma regra, grupo, serviço ou diretiva FIM foi alterada.
+
+## Referências de revisão e aprovação humana — reforço em 03/11
+
+As entradas `checks.*.evidence_ref` do manifesto privado devem estar preenchidas com rótulos verificáveis pelo responsável: até 256 caracteres, sem caracteres de controle, sem espaço nas pontas e sem marcadores como `UNVERIFIED`, `PENDING`, `TBD` ou `placeholder`. O gate agora **recusa** `status=verified` associado a uma dessas referências inválidas, inclusive em `change_approval` e `group_precedence_review`.
+
+Essa é apenas uma **checagem sintática, não uma assinatura, auditoria de identidade ou validação do conteúdo referenciado**. Mesmo uma referência com formato válido e `EVIDENCE_COMPLETENESS=REVIEW_READY` permanece `EVIDENCE_SOURCE=PRIVATE_UNATTESTED` e `DEPLOYMENT_GATE=BLOCKED`. A aprovação do escopo foi registrada com limitação de segregação; o inventário real dos três agentes e os demais requisitos externos continuam obrigatórios.

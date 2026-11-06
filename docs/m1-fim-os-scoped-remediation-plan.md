@@ -126,3 +126,62 @@ Procedimento executado no Manager via Windows Remote/SSH autorizado:
 **Próximo gate não concluído:** inventário autorizado dos demais agentes no `default`, análise do impacto por sistema operacional, backup/restauração da configuração ativa, aprovação explícita para **aplicar** a mudança, publicação em janela controlada e validação efetiva de Windows/Linux. A [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17) permanece aberta.
 
 **Fonte oficial sobre o uso de `-f` em arquivo temporário:** [Wazuh centralized configuration](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html). Evidência operacional detalhada permanece apenas no diretório privado `.lab/`; sem publicação de caminhos reais, arquivo integral, credenciais ou hash.
+
+## Reforço de revisão FIM — 03/11/2026 (somente offline)
+
+O comparador [review_fim_scope_only.py](../scripts/review_fim_scope_only.py) passou a rejeitar **blocos mistos Unix/Windows**, inclusive quando as referências Windows aparecem fora de `syscheck/directories` ou `localfile/location`. A análise conservadora percorre todos os elementos e atributos XML do bloco proposto para reconhecer caminhos de unidade (exemplo sintético `C:\\Windows`), UNC, variáveis como `%PROGRAMDATA%\\`, elementos de registro Windows e formatos de log `eventlog`/`eventchannel`. A normalização XML também impede ocultar um prefixo de drive por entidade numérica.
+
+O resultado de uma identificação suspeita é **rejeitar o escopo automático Linux** e exigir revisão humana de toda a configuração. Uma exclusão Unix legítima em um bloco Unix continua permitida, desde que nenhuma outra alteração XML além de `os="^Linux"` tenha ocorrido. São controles conservadores para reduzir classificação incorreta; **não comprovam detecção de toda configuração específica de Windows nem substituem o parser oficial do Wazuh**.
+
+Testes sintéticos incluem diretório Unix com exclusão Windows, atributo Windows, referência UNC, registro Windows, formato `eventchannel`, caminho XML codificado e um caso exclusivamente Unix permitido. Nenhum arquivo ativo do Manager foi lido, gravado ou implantado nessa revisão.
+
+## Alinhamento dos dois validadores estruturais — 03/11/2026
+
+O [validador OS-scope](../scripts/validate_fim_os_scope.py) também examina referências cruzadas fora dos campos de diretório e fonte de log. Ele rejeita no escopo Linux referências Windows de unidade, UNC, variável de ambiente, registro e formatos `eventchannel/eventlog`; no escopo Windows, rejeita exclusão FIM com caminho Unix absoluto. Controles negativos sintéticos exercitam essas possibilidades e um exemplo Unix válido.
+
+Os dois verificadores têm funções diferentes: `validate_fim_os_scope.py` confere padrões estruturais de um fragmento já marcado por SO, enquanto `review_fim_scope_only.py` compara original/proposta e permite **somente** a inclusão mínima do seletor Linux. A aprovação de ambos **não** equivale a `verify-agent-conf` oficial, não valida a precedência efetiva dos grupos e **não** permite implantação sem inventário e autorização.
+
+## Compatibilidade de rótulos de SO do Dashboard — 03/11
+
+A coluna `os` do CSV guarda a **string de sistema operacional exibida no Dashboard**, não o campo interno completo de OS utilizado pelo mecanismo de seleção `agent_config os="^Linux"`. Entre os rótulos agora reconhecidos pelo importador e pelo gate estão `Amazon Linux 2023`, `Kali GNU/Linux 2025.3`, `Linux Ubuntu 24.04` e `Microsoft Windows Server 2022 Standard Evaluation 10.0.20348.587` (valores usados em testes sintéticos, **não confirmação de vínculo ao grupo `default`**). A validação continua exigindo versão e rejeita placeholders.
+
+A [documentação oficial Wazuh](https://documentation.wazuh.com/current/user-manual/reference/centralized-configuration.html) informa que o atributo `os` do `agent.conf` consulta **informações do sistema operacional do agente**, cujo formato pode incluir um prefixo `Linux |...`. O nome comercial mostrado no Dashboard **não é equivalente** à string usada na seleção. Assim, a prévia FIM calcula **somente a quantidade hipotética de endpoints da família Linux**, não testa o regex contra a informação OS interna nem certifica que `^Linux` selecionará cada agente. Seu resultado declara `agent_config_os_regex_checked=false` e `wazuh_runtime_selection_confirmed=false`.
+
+O importador e o gate exigem que os quatro membros de `default` estejam individualmente identificados e `active/synced` em observação autorizada. Um endpoint marcado `disconnected` é **inaceitável** no inventário final e não deve ser convertido manualmente para `active`. A associação e a ordem dos grupos, assim como a string interna de SO quando disponível na interface autorizada, permanecem dependentes de verificação humana. Nenhuma regra, grupo, serviço ou diretiva FIM foi alterada.
+
+## Revisão operacional por interface autorizada — 03/11/2026, aproximadamente 19h BRT
+
+> **Observações reais, somente leitura; mudança ativa NÃO autorizada.** As capturas brutas e os tempos individuais ficam exclusivamente em `.lab/` (ignorado pelo Git). Este relatório público não inclui nomes de hosts nem endereços.
+
+- A tela **Groups** do Dashboard exibia **somente um grupo centralizado, `default`**, com quatro membros: IDs `001`, `002`, `004` e `005`. Não foi observado conflito de precedência entre grupos centralizados distintos. Isso não comprova cobertura FIM ponta a ponta.
+- A aba **Configuration** dos agentes ativos `002` (Amazon Linux), `004` (Windows Server) e `005` (Kali Linux) exibia explicitamente **`SYNCHRONIZED`** e `Groups: default`. Esse é o estado mostrado pela interface no momento da captura, não um atestado criptográfico.
+- O agente `001`, membro de `default`, permanecia **`disconnected`** e teve o último keep-alive registrado no Dashboard em **21/10/2026**, sem fuso indicado na interface. O operador optou por mantê-lo **inativo como histórico**. Não houve remoção do registro nem do grupo; qualquer descomissionamento exige revisão e autorização próprias.
+- No agente Linux nativo `005`, a tela **Integrity monitoring → Monitored** exibia o caminho de laboratório `/opt/wazuh-lab/monitorado` com monitoramento **real-time habilitado**. Isso comprova a configuração exibida, **não** eventos de FIM efetivamente recebidos e indexados.
+- No agente **Windows `004`**, a mesma tela exibia diretórios no formato Linux (`/bin`, `/boot`, `/etc`, `/opt/wazuh-lab/monitorado`, `/sbin`, `/usr/bin`, `/usr/sbin`), inclusive o caminho de laboratório marcado **real-time=yes**. Isso **confirma a exposição do Windows a diretivas FIM Linux na configuração apresentada pelo Dashboard**. Não prova que esses diretórios inexistentes sejam monitorados com sucesso; tampouco invalida, por si, os seis caminhos FIM locais previamente observados.
+- O seletor proposto **`os="^Linux"` permanece apenas uma hipótese de remediação, validada em cópia isolada**. A comparação entre rótulos de distribuição exibidos na interface e a string interna de SO do agente precisa ser comprovada após mudança autorizada, não por suposição.
+
+**Ressalva do checkpoint após religar o Kali:** a tentativa read-only de acesso ao Manager pelo procedimento remoto previamente preparado retornou `AGENT_004_SYNC=UNKNOWN_OR_FAILED`, `ACTIVE_DEFAULT_CONFIG_PARSER=UNKNOWN_OR_FAILED` e hash `UNKNOWN`. A verificação de conectividade host → Kali também não conseguiu alcançar os serviços consultados naquele momento. Isso é uma **falha/indisponibilidade do canal de conferência**, não uma demonstração de divergência do hash nem uma contradição com o `SYNCHRONIZED` exibido minutos antes na interface. Não marcar o checkpoint remoto como PASS nesta sessão.
+
+**Decisão:** `NO-GO`. Próximas dependências: restabelecer/validar a conectividade de diagnóstico autorizada; confirmar a baseline do Manager e procedimento de rollback; decidir formalmente como tratar o registro legado `001` no gate; obter revisão independente e aprovação de janela; só então considerar o escopo FIM Linux e a verificação pós-mudança em Windows/Linux. Não editar `agent.conf`, reiniciar serviços ou alterar grupos apenas para produzir um estado verde.
+
+## Checkpoint de 03/11 — conexão Kali e validação privada do backup (sem implantação)
+
+A revisão remota, **somente leitura**, encontrou a VM Kali em estado `running` no VirtualBox e com a interface Host-Only configurada, mas **inacessível** pelo Windows. Os testes ICMP e TCP da rede de laboratório não tiveram resposta; até o navegador da VM Windows retornou `ERR_CONNECTION_TIMED_OUT` depois de atualizar a página do Wazuh. Uma captura do console da Kali permaneceu preta, inclusive após tentativa não destrutiva de ativar o terminal. **A causa ainda não foi determinada**; não presumir que apenas o serviço SSH está indisponível.
+
+O backup privado e criptografado por DPAPI do `default/agent.conf` passou novamente na conferência de tamanho e SHA-256 contra **seus metadados de backup**. A restauração local, a recuperação da cópia original e um controle negativo de corrupção passaram, com limpeza da área temporária. **O Manager não recebeu nenhum arquivo restaurado.**
+
+A versão **real do backup**, mantida em memória no host autorizado e sem gravar conteúdo aberto em disco, foi comparada com uma proposta que adiciona **somente** `os="^Linux"` ao único bloco originalmente sem seletor. O comparador de escopo exclusivo e o validador de XML por família de SO aprovaram a mudança **estrutural**; o teste negativo com seletor Windows foi rejeitado. Os testes sintéticos específicos de FIM também passaram (21 testes). Isso **não comprova** que a expressão será aplicada às strings internas dos sistemas operacionais em runtime.
+
+O `verify-agent-conf` oficial da proposta foi executado anteriormente em **staging isolado**, conforme documentação de 02/11. **Não foi possível repetir o verificador, obter o hash atual ou validar o Manager agora**, devido à indisponibilidade do Kali. Assim, o hash do backup contra metadados não prova que a configuração ativa continua idêntica; nem teste local de rollback equivale a restauração operacional validada.
+
+**Decisão:** `NO-GO / DEPLOYMENT_GATE=BLOCKED`. Para continuar, recuperar o console/acesso da VM Kali com procedimento autorizado, identificar a causa sem reinicialização precipitada, repetir o checkpoint de baseline/parser/serviços pelo acesso autorizado e submeter a mudança com janela, revisão independente e rollback aprovado. Não modificar `agent.conf`, membros de grupos nem auditoria Windows `4698` antecipadamente.
+
+## 03/11/2026, 19h45–19h48 BRT — restabelecimento do Kali e baseline em leitura
+
+O operador reabriu o Kali. Em nova verificação pelo computador Windows autorizado, as portas 22 (SSH), 443 (Dashboard), 55000 (Manager API) e 9200 (Indexer) voltaram a responder. Consultas HTTPS sem credenciais retornaram HTTP **302** do Dashboard e HTTP **401** do Indexer, confirmando que os endpoints atendem conexões, sem comprovar todas as funcionalidades internas. Via SSH com chave preexistente e **somente leitura**, `docker inspect` confirmou os contêineres `wazuh.manager`, `wazuh.indexer` e `wazuh.dashboard` em execução.
+
+O script privado `M1_CHECKPOINT_READONLY.ps1` retornou **`M1_READ_ONLY_CHECKPOINT=PASS`**, com `AGENT_004_SYNC=PASS`, `ACTIVE_DEFAULT_CONFIG_PARSER=PASS` e `MANAGER_HASH_EQUALS_PRIVATE_BASELINE=True`. Portanto, o problema anterior de conectividade não impede mais a comparação da configuração ativa com o baseline privado. A tela visual dos três agentes ativos sincronizados foi conferida anteriormente; a presente leitura do Manager valida explicitamente o `004`, não substitui nova checagem formal de todos os agentes.
+
+A proposta de acrescentar **somente** `os="^Linux"` ao bloco FIM Linux continua aprovada **estruturalmente** contra o backup real, com validação histórica pelo `verify-agent-conf` em staging isolado. **Não foi implantada**; o escopo real de seleção pelo Wazuh só poderá ser verificado após aprovação e implantação controlada.
+
+O gate privado continua `EVIDENCE_SOURCE=PRIVATE_UNATTESTED`, `EVIDENCE_COMPLETENESS=INCOMPLETE` e `DEPLOYMENT_GATE=BLOCKED`. O fato de o Manager estar operacional não concede autorização de deploy: faltam revisão humana independente, autorização de rollback/janela e regularização formal do membro histórico `001` desconectado. Nenhum serviço foi reiniciado pelo assistente, nenhum arquivo ativo, grupo ou política de auditoria foi modificado.

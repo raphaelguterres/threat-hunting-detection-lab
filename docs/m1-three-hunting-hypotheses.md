@@ -1,5 +1,7 @@
 # M1 — Três hipóteses de Threat Hunting com correlação offline
 
+> **Checkpoint 05/11, H01:** a [auditoria de escopo da regra ativa](m1-h01-active-rule-scope-diagnosis-20261105.md) confirmou que `110100` só eleva PowerShell Sysmon EID1 quando `commandLine` contém `-enc`/`-EncodedCommand`; a regra-base `61603` está nível 0 e o limite de alertas é 3. Um ensaio real com PowerShell `-File` e Security `4698` criou um par benigno **nativo** dentro de 1,34 s, mas o EID1 específico não gerou alerta indexado. Não confundir o evento Sysmon nativo com um alerta `110100` validado; próximos testes precisam alinhar o comando à regra, sob nova janela aprovada. H02 e H03 continuam com lacunas próprias.
+
 **Início:** 02/11/2026. **Estado:** especificação e validação sintética; triagem de novos eventos reais **não executada**. Este incremento não comprova novos incidentes nem classifica as três hipóteses como detecções implantadas.
 
 O laboratório já contém cinco estudos de caso históricos, Sysmon IDs 1, 3 e 11, auditoria Windows e FIM Linux/Windows. Este M1 cria hipóteses **adicionais**, em vez de renomear os estudos antigos.
@@ -7,6 +9,12 @@ O laboratório já contém cinco estudos de caso históricos, Sysmon IDs 1, 3 e 
 ## Atualização read-only do ambiente — 02/11/2026
 
 A [auditoria de visibilidade do Windows Server e Wazuh FIM](m1-native-windows-wazuh-visibility-review-20261102.md) encontrou **0 eventos Security 4698** e `Other Object Access Events = No Auditing`, **1 evento 4720** sem logons `4624/4672` associados ao mesmo SID nos 30 minutos seguintes e **0 documentos FIM do agente 004** na janela recente, embora existam **102 documentos FIM históricos** desse agente. Esses são **limites do recorte e da instrumentação**: não permitem confirmar nem descartar integralmente H01/H02/H03.
+
+## Matriz de prontidão — checkpoint de 03/11
+
+O [diagnóstico da cobertura real H01/H02/H03](m1-hunting-source-readiness-20261103.md) separa eventos efetivamente observados, fontes ausentes, identidade não confirmada e próximos passos autorizados. Os dados atuais **não permitem** promover nenhuma hipótese a detecção real comprovada.
+
+O normalizador agora rejeita identificadores de referência/ativo/ator/artefato com marcadores como `UNKNOWN`, `UNVERIFIED`, `PENDING`, `TBD` e caracteres invisíveis Unicode; **duas evidências com identidade desconhecida não podem ser pareadas**. Isso é uma proteção do motor, não uma forma de comprovar a identidade da fonte. Não preencher lacunas com pseudônimos fabricados.
 
 ## Modelo de entrada: registros normalizados e pseudonimizados
 
@@ -112,3 +120,23 @@ O programa rejeita arquivo fora de .lab (exceto fixture declarada), campos inesp
 | Falsos positivos, lacunas e próxima ação | |
 
 Referências: [matriz de telemetria](telemetry-matrix.md), [cobertura ATT&CK](mitre-coverage.md), [registro de falsos positivos](false-positive-register.md), [modelo de investigação](registro-de-investigacao.md), [MITRE ATT&CK](https://attack.mitre.org/), [Microsoft Security Event 4698](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4698), [4720](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4720) e [4672](https://learn.microsoft.com/en-us/windows/security/threat-protection/auditing/event-4672).
+
+## Revisão de qualidade de cobertura — 03/11/2026
+
+O correlacionador agora reporta, para cada hipótese, as **contagens agregadas** `first_kind_events` e `second_kind_events`, além de `candidate_pairs`. Ele distingue três estados:
+
+- `insufficient_source_coverage`: pelo menos um tipo obrigatório não aparece na amostra fornecida. **Não é uma busca negativa válida**, nem comprova que a fonte esteja desabilitada no ambiente.
+- `no_candidate_in_supplied_sample`: os dois tipos aparecem na amostra, porém não formam um par com a ordem, janela e chaves de correlação esperadas. **Não exclui ocorrência fora do recorte**.
+- `triage_candidate`: há um ou mais pares compatíveis com a hipótese. **Não determina incidente, causalidade ou intenção maliciosa**.
+
+O resultado global permanece `verdict=not_an_incident_determination`. O H01 requer `task_created` validado por Security 4698; um comando `schtasks /create` da regra 110120 é apenas tentativa e não substitui 4698. Em H02, confirmar Logon ID/4624 junto ao 4672 antes de uma conclusão operacional. Em H03, exigir correspondência do **mesmo artefato** FIM e execução, não somente host compartilhado.
+
+A leitura JSONL offline passou a rejeitar `NaN`/`Infinity` e estruturas excessivamente aninhadas, com erro genérico que não expõe caminhos privados ou conteúdo bruto no console. A execução com `--fixture` permanece **sintética**; essas melhorias não comprovam eventos reais, nem alteram Wazuh, agentes ou auditoria Windows.
+
+**Status do M1:** as fontes reais do recorte de 02/11 ainda são insuficientes para confirmar integralmente H01/H02/H03. Novas evidências dependem da revisão autorizada de logs, sem gerar simulações desnecessárias nas VMs.
+
+## Revisão do leitor de evidências offline — 03/11/2026
+
+Os aliases normalizados `event_ref`, `asset_key`, `actor_key` e `object_key` agora recusam caracteres de controle (incluindo quebras de linha, escapes ANSI e DEL), evitando campos pseudonimizados ambíguos. A validação de caminho recusa arquivos e **diretórios ancestrais simbólicos**, inclusive aliases que apontem de volta para `.lab/`. O processamento continua limitado a amostras normalizadas sob `.lab/` (ou fixtures explicitamente sintéticas, para CI), sem consultar serviços.
+
+O objetivo desses controles é **integridade da entrada**, não inferir incidentes nem validar autenticidade da origem. Os cenários de regressão rodam em Windows e Linux; se a criação de symlinks não estiver permitida no host, o cenário específico é ignorado de forma declarada. Nenhuma alteração operacional no Wazuh.

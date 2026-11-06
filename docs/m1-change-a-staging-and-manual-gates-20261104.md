@@ -1,0 +1,78 @@
+# M1 / Mudança A — staging seguro e ações manuais restantes
+
+**Data:** 04/11/2026, aproximadamente 22h14–22h17 BRT. **Change ID:** `M1-FIM-OS-SCOPE`. **Escopo:** `default/agent.conf` do Wazuh Manager 4.14.9. **Status:** `STAGED_OFFLINE`, `DEPLOYMENT_GATE=BLOCKED`. **Não houve alteração da configuração ativa, restart, deployment nem novo alerta.**
+
+## O que foi feito remotamente
+
+O arquivo **real** `/var/ossec/etc/shared/default/agent.conf` foi lido **somente leitura** pelo canal SSH/CLI autorizado, como base64, decodificado no host e salvo **exclusivamente** em `.lab/m1-change-prep/` (fora do Git). Antes e depois, seu SHA-256 foi comparado com o Manager e com o backup DPAPI real registrado anteriormente. O hash ficou **inalterado**.
+
+A ferramenta nova [`scripts/m1_stage_linux_os_scope_readonly.py`](../scripts/m1_stage_linux_os_scope_readonly.py) gerou uma **cópia privada** da configuração proposta. O código não contém funções de escrita na VM, publicação central, reinício de serviços ou alteração de agentes.
+
+| Controle | Resultado |
+| --- | --- |
+| Arquivo original real | **221 bytes**, hash igual ao backup e ao Manager |
+| Staging privado | **233 bytes** |
+| Único diff admissível | Adicionar `os="^Linux"` à abertura de `<agent_config>` |
+| Diretiva Linux FIM realtime | **Preservada: 1** |
+| Fonte de logs Unix `localfile` | **Preservada: 1** |
+| Blocos `agent_config` Linux | **1**, sem diretiva Windows adicionada |
+| Comparação byte a byte reversa | **PASS** — remover o atributo proposto recupera todos os bytes originais |
+| SHA-256 no Manager após staging | **Sem alteração** |
+| Testes da ferramenta | **10 PASS**, incluindo casos negativos e recusa de overwrite |
+| Wazuh parser oficial na candidata | **PASS (04/11, ~22h35 BRT)** — `verify-agent-conf: OK` em arquivo temporário não ativo, com limpeza e hash ativo intacto; [evidência](m1-change-a-parser-ci-20261104.md) |
+| Seleção real `^Linux` distribuída aos agentes | **Não testada** |
+| Implantação | **NÃO EXECUTADA** |
+
+**Atualização após o bloqueio de `/dev/stdin`:** a candidata foi validada **com sucesso** pelo parser oficial `verify-agent-conf -f` sobre uma **cópia temporária exclusiva**, fora de `default/agent.conf`. Resultado `verify-agent-conf: OK`; arquivos temporários eliminados e hash do Manager ativo inalterado. A tentativa anterior por `/dev/stdin` foi somente uma limitação do método e não uma rejeição de sintaxe. [Evidência técnica e CI](m1-change-a-parser-ci-20261104.md). **Isso ainda não prova seleção OS ou eventos FIM em runtime.**
+
+## Validações que agora podem ser consideradas concluídas tecnicamente
+
+1. **Inventário:** Manager confirmou `002/004/005` ativos e sincronizados, pertencendo apenas ao grupo `default`, dois Linux e um Windows.
+2. **Precedência de grupos:** não há grupo concorrente entre esses três agentes; ainda falta analisar FIM local do Linux `002/005` para declarar a cobertura efetiva completa.
+3. **Baseline/backup:** hash, tamanho, UID/GID e modo do arquivo central atual foram confrontados com o backup DPAPI; recuperação isolada da cópia original e controle negativo de corrupção passaram.
+4. **Impacto declarado:** adicionar o atributo ao bloco central **restringirá tanto FIM Linux como a fonte de logs Unix `localfile`**, que continuará no arquivo mas deixará de ser oferecida ao Windows. A escolha precisa de aceite humano como parte da mudança A.
+5. **Teste negativo de escopo:** a expressão `^Linux` corresponde aos metadados observados de `002/005`, não aos de `004`. Isso não é prova de seleção real pós-distribuição.
+
+**Nova governança:** [Issue #31](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31) e [exceção específica para A, ratificada pelo proprietário](m1-change-a-solo-owner-review-exception-20261104.md). Os cinco riscos foram **aceitos expressamente** na [Issue #31 — comentário 6647042764](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/31#issuecomment-6647042764); **não** há revisão independente. Ainda faltam o atestado de inventário/impacto e o GO operacional final; nenhuma autorização de implantação foi concedida.
+
+**Read-only adicional 04/11, ~22h27 BRT:** no contêiner do agente Linux `002`, o arquivo `ossec.conf` possui **dois blocos raiz `ossec_config`** (normal para arquivos que contêm múltiplos blocos), um bloco `syscheck`, **dois nós de diretórios FIM locais**, **zero diretivas locais realtime**. O bloco central `default/agent.conf` possui uma diretiva Unix realtime adicional. O XML foi analisado com uma raiz de análise temporária **em memória**, sem modificar arquivo. Na VM Kali nativa, `ossec.conf` do agente `005` não é legível pela conta remota atual; **não alterar ACL nem usar elevação para contornar permissão**. A comprovação de sua configuração local exigirá acesso autorizado do operador ou consulta por interface já permitida. Essas observações **não comprovam FIM efetivo pós-mudança**.
+
+## O que falta fazer manualmente
+
+| Ação | Responsável | Evidência exigida | Status |
+| --- | --- | --- | --- |
+| **A-01 — Atestar inventário 3/3** | Proprietário/revisor | Conferir os registros privados e registrar decisão na Issue #17 | **Pendente** |
+| **A-01b — Conferir FIM exibido no agente Linux 005** | Dashboard do agente 005 aberto pelo operador, consultado remotamente | General/Monitored/Ignored confirmados, sete diretórios, `realtime=yes` no caminho central, sem exclusão de caminho para `/opt/wazuh-lab/monitorado`; pasta existe em 002 e 005; [evidência](m1-agent005-fim-ignored-and-path-checkpoint-20261104.md) | **PASS na visão de configuração do agente; acesso ao arquivo local bruto ainda não autorizado e cobertura por eventos não provada** |
+| **A-02 — Aceitar impacto do bloco inteiro** | Proprietário/revisor | Reconhecer que FIM realtime e fonte `localfile` Unix passarão a ser exclusivos dos agentes Linux | **Pendente** |
+| **A-03 — Revisão da mudança A** | Autoavaliação formal do proprietário (sem revisor externo) | Cinco riscos da exceção A aceitos na Issue #31; revisão técnica independente não ocorreu e controle de CI/diff ainda obrigatório | **Exceção RATIFICADA; restantes controles NÃO dispensados** |
+| **A-04 — Parser oficial em staging temporário** | Executado no Manager com cópia temporária segregada | `verify-agent-conf: OK`, hash ativo preservado, cópia temporária removida de Kali e Manager | **PASS técnico em 04/11**; revalidar em janela e atestar evidência privada |
+| **A-05 — Pré-check em janela** | Operador | Revalidar 3/3, backup DPAPI, sha256/UID/GID/mode, logs, rollback, parser e tempo disponível para revert | **Pendente da janela** |
+| **A-06 — Autorização operacional final** | Proprietário | Aprovar **execução** de mudança A com referência rastreável, não apenas agendar a janela | **Pendente** |
+| **A-07 — Validação pós-mudança** | Operador | Configuração aplicada em `002/005`, ausência do bloco no Windows `004`, sincronização e cadeia Manager → Indexer → Dashboard | **Pendente de deployment** |
+
+**Janela do proprietário:** **05/11/2026, 18h00–19h00 BRT** — aprovada **condicionalmente** na [Issue #17](https://github.com/raphaelguterres/threat-hunting-detection-lab/issues/17#issuecomment-6646704047). A janela não concede GO, não inicia operação automaticamente e termina às 19h.
+
+### Roteiro de conferência pré-cutover — não executável automaticamente
+
+```mermaid
+flowchart TD
+  A["Inventário atual 3/3 + revisão humana"] --> B["Confirmar impacto de filtrar FIM e localfile Unix"]
+  B --> C["Revisão específica ou waiver formal para mudança A"]
+  C --> D["Backup DPAPI + baseline/owner/mode + rollback conferidos"]
+  D --> E["Parser oficial em cópia temporária isolada"]
+  E --> F{"Janela válida e autorização final de execução?"}
+  F -->|"não"| X["NO-GO / BLOCKED"]
+  F -->|"sim"| G["Aplicação controlada somente da mudança A"]
+  G --> H["Verificar Windows 004 e Linux 002/005"]
+  H --> I{"Sincronização, telemetria e rollback OK?"}
+  I -->|"não"| R["Interromper; executar rollback APROVADO"]
+  I -->|"sim"| J["Documentar hashes privados, resultados e evidências"]
+```
+
+## Integridade do processo
+
+O validador `m1_evidence_gate.py` continua exibindo `EVIDENCE_SOURCE=PRIVATE_UNATTESTED`, `EVIDENCE_COMPLETENESS=INCOMPLETE` e `DEPLOYMENT_GATE=BLOCKED`. **Não alterar checks para `verified` só porque scripts passaram**. A aprovação de janela, a validação local e a revisão independente são objetos distintos.
+
+Nenhum arquivo em `.lab/` deve ser publicado; o relatório versionado contém somente contagens e estados. Mudança C/H03 e Windows `4698` estão explicitamente fora deste escopo.
+
+**Lembrete agendado:** 05/11 às 17h45 BRT para pré-checks. **Próximo progresso seguro:** parser oficial em staging **concluído**; CI do [PR #25](https://github.com/raphaelguterres/threat-hunting-detection-lab/pull/25) confirmado **3/3 SUCCESS** no SHA `73d50b3`. Ainda faltam FIM local do `005`, atestados humanos, validações novamente na janela e GO operacional. [Checkpoint atualizado](m1-change-a-parser-ci-20261104.md).

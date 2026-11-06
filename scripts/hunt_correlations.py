@@ -10,6 +10,7 @@ import argparse
 import json
 import re
 import sys
+import unicodedata
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -30,6 +31,10 @@ IDENTITY_FIELDS = ("event_ref", "asset_key", "actor_key", "object_key")
 FIELDS = set(IDENTITY_FIELDS) | {"timestamp", "kind", "source"}
 OFFSET = re.compile(r"([+-]\d{2})(\d{2})$")
 TZ_SUFFIX = re.compile(r"(Z|[+-]\d{2}:?\d{2})$")
+PLACEHOLDER_COMPONENT = re.compile(
+    r"(?:^|[-_:/\.])(?:unknown|unverified|pending|placeholder|tbd|undefined|missing|null|none|n/?a)(?:$|[-_:/\.])",
+    re.IGNORECASE,
+)
 
 
 @dataclass(frozen=True)
@@ -87,6 +92,10 @@ def parse_event(obj: object) -> Event:
             raise ValueError("missing or oversized identity field")
         if value != value.strip():
             raise ValueError("whitespace around identity field")
+        if any(unicodedata.category(ch) in {"Cc", "Cf"} for ch in value):
+            raise ValueError("control character in identity field")
+        if PLACEHOLDER_COMPONENT.search(value):
+            raise ValueError("unverified placeholder in identity field")
     kind, source = obj["kind"], obj["source"]
     if not isinstance(kind, str) or kind not in KINDS:
         raise ValueError("unsupported event kind")
@@ -128,16 +137,29 @@ def correlate(events: list[Event]) -> dict:
                 pairs.append((start.event_ref, end.event_ref))
                 if len(pairs) > MAX_CANDIDATES:
                     raise ValueError("candidate limit exceeded")
+        if pairs:
+            coverage_status = "triage_candidate"
+        elif not earlier or not later:
+            coverage_status = "insufficient_source_coverage"
+        else:
+            coverage_status = "no_candidate_in_supplied_sample"
         results[hypothesis.name] = {
             "candidate_pairs": _unique_pairs(pairs),
             "window_minutes": hypothesis.minutes,
-            "status": "triage_candidate" if pairs else "no_candidate_in_supplied_sample",
+            "first_kind_events": len(earlier),
+            "second_kind_events": len(later),
+            "status": coverage_status,
         }
     return {
         "input_events": len(events),
         "hypotheses": results,
         "verdict": "not_an_incident_determination",
     }
+
+
+def _reject_nonfinite_json_constant(value):
+    """Disallow NaN and Infinity extensions in normalized JSONL."""
+    raise ValueError("nonfinite JSON constant")
 
 
 def _reject_duplicate_json_keys(pairs):
@@ -162,25 +184,26 @@ def load_events(path: Path) -> list[Event]:
             if len(events) >= MAX_EVENTS:
                 raise ValueError("event count limit exceeded")
             try:
-                obj = json.loads(line, object_pairs_hook=_reject_duplicate_json_keys)
-            except json.JSONDecodeError as exc:
-                raise ValueError("invalid JSONL input") from exc
+                obj = json.loads(line, object_pairs_hook=_reject_duplicate_json_keys,
+                                 parse_constant=_reject_nonfinite_json_constant)
+            except (json.JSONDecodeError, RecursionError) as exc:
+                raise ValueError("invalid or too deeply nested JSONL input") from exc
             events.append(parse_event(obj))
     return events
 
 
 def allowed_input(path: Path, repository: Path, fixture: bool) -> bool:
-    private_root = repository / ".lab"
-    fixture_root = repository / "tests" / "fixtures"
-    if path.is_symlink():
-        return False
-    if fixture:
-        if fixture_root.is_symlink():
+    """Allow trusted repository paths only, without symlink traversal."""
+    try:
+        candidate = path.absolute()
+        root = (repository / ("tests/fixtures" if fixture else ".lab")).absolute()
+        if any(part.is_symlink() for part in (candidate, *candidate.parents)):
             return False
-        return fixture_root.resolve() in path.resolve().parents
-    if private_root.is_symlink():
+        if any(part.is_symlink() for part in (root, *root.parents)):
+            return False
+        return root.resolve() in candidate.resolve().parents
+    except (OSError, RuntimeError):
         return False
-    return private_root.resolve() in path.resolve().parents
 
 
 def main(argv=None) -> int:
@@ -198,9 +221,9 @@ def main(argv=None) -> int:
         if not allowed_input(path, repo, args.fixture):
             raise ValueError("input must be under .lab/ (or tests/fixtures with --fixture)")
         result = correlate(load_events(path))
-    except (OSError, UnicodeError, ValueError) as exc:
-        # Never echo paths, event IDs, or raw data into CI logs.
-        print("M1_INPUT_REJECTED: " + str(exc), file=sys.stderr)
+    except (OSError, UnicodeError, ValueError, RecursionError):
+        # Avoid disclosing filenames, aliases or raw evidence in logs or errors.
+        print("M1_INPUT_REJECTED: invalid_or_unavailable_normalized_input", file=sys.stderr)
         return 2
     result["sample_provenance"] = (
         "synthetic_fixture" if args.fixture else "user_supplied_normalized_not_independently_verified"

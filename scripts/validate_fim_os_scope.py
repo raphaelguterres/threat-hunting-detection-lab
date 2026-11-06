@@ -18,6 +18,7 @@ MAX_SIZE = 65536
 OS_SCOPES = {"^Linux": "Linux", "^Windows": "Windows"}
 DRIVE = re.compile(r"^[A-Za-z]:[\\/]")
 ENV_PATH = re.compile(r"^%[A-Za-z_][A-Za-z_0-9]*%[\\/]")
+WINDOWS_REFERENCE = re.compile(r"[A-Za-z]:[\\/]|%[A-Za-z_][A-Za-z_0-9]*%[\\/]|\\\\")
 
 
 def classify_path(value: str) -> str:
@@ -28,6 +29,25 @@ def classify_path(value: str) -> str:
     if value.startswith("\\\\"):
         return "network"
     return "unknown"
+
+
+def _check_platform_content(block: ET.Element, os_family: str) -> None:
+    """Reject evident cross-platform payloads hidden outside FIM/log locations."""
+    for node in block.iter():
+        if not isinstance(node.tag, str):
+            continue
+        tag = node.tag.lower()
+        value = (node.text or "").strip()
+        if os_family == "Linux":
+            if "registry" in tag or tag.startswith("windows_"):
+                raise ValueError("Windows-only setting in Linux scope")
+            if tag == "log_format" and value.lower() in ("eventchannel", "eventlog"):
+                raise ValueError("Windows-only log format in Linux scope")
+            if WINDOWS_REFERENCE.search(value) or any(
+                    WINDOWS_REFERENCE.search(a) for a in node.attrib.values()):
+                raise ValueError("Windows path reference in Linux scope")
+        elif tag == "ignore" and value.startswith("/"):
+            raise ValueError("Unix FIM ignore path in Windows scope")
 
 
 def validate(text: str) -> dict[str, object]:
@@ -52,6 +72,7 @@ def validate(text: str) -> dict[str, object]:
         if os_regex not in OS_SCOPES or len(block.attrib) != 1:
             raise ValueError("OS must be explicitly anchored to ^Linux or ^Windows")
         os_family = OS_SCOPES[os_regex]
+        _check_platform_content(block, os_family)
         totals[os_family] += 1
         for node in block.findall("./syscheck/directories"):
             items = [x.strip() for x in (node.text or "").split(",")]

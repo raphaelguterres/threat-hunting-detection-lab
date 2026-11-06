@@ -47,6 +47,44 @@ class ChangeGuardTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             reviewer.compare(base() + base(), staged() + base())
 
+    def test_reject_hidden_windows_ignore_inside_linux_block(self):
+        mixed = base().replace("</syscheck>", "<ignore>C:\\Windows\\Temp</ignore></syscheck>")
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_reject_windows_registry_inside_linux_block(self):
+        mixed = base().replace("</syscheck>", "<windows_registry>HKEY_LOCAL_MACHINE\\Software</windows_registry></syscheck>")
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_reject_windows_path_hidden_in_attribute(self):
+        mixed = base().replace('realtime="yes"', 'realtime="yes" alert_path="%PROGRAMDATA%\\Windows"')
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_reject_encoded_windows_path_in_unrelated_element(self):
+        mixed = base().replace("</syscheck>",
+                               "<ignore>&#67;:/Windows/Temp</ignore></syscheck>")
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_reject_unc_share_in_unrelated_element(self):
+        mixed = base().replace("</syscheck>",
+                               "<ignore>\\\\server\\share</ignore></syscheck>")
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_reject_windows_only_log_format_even_with_unix_location(self):
+        mixed = base().replace("<log_format>syslog</log_format>",
+                               "<log_format>eventchannel</log_format>")
+        with self.assertRaises(ValueError):
+            reviewer.compare(mixed, mixed.replace("<agent_config>", '<agent_config os="^Linux">'))
+
+    def test_allowed_unix_ignore_remains_structural_match(self):
+        unix = base().replace("</syscheck>", "<ignore>/var/cache/example</ignore></syscheck>")
+        result = reviewer.compare(unix, unix.replace("<agent_config>", '<agent_config os="^Linux">'))
+        self.assertEqual(result["linux_scope_additions"], 1)
+
     def test_reject_changed_directory(self):
         with self.assertRaises(ValueError):
             reviewer.compare(base(), staged().replace("/opt/", "/tmp/"))
