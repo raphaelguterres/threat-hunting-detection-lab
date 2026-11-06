@@ -67,7 +67,11 @@ def compare(baseline_raw: bytes, proposal_raw: bytes) -> dict:
 
     # Do not mistake an existing directory for an authorized new directive.
     for node in old_sys.findall("./directories"):
-        if normalized_path(node.text or "") == expected_path:
+        # Wazuh permits comma-separated pre-existing directory paths.
+        # Preserve those nodes intact; only reject if they already cover
+        # the exact proposed target.
+        existing_paths = [p.strip() for p in (node.text or "").split(",") if p.strip()]
+        if any(normalized_path(p) == expected_path for p in existing_paths):
             raise ValueError("target already monitored in baseline")
 
     new_matches = [
