@@ -93,6 +93,20 @@ class H03ChangeCDiffTests(unittest.TestCase):
                     gate.compare(BASE.encode(), proposal(TARGET.replace(
                         r"C:\SecurityLab\H03", wrong)).encode())
 
+    def test_comma_separated_preexisting_paths_are_preserved(self):
+        multiple = BASE.replace(
+            r"C:\Windows\System32</directories>",
+            r"C:\Windows\System32,C:\Windows\SysWOW64</directories>")
+        after = multiple.replace("  </syscheck>", TARGET + "\n  </syscheck>")
+        result = gate.compare(multiple.encode(), after.encode())
+        self.assertEqual(result["directive_count_added"], 1)
+        already = multiple.replace(
+            r"C:\Windows\SysWOW64</directories>",
+            r"C:\SecurityLab\H03</directories>")
+        with self.assertRaisesRegex(ValueError, "already monitored"):
+            gate.compare(already.encode(), already.replace(
+                "  </syscheck>", TARGET + "\n  </syscheck>").encode())
+
     def test_baseline_already_monitoring_target_is_not_new(self):
         before = proposal(TARGET)
         after = before.replace("</syscheck>", TARGET + "</syscheck>")
