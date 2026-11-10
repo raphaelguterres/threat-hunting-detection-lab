@@ -1,0 +1,11 @@
+<!-- Proposed laboratory telemetry rule. Installing requires a separate Manager change. -->
+<group name="local,windows,sysmon,h03_lab_telemetry,">
+  <rule id="110150" level="3">
+    <if_group>sysmon_event1</if_group>
+    <field name="win.system.providerName">^Microsoft-Windows-Sysmon$</field>
+    <field name="win.system.eventID">^1$</field>
+    <field name="win.eventdata.image" type="pcre2">(?i)^C:\\SecurityLab\\H03\\H03-(?:Benign|Negative)Probe\.exe$</field>
+    <description>LAB H03: benign probe process telemetry; not a threat verdict</description>
+    <group>h03_benign_probe,</group>
+  </rule>
+</group>
