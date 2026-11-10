@@ -79,3 +79,29 @@ linha JSON inválida no arquivo ativo, sem investigar sua causa.
 
 Esta consulta não atesta Indexer/Discover, configuração completa em runtime
 ou correlação FIM/Sysmon do mesmo executável. **M1 permanece 15/17**.
+
+## Confirmação posterior no Indexer, somente leitura
+
+A consulta autenticada a `wazuh-alerts-*`, pelo agente `004`, presença de
+`syscheck.path` e intervalo 20:10–20:14 UTC de 10/11, retornou exatamente
+**três hits**, sem timeout e sem shards com falha. A conexão verificou a CA
+e o hostname TLS. Credenciais existentes foram usadas somente em memória;
+nenhum valor foi incluído na saída ou no repositório.
+
+Os três documentos coincidem exatamente com o Manager nos campos de
+identidade do evento, timestamp, caminho, tipo, regra e hashes SHA-256
+anterior/posterior. Há um único caminho. A comparação em memória confirmou
+também o nome previsto pelo executor de smoke e os hashes das duas versões
+do texto inerte definidas nesse executor. Isso confirma o artefato do smoke
+no Manager e no Indexer, apesar da divergência entre os horários registrados.
+A causa dessa diferença de relógio permanece sem diagnóstico.
+
+O Discover abriu autenticado no padrão `wazuh-alerts-*`, mas ainda exibia
+uma consulta antiga de outro teste. A entrada remota de texto na VM não
+substituiu esse filtro; o resultado `No Results` observado corresponde
+ao filtro antigo e **não** refuta a busca nova do Indexer. Visibilidade do
+smoke no Discover permanece **NOT_VERIFIED** até aplicar a consulta correta.
+
+`H03_MANAGER_INDEXER_SMOKE_MATCH=PASS` · `H03_DISCOVER_SMOKE=NOT_VERIFIED` ·
+`H03_BINARY_EXECUTION=NOT_PERFORMED`. A sequência FIM/Sysmon do mesmo
+executável e seus controles negativos continuam pendentes; **M1 15/17**.

@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**H03 confirmado no Indexer em 10/11:** busca somente leitura retornou três hits, sem falhas, idênticos aos do Manager em identidade, timestamp, caminho, tipo, regra e hashes. Nome e hashes correspondem ao texto inerte do smoke. [Prova e limites](m1-h03-change-c-activated-20261110.md). Discover abriu com filtro antigo, ainda sem validação visual do smoke; correlação FIM/Sysmon de executável permanece pendente. **M1 15/17.**
+
 **H03 no Manager, consulta posterior de 10/11:** três alertas FIM (`554`, `550`, `553`) de criação, alteração e exclusão para um mesmo caminho da pasta H03 foram confirmados no arquivo ativo. Há diferença de aproximadamente 35 segundos em relação aos horários registrados para o teste local; a correspondência exata permanece pendente. [Resultado e limites](m1-h03-change-c-activated-20261110.md). Indexer/Discover e correlação com Sysmon ainda não comprovados. **M1 15/17.**
 
 **Auditoria nativa H01/H02 de 10/11:** [contagens e limitações](m1-h01-h02-native-readonly-20261110.md): Security `4698=3`, Sysmon EID1 `4017`, PowerShell codificado `0`, Security `4720=0` nos sete dias consultados. **Nenhum par H01 ou H02 completo no recorte**, nenhuma execução ativa nova; H03 continua sem prova Indexer/Discover e Sysmon do mesmo executável. **M1 15/17; gate BLOCKED.**
