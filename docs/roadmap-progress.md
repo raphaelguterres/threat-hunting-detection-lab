@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**H03 no Manager, consulta posterior de 10/11:** três alertas FIM (`554`, `550`, `553`) de criação, alteração e exclusão para um mesmo caminho da pasta H03 foram confirmados no arquivo ativo. Há diferença de aproximadamente 35 segundos em relação aos horários registrados para o teste local; a correspondência exata permanece pendente. [Resultado e limites](m1-h03-change-c-activated-20261110.md). Indexer/Discover e correlação com Sysmon ainda não comprovados. **M1 15/17.**
+
 **Auditoria nativa H01/H02 de 10/11:** [contagens e limitações](m1-h01-h02-native-readonly-20261110.md): Security `4698=3`, Sysmon EID1 `4017`, PowerShell codificado `0`, Security `4720=0` nos sete dias consultados. **Nenhum par H01 ou H02 completo no recorte**, nenhuma execução ativa nova; H03 continua sem prova Indexer/Discover e Sysmon do mesmo executável. **M1 15/17; gate BLOCKED.**
 
 **Change C aplicada em 10/11/2026 (janela nova autorizada):** [relato sanitizado](m1-h03-change-c-activated-20261110.md). O agente Windows `004` recebeu uma única diretiva FIM local `realtime=yes` para a pasta H03, com DPAPI/rollback preservados, serviço reiniciado e pós-checagem de XML/serviço aprovada. O smoke test local com arquivo inerte (criação, alteração e remoção) teve saída 0 e limpeza concluída. **Indexer/Discover ainda não atestados, binário H03 não executado e nenhuma das correlações H01/H02/H03 encerrada. M1 continua 15/17 e `DEPLOYMENT_GATE=BLOCKED`.**

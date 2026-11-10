@@ -21,7 +21,7 @@
 
 - Executado teste de **arquivo texto inerte** no diretório H03: criação **20:11:02 UTC**, modificação **20:11:07 UTC** e exclusão **20:11:12 UTC**.
 - Resultado do executor: `H03_SMOKE_PREFLIGHT=PASS`, `SMOKE_WINDOWS_LOCAL_FILE_CYCLE=PASS`, `H03_DIRECTORY_EMPTY_AFTER=TRUE`, **exit 0**. Nenhum binário foi enviado/executado, nenhuma conta ou tarefa criada.
-- Esses timestamps comprovam a ação local, **não** comprovam alerta recebido no Wazuh. A inspeção do Manager/Indexer/Discover para esses eventos está **PENDENTE**, com verificação remota aguardando liberação do painel de revisão.
+- Esses timestamps registram a ação local. A consulta posterior ao Manager encontrou um ciclo compatível, descrito abaixo, com divergência temporal ainda não explicada. Indexer/Discover permanecem **PENDENTES**.
 - **Não houve teste v1→v2 e Sysmon EID1 para o mesmo executável.** H03 continua `INCONCLUSIVE` como correlação real.
 
 ## Estado e próximos controles
@@ -54,3 +54,28 @@ ambos atributos `yes`, ACL do arquivo igual à baseline e serviço Running.
 O comparador não alterou arquivos ativos ou serviços. Esse resultado é
 coerente com a implantação documentada acima; não deve ser contado como
 segunda implantação nem como comprovação da cobertura efetivamente carregada.
+
+## Consulta posterior ao Manager, somente leitura
+
+A leitura do arquivo ativo `alerts.json`, filtrada por agente `004` e pela
+pasta H03, encontrou três alertas para um mesmo caminho:
+
+| Horário UTC no Manager | Evento | Regra |
+| --- | --- | --- |
+| 20:10:27.736 | added | 554 |
+| 20:10:32.753 | modified | 550 |
+| 20:10:37.785 | deleted | 553 |
+
+O evento de alteração possui os campos SHA-256 anterior e posterior; nenhum
+valor de hash, nome de arquivo ou conteúdo foi publicado. Os três eventos
+estão no intervalo consultado de 20:10–20:14 UTC. Isso comprova recebimento
+de eventos FIM dessa pasta no Manager durante esse intervalo.
+
+Os horários antecedem em aproximadamente 35 segundos os horários registrados
+para as ações locais acima. A sequência e os intervalos são compatíveis,
+mas a origem dessa diferença ainda não foi verificada; não se afirma
+identidade exata com o smoke test documentado. A leitura contou também uma
+linha JSON inválida no arquivo ativo, sem investigar sua causa.
+
+Esta consulta não atesta Indexer/Discover, configuração completa em runtime
+ou correlação FIM/Sysmon do mesmo executável. **M1 permanece 15/17**.
