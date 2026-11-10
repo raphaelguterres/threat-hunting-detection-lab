@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Auditoria nativa H01/H02 de 10/11:** [contagens e limitações](m1-h01-h02-native-readonly-20261110.md): Security `4698=3`, Sysmon EID1 `4017`, PowerShell codificado `0`, Security `4720=0` nos sete dias consultados. **Nenhum par H01 ou H02 completo no recorte**, nenhuma execução ativa nova; H03 continua sem prova Indexer/Discover e Sysmon do mesmo executável. **M1 15/17; gate BLOCKED.**
+
 **Change C aplicada em 10/11/2026 (janela nova autorizada):** [relato sanitizado](m1-h03-change-c-activated-20261110.md). O agente Windows `004` recebeu uma única diretiva FIM local `realtime=yes` para a pasta H03, com DPAPI/rollback preservados, serviço reiniciado e pós-checagem de XML/serviço aprovada. O smoke test local com arquivo inerte (criação, alteração e remoção) teve saída 0 e limpeza concluída. **Indexer/Discover ainda não atestados, binário H03 não executado e nenhuma das correlações H01/H02/H03 encerrada. M1 continua 15/17 e `DEPLOYMENT_GATE=BLOCKED`.**
 
 **Retomada remota de 10/11:** acesso host ↔ Kali recuperado, serviços Wazuh em execução, `002`/`004`/`005` ativos na última consulta ao Manager e portas privadas acessíveis. [Check de rede, fontes e testes offline](m1-remote-resume-readonly-20261110.md): **277 testes aprovados, 4 ignorados, 197 subtestes aprovados**. Os sete arquivos locais anteriores foram preservados sem aplicar Change C. O gate de evidências continua `BLOCKED`, **M1 15/17 (88,2%)**; H03 e aceite independente permanecem pendentes.
