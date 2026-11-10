@@ -71,3 +71,27 @@ Indexer, Dashboard e agentes não foram reiniciados por esta mudança.
 
 A regra instalada comprova configuração e carga dos serviços, não o evento
 do probe. **Validação real de Sysmon do binário ainda pendente.**
+
+## Correções verificadas após a implantação
+
+O status de serviços acima não comprovava que a regra havia sido lida.
+O log mostrou `Permission denied` no arquivo: o modo 640 foi mantido,
+mas o grupo precisou ser corrigido para `wazuh`. A leitura foi comprovada
+executando a verificação com a identidade do serviço; parser e restart
+passaram, concluídos às 21:31:07 UTC no relógio do Manager, dentro do limite
+autorizado. Um parser executado como root não substitui esse teste de acesso.
+
+Os eventos nativos dos probes foram depois confirmados, mas a busca não
+mostrou os respectivos alertas Sysmon. A auditoria de 342 imagens EID1
+existentes confirmou a representação com barras duplicadas. O XML versionado
+agora contém a **correção proposta** do único campo de caminho, aceitando
+separadores simples ou duplicados nos mesmos dois objetos. Isso ainda não
+significa que essa revisão do XML esteja aplicada. O parser isolado passou;
+a aplicação/restart aguardam nova janela de 20 minutos solicitada ao dono.
+
+O proprietário autorizou a nova janela, delimitada no executor até
+**21:56:40 UTC (18:56:40 BRT)**. A correção do único padrão foi aplicada;
+parser e restart retornaram sucesso, serviços essenciais ativos e demais
+configurações iguais à baseline. Conclusão às **21:37:49 UTC pelo relógio
+do Manager**, sem rollback. A nova rodada dos probes é necessária para
+atestar a geração de alertas reais com essa revisão carregada.

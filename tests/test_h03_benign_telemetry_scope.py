@@ -22,7 +22,9 @@ class H03TelemetryScope(unittest.TestCase):
         self.assertEqual(fields['win.system.eventID'], '^1$')
         pattern = re.compile(fields['win.eventdata.image'])
         for name in ('Benign', 'Negative'):
-            self.assertIsNotNone(pattern.fullmatch(fr'C:\SecurityLab\H03\H03-{name}Probe.exe'))
+            path = fr'C:\SecurityLab\H03\H03-{name}Probe.exe'
+            self.assertIsNotNone(pattern.fullmatch(path))
+            self.assertIsNotNone(pattern.fullmatch(path.replace('\\', '\\\\')))
         for path in (
             r'C:\SecurityLab\H03\sub\H03-BenignProbe.exe',
             r'C:\SecurityLab\H03\H03-BenignProbe.exe.bak',

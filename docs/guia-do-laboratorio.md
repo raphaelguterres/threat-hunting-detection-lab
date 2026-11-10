@@ -114,6 +114,12 @@ VirtualBox para comunicar referências ao host sem liberar escrita na pasta
 compartilhada. O [auditor de Manager/Indexer](../scripts/m1_h03_live_manager_indexer_audit.py)
 é somente leitura e não substitui a inspeção no Discover.
 
+O [coletor nativo de leitura](../scripts/M1_H03_COLLECT_NATIVE_READONLY.ps1)
+pode recuperar os eventos existentes sem executar os probes outra vez. Quando
+a sessão já salvou seus dois RecordIDs, ele restringe a coleta a essas
+referências. Se encontrar múltiplos processos sem uma referência inequívoca,
+ele para em vez de escolher um evento arbitrariamente.
+
 ## 6. Publicar no GitHub
 
 ```powershell

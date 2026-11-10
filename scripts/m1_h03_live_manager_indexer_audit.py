@@ -15,7 +15,7 @@ import sys
 import urllib.request
 
 
-def run(expected):
+def run(expected, private_export=False):
     def stamp(value):
         return datetime.datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f%z')
     begin = datetime.datetime.strptime(expected['audit_after_utc'], '%Y-%m-%dT%H:%M:%SZ')
@@ -27,7 +27,8 @@ def run(expected):
         win = event.get('data', {}).get('win', {})
         path = sc.get('path') or win.get('eventdata', {}).get('image', '')
         for name, value in paths.items():
-            if path.replace('/', '\\').casefold() == value:
+            canonical = re.sub(r'\\+', lambda match: '\\', path.replace('/', '\\')).casefold()
+            if canonical == value:
                 return name
         return None
     manager = []
@@ -89,17 +90,20 @@ def run(expected):
                            'rule_id': event.get('rule', {}).get('id')})
         if hash_match:
             normalized.append(normalize(event, 'file_execution', 'sysmon_eid1', data.get('user')))
-    return {'query_complete': complete, 'manager_events': len(manager), 'indexer_events': len(indexer),
+    outcome = {'query_complete': complete, 'manager_events': len(manager), 'indexer_events': len(indexer),
             'manager_indexer_exact': exact, 'baseline_ok': exact and len(baseline) == 1,
             'modified_ok': exact and len(modified) == 1, 'invalid_manager_json_lines': invalid,
             'negative_modified_events': sum(role(event) == 'negative' and event.get('syscheck', {}).get('event') == 'modified' for event in indexer),
             'executions': executions, 'normalized': normalized, 'discover_verified': False}
+    if private_export:
+        outcome['private_sources'] = {'manager': manager, 'indexer': indexer}
+    return outcome
 
 
 if __name__ == '__main__':
     try:
         expected = json.loads(base64.b64decode(sys.argv[1]))
-        print(json.dumps(run(expected)))
+        print(json.dumps(run(expected, private_export='--private-export' in sys.argv[2:])))
     except Exception as error:
         print(json.dumps({'audit_failed': True, 'error_type': type(error).__name__, 'http_status': getattr(error, 'code', None)}))
         raise SystemExit(2)

@@ -7,18 +7,20 @@ $created=@()
 $phase='preflight'
 $manifest=$null
 $configHash=$null
+$config=$null
 $exitCode=2
+$configEqualsProposal=$false
 $EvidenceDirectory=$null
 $VBoxControl=@((Join-Path $env:WINDIR 'System32\VBoxControl.exe'),(Join-Path $env:ProgramFiles 'Oracle\VirtualBox Guest Additions\VBoxControl.exe')) | Where-Object {Test-Path -LiteralPath $_ -PathType Leaf} | Select-Object -First 1
 function Publish([string]$name,$value) {
     $encoded=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes(($value | ConvertTo-Json -Compress -Depth 6)))
     if(($propertyRoot+'/'+$name).Length -gt 63 -or $encoded.Length -gt 1023){throw 'GuestPropertySizeLimit'}
-    & $VBoxControl guestproperty set ($propertyRoot+'/'+$name) $encoded --flags 'TRANSIENT,TRANSRESET,RDONLYHOST' | Out-Null
+    & $VBoxControl --nologo guestproperty set ($propertyRoot+'/'+$name) $encoded --flags 'TRANSIENT,TRANSRESET,RDONLYHOST' | Out-Null
     if($LASTEXITCODE -ne 0){throw 'GuestPropertyPublishFailed'}
 }
 function Hash([string]$path) { return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToLowerInvariant() }
 function State([string]$value) {
-    $data=@{session=$manifest.session;phase=$value;guest_utc=[DateTimeOffset]::UtcNow.ToString('o')}
+    $data=@{session=$manifest.session;phase=$value;guest_utc=[DateTimeOffset]::UtcNow.ToString('o');config_equals_proposal=$configEqualsProposal}
     $data | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $EvidenceDirectory 'status.json') -Encoding UTF8
     Publish 'state' $data
     Write-Output ('H03_PHASE='+$value)
@@ -26,8 +28,9 @@ function State([string]$value) {
 function Await-Receipt([string]$gate) {
     $limit=[DateTimeOffset]::UtcNow.AddMinutes(5)
     while([DateTimeOffset]::UtcNow -lt $limit -and [DateTimeOffset]::UtcNow -lt $deadline) {
-        $receipt=@(& $VBoxControl guestproperty get ($propertyRoot+'/'+$gate+'-confirmed')) -join ''
-        if($LASTEXITCODE -eq 0 -and $receipt -match '^Value: (.+)$') {
+        $receiptLines=@(& $VBoxControl --nologo guestproperty get ($propertyRoot+'/'+$gate+'-confirmed'))
+        $receipt=@($receiptLines | Where-Object {$_ -match '^Value: '}) | Select-Object -First 1
+        if($LASTEXITCODE -eq 0 -and $receipt -and $receipt -match '^Value: (.+)$') {
             $proof=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($Matches[1])) | ConvertFrom-Json
             if($proof.session -cne $manifest.session -or $proof.gate -cne $gate -or $proof.manager_indexer_exact -ne $true){throw 'InvalidReceipt'}
             if((Hash $probe) -cne $(if($gate -eq 'baseline'){$manifest.sha256_v1}else{$manifest.sha256_v2})){throw 'ProbeChangedWhileWaiting'}
@@ -68,9 +71,11 @@ try {
             if($ace.IdentityReference.Value -notin @('S-1-5-18','S-1-5-32-544',$identity.User.Value) -or $ace.AccessControlType -ne 'Allow'){throw 'UnexpectedDirectoryPrincipal'}
         }
     }
-    if(@(Get-ChildItem -LiteralPath $target -Force).Count -ne 0){throw 'TargetNotEmpty'}
     $config=Join-Path $agentRoot 'ossec.conf'
     $configHash=Hash $config
+    $approvedProposal=Join-Path $env:LOCALAPPDATA 'WazuhH03ChangeC-20261110\proposal.conf'
+    if(-not (Test-Path -LiteralPath $approvedProposal -PathType Leaf) -or (Hash $approvedProposal) -cne $configHash){throw 'ActiveConfigDiffersFromApprovedProposal'}
+    $configEqualsProposal=$true
     $xml=New-Object Xml.XmlDocument
     $xml.XmlResolver=$null
     $xml.Load($config)
@@ -83,6 +88,14 @@ try {
     if((Hash $v1) -cne $manifest.sha256_v1 -or (Hash $v2) -cne $manifest.sha256_v2 -or $manifest.sha256_v1 -ceq $manifest.sha256_v2){throw 'StagedArtifactMismatch'}
     $probe=Join-Path $target 'H03-BenignProbe.exe'
     $negative=Join-Path $target 'H03-NegativeProbe.exe'
+    $existing=@(Get-ChildItem -LiteralPath $target -Force)
+    if($existing.Count -gt 0) {
+        $recover=($manifest.PSObject.Properties.Name -contains 'recover_aborted_v1') -and $manifest.recover_aborted_v1 -eq $true
+        if(-not $recover -or $existing.Count -ne 1 -or $existing[0].FullName -ine $probe -or $existing[0].PSIsContainer -or ($existing[0].Attributes -band [IO.FileAttributes]::ReparsePoint) -or (Hash $probe) -cne $manifest.sha256_v1){throw 'TargetNotEmptyOrPriorArtifactNotVerified'}
+        [IO.File]::Delete($probe)
+        if([IO.File]::Exists($probe)){throw 'PriorArtifactCleanupFailed'}
+        Write-Output 'PRIOR_ABORTED_V1_EXACT_HASH_CLEANED=TRUE'
+    }
     $start=Get-Date
     $created+= $probe
     [IO.File]::Copy($v1,$probe,$false)
@@ -111,7 +124,7 @@ try {
             $eventXml.XmlResolver=$null
             $eventXml.LoadXml($event.ToXml())
             $fields=@{}
-            foreach($node in $eventXml.SelectNodes('/Event/EventData/Data')){$fields[$node.GetAttribute('Name')]=$node.InnerText}
+            foreach($node in $eventXml.SelectNodes("/*[local-name()='Event']/*[local-name()='EventData']/*[local-name()='Data']")){$fields[$node.GetAttribute('Name')]=$node.InnerText}
             if($fields['Image'] -ieq $probe -or $fields['Image'] -ieq $negative) {
                 if($event.ProviderName -ne 'Microsoft-Windows-Sysmon'){throw 'UnexpectedProvider'}
                 [pscustomobject]@{record_id=$event.RecordId;timestamp_utc=$event.TimeCreated.ToUniversalTime().ToString('o');image=$fields['Image'];hashes=$fields['Hashes'];process_guid=$fields['ProcessGuid'];xml=$event.ToXml()}
@@ -138,16 +151,25 @@ try {
     if($manifest -and $EvidenceDirectory -and (Test-Path -LiteralPath $EvidenceDirectory)){State ('FAILED_'+$phase)}
 } finally {
     $cleanup=$true
+    $remaining=0
     foreach($path in $created) {
-        if(Test-Path -LiteralPath $path) {
+        if([IO.File]::Exists($path)) {
             $expected=@($manifest.sha256_v1,$manifest.sha256_v2)
-            if((Hash $path) -cin $expected -and -not ((Get-Item -LiteralPath $path -Force).Attributes -band [IO.FileAttributes]::ReparsePoint)) {
-                Remove-Item -LiteralPath $path -Force
+            $hasher=[Security.Cryptography.SHA256]::Create()
+            try{$cleanupHash=[BitConverter]::ToString($hasher.ComputeHash([IO.File]::ReadAllBytes($path))).Replace('-','').ToLowerInvariant()}finally{$hasher.Dispose()}
+            if($cleanupHash -cin $expected -and -not ([IO.File]::GetAttributes($path) -band [IO.FileAttributes]::ReparsePoint)) {
+                [IO.File]::Delete($path)
             } else {$cleanup=$false}
         }
+        if([IO.File]::Exists($path)){$remaining++;$cleanup=$false}
     }
     if($manifest -and $EvidenceDirectory -and (Test-Path -LiteralPath $EvidenceDirectory)) {
-        $cleanupResult=@{session=$manifest.session;cleanup_pass=$cleanup;remaining_test_files=@($created | Where-Object {Test-Path -LiteralPath $_}).Count;config_unchanged=[bool]($configHash -and (Hash $config) -ceq $configHash);service_running=((Get-Service WazuhSvc).Status -eq 'Running')}
+        $configUnchanged=$false
+        if($configHash -and $config) {
+            $afterConfigHash=Hash $config
+            $configUnchanged=[string]::Equals($afterConfigHash,$configHash,[StringComparison]::Ordinal)
+        }
+        $cleanupResult=@{session=$manifest.session;cleanup_pass=$cleanup;remaining_test_files=$remaining;config_unchanged=$configUnchanged;service_running=((Get-Service WazuhSvc).Status -eq 'Running')}
         $cleanupResult | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $EvidenceDirectory 'cleanup.json') -Encoding UTF8
         Publish 'cleanup' $cleanupResult
     }

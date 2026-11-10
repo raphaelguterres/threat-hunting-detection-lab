@@ -12,6 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import m1_h03_live_manager_indexer_audit as audit
+import hunt_correlations as hunting
 
 EXPECTED = {'audit_after_utc': '2026-11-10T21:08:00Z', 'sha256_v1': 'a'*64, 'sha256_v2': 'b'*64}
 
@@ -26,6 +27,15 @@ def event(kind='added'):
 
 
 class AuditGates(unittest.TestCase):
+    def process(self, negative=False):
+        image = r'C:\SecurityLab\H03\H03-NegativeProbe.exe' if negative else r'C:\SecurityLab\H03\H03-BenignProbe.exe'
+        return {'id': 'synthetic-process', 'timestamp': '2026-11-10T21:10:01.001+0000',
+                'agent': {'id': '004'}, 'rule': {'id': '110150'},
+                'data': {'win': {'system': {'eventID': '1', 'eventRecordID': '123'},
+                                 'eventdata': {'image': image.replace('\\', '\\\\'),
+                                              'hashes': 'SHA256='+EXPECTED['sha256_v2'],
+                                              'user': 'synthetic-operator', 'processGuid': 'synthetic-guid'}}}}
+
     def run_audit(self, manager, indexer, failed=0, timeout=False, total=None):
         result = {'hits': {'hits': [{'_source': item} for item in indexer],
                            'total': {'relation': 'eq', 'value': len(indexer) if total is None else total}},
@@ -82,3 +92,17 @@ class AuditGates(unittest.TestCase):
         del item['syscheck']['uname_after']
         with self.assertRaises(ValueError):
             self.run_audit([item], [item])
+
+    def test_realistic_doubled_sysmon_separators_join_single_fim_path(self):
+        records = [event('modified'), self.process()]
+        result = self.run_audit(records, records)
+        self.assertEqual(len(result['executions']), 1)
+        self.assertTrue(result['executions'][0]['sha256_v2_match'])
+        normalized = [hunting.parse_event(item) for item in result['normalized']]
+        self.assertEqual(hunting.correlate(normalized)['hypotheses']['H03_FIM_EXECUTION']['candidate_pairs'], 1)
+
+    def test_equal_hash_on_other_object_does_not_create_h03_pair(self):
+        records = [event('modified'), self.process(negative=True)]
+        result = self.run_audit(records, records)
+        normalized = [hunting.parse_event(item) for item in result['normalized']]
+        self.assertEqual(hunting.correlate(normalized)['hypotheses']['H03_FIM_EXECUTION']['candidate_pairs'], 0)
