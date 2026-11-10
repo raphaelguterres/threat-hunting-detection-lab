@@ -2,7 +2,7 @@
 setlocal
 echo Preflight H03: consulta de volume, servico e ACL por SID.
 echo A copia local do verificador sera preservada. Nenhuma mudanca H03 sera aplicada.
-set "h03_source=%~dp0scripts\M1_H03_PREFLIGHT_READONLY.ps1"
+set "h03_source=%~dp0..\M1_H03_PREFLIGHT_READONLY.ps1"
 set "h03_local=%LOCALAPPDATA%\WazuhH03Preflight-%RANDOM%-%RANDOM%"
 if not exist "%h03_source%" goto failed
 if exist "%h03_local%" goto failed

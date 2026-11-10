@@ -2,7 +2,7 @@
 setlocal
 echo CHANGE C: aplicar UMA diretiva FIM no agente 004 e reiniciar WazuhSvc.
 echo Janela termina em 10/11/2026 18:01 BRT. Ha verificacao e recuperacao em falha.
-set "h03_source=%~dp0scripts\M1_H03_CHANGE_C_APPLY.ps1"
+set "h03_source=%~dp0..\M1_H03_CHANGE_C_APPLY.ps1"
 set "h03_local=%LOCALAPPDATA%\WazuhH03Apply-%RANDOM%-%RANDOM%"
 if not exist "%h03_source%" goto failed
 if exist "%h03_local%" goto failed

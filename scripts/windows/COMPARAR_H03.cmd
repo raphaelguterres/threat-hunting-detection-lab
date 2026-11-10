@@ -1,7 +1,7 @@
 @echo off
 setlocal
 echo Comparacao H03 SOMENTE LEITURA. Valores privados nao serao impressos.
-set "h03_source=%~dp0scripts\M1_H03_COMPARE_READONLY.ps1"
+set "h03_source=%~dp0..\M1_H03_COMPARE_READONLY.ps1"
 set "h03_local=%LOCALAPPDATA%\WazuhH03Compare-%RANDOM%-%RANDOM%"
 if not exist "%h03_source%" goto failed
 if exist "%h03_local%" goto failed

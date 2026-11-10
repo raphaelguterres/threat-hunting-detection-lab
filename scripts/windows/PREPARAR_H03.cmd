@@ -2,7 +2,7 @@
 setlocal
 echo CHANGE C AUTORIZADA: criar pastas protegidas e preparar proposta FIM.
 echo Este passo NAO altera ossec.conf ativo e NAO reinicia o servico.
-set "h03_source=%~dp0scripts\M1_H03_CHANGE_C_PREPARE.ps1"
+set "h03_source=%~dp0..\M1_H03_CHANGE_C_PREPARE.ps1"
 set "h03_local=%LOCALAPPDATA%\WazuhH03Prepare-%RANDOM%-%RANDOM%"
 if not exist "%h03_source%" goto failed
 if exist "%h03_local%" goto failed

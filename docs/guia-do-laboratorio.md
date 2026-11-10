@@ -104,7 +104,8 @@ O último comando usa dados sintéticos e não comprova nenhum evento real.
 Para uma coleta real, preserve os originais em `.lab/`, confirme as identidades
 e só então normalize os sete campos exigidos pelo correlacionador.
 
-Os executores de VM são separados dessas verificações. `TESTAR_H03.cmd`
+Os executores de VM ficam em [`scripts/windows/`](../scripts/windows/). O
+[`TESTAR_H03.cmd`](../scripts/windows/TESTAR_H03.cmd)
 depende de um manifesto privado e de uma sessão autorizada; ele não é um
 instalador genérico. O [executor Windows](../scripts/M1_H03_CONTROLLED_BINARY_TEST.ps1)
 recusa outro agente, espera recibos de ingestão e limita a execução a dois

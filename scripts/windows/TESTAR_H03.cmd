@@ -2,8 +2,8 @@
 setlocal
 echo H03: teste autorizado de dois programas benignos, com coleta Sysmon e limpeza.
 echo Aguarda comprovacao Manager/Indexer antes de modificar e executar.
-set "h03_source=%~dp0scripts\M1_H03_CONTROLLED_BINARY_TEST.ps1"
-set "h03_run=%~dp0.lab\h03-live-20261110"
+set "h03_source=%~dp0..\M1_H03_CONTROLLED_BINARY_TEST.ps1"
+set "h03_run=%~dp0..\..\.lab\h03-live-20261110b"
 set "h03_local=%LOCALAPPDATA%\WazuhH03Binary-%RANDOM%-%RANDOM%"
 if not exist "%h03_source%" goto failed
 if not exist "%h03_run%\manifest.json" goto failed

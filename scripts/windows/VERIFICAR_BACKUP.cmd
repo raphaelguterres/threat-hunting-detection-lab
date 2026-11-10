@@ -3,7 +3,7 @@ setlocal
 echo Verificacao de backup Wazuh - recuperacao apenas em memoria.
 echo Nenhum arquivo ativo sera restaurado e nenhum servico sera reiniciado.
 echo Uma copia local do verificador sera criada. A politica PowerShell sera preservada.
-set "backup_check_source=%~dp0.lab\m1-change-prep\M1_CHANGE_C_BACKUP_VERIFY_ONLY.ps1"
+set "backup_check_source=%~dp0..\..\.lab\m1-change-prep\M1_CHANGE_C_BACKUP_VERIFY_ONLY.ps1"
 if not exist "%backup_check_source%" goto source_missing
 set "backup_check_dir=%LOCALAPPDATA%\WazuhM1Verify-%RANDOM%-%RANDOM%"
 if exist "%backup_check_dir%" goto target_exists
