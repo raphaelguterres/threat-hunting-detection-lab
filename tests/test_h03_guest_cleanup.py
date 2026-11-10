@@ -46,11 +46,15 @@ Write-Output 'ACTUAL_FINALIZER_BOUNDARIES=PASS'
             directory = Path(temporary)
             runner = directory / 'run.ps1'
             runner.write_text(script, encoding='utf-8')
+            # pwsh-based CI parents can pass a PS7-only module lookup path to PS5.
+            environment = os.environ.copy()
+            windows_modules = Path(environment['WINDIR']) / 'System32/WindowsPowerShell/v1.0/Modules'
+            environment['PSModulePath'] = str(windows_modules) + os.pathsep + environment.get('PSModulePath', '')
             result = subprocess.run(
                 ['powershell.exe', '-NoProfile', '-File', str(runner),
                  '-Source', str(ROOT / 'scripts/M1_H03_CONTROLLED_BINARY_TEST.ps1'),
                  '-Work', str(directory)],
-                capture_output=True, text=True, timeout=30,
+                capture_output=True, text=True, timeout=30, env=environment,
             )
             if result.returncode and ('AuthorizationManager' in result.stderr or 'UnauthorizedAccess' in result.stderr):
                 self.skipTest('Host policy blocks temporary PowerShell scripts; policy preserved')
