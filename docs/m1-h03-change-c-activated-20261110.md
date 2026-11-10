@@ -105,3 +105,24 @@ smoke no Discover permanece **NOT_VERIFIED** até aplicar a consulta correta.
 `H03_MANAGER_INDEXER_SMOKE_MATCH=PASS` · `H03_DISCOVER_SMOKE=NOT_VERIFIED` ·
 `H03_BINARY_EXECUTION=NOT_PERFORMED`. A sequência FIM/Sysmon do mesmo
 executável e seus controles negativos continuam pendentes; **M1 15/17**.
+
+## Confirmação visual posterior no Discover
+
+Após o operador substituir o filtro antigo por
+`agent.id:004 and syscheck.path:*h03*`, o Discover autenticado exibiu
+**3 hits** no padrão `wazuh-alerts-*`, no recorte das últimas 24 horas.
+Os três registros apresentaram os horários terminados em
+`:10:27.736`, `:10:32.753` e `:10:37.785`, no fuso de exibição do navegador,
+e o caminho do arquivo texto do smoke. A ordem da tabela era decrescente.
+Os horários do Indexer permanecem registrados em UTC na tabela acima;
+não se deve tratar o horário de exibição como BRT sem verificar o fuso.
+
+Assim, o ciclo do arquivo inerte tem comprovação de recebimento no Manager,
+igualdade dos três documentos no Indexer e visibilidade no Discover.
+`H03_MANAGER_INDEXER_SMOKE_MATCH=PASS` · `H03_DISCOVER_SMOKE=PASS`.
+Não houve repetição do teste nem alteração de configuração ou serviço.
+
+**Concluído: validação da ingestão do smoke FIM H03.**
+**Pendente: hipótese H03 completa**, que exige alteração v1→v2 e Sysmon
+EID1 de execução do mesmo binário, ordem temporal e controles negativos.
+`H03_REAL_PAIR=INCONCLUSIVE`; **M1 permanece 15/17**.

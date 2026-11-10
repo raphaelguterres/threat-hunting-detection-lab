@@ -1,5 +1,7 @@
 # Painel de progresso — Threat Hunting & Detection Lab
 
+**Smoke FIM H03 validado ponta a ponta em 10/11:** Manager e Indexer contêm três eventos idênticos do mesmo arquivo inerte; o Discover exibiu **3 hits** com o filtro H03 correto e os mesmos horários. [Resultado completo](m1-h03-change-c-activated-20261110.md). Ingestão do smoke concluída; alteração e execução do mesmo binário com Sysmon EID1 e controles negativos ainda pendentes. **Hipótese H03 INCONCLUSIVE; M1 15/17.**
+
 **H03 confirmado no Indexer em 10/11:** busca somente leitura retornou três hits, sem falhas, idênticos aos do Manager em identidade, timestamp, caminho, tipo, regra e hashes. Nome e hashes correspondem ao texto inerte do smoke. [Prova e limites](m1-h03-change-c-activated-20261110.md). Discover abriu com filtro antigo, ainda sem validação visual do smoke; correlação FIM/Sysmon de executável permanece pendente. **M1 15/17.**
 
 **H03 no Manager, consulta posterior de 10/11:** três alertas FIM (`554`, `550`, `553`) de criação, alteração e exclusão para um mesmo caminho da pasta H03 foram confirmados no arquivo ativo. Há diferença de aproximadamente 35 segundos em relação aos horários registrados para o teste local; a correspondência exata permanece pendente. [Resultado e limites](m1-h03-change-c-activated-20261110.md). Indexer/Discover e correlação com Sysmon ainda não comprovados. **M1 15/17.**
