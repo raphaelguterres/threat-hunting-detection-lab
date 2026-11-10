@@ -5,6 +5,8 @@ estrutura das pastas, hipóteses H01/H02/H03, validação de eventos e publicaç
 no GitHub. O [painel de progresso](docs/roadmap-progress.md) reúne o estado
 mais recente; os checkpoints datados registram o histórico.
 
+**H03 validado em 10/11/2026:** [prova real e controle negativo](docs/m1-h03-controlled-binary-validation-20261110.md), com alteração e execução do mesmo binário benigno, sete eventos no Manager/Indexer/Discover e CI 3/3 aprovado. **M1 continua 15/17**; H01/H02 e revisão final seguem pendentes.
+
 <p align="center">
   <strong>Cyber Defense Engineering para transformar telemetria em decisões investigáveis.</strong><br />
   <sub>Wazuh · Windows Server · Linux · Sysmon · FIM · MITRE ATT&CK · Playbooks · Evidência reproduzível</sub>

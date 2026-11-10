@@ -1,6 +1,6 @@
 # H03: validação controlada do binário benigno — 10/11/2026
 
-**Estado: correlação positiva e controle negativo comprovados; conferência visual final no Discover pendente.** Este documento
+**Estado: H03 validado no laboratório, incluindo correlação positiva, controle negativo e Discover.** Este documento
 separa preparação e testes automatizados de eventos efetivamente observados.
 O smoke de texto já foi [confirmado em Manager, Indexer e Discover](m1-h03-change-c-activated-20261110.md).
 
@@ -77,7 +77,7 @@ O recorte da nova sessão exclui os eventos da primeira tentativa.
 | Execução positiva e negativa: EID1 nativo e SHA-256 v2 | PASS, dois registros nativos |
 | Mesmas identidades Sysmon no Manager/Indexer | PASS, dois RecordIDs/ProcessGuids e hashes coincidentes com a fonte nativa |
 | Correlação positiva: 1 candidato; controle de outro objeto: 0 | PASS, 1 positivo e 0 no controle |
-| Eventos dessa sessão visíveis no Discover | PENDENTE |
+| Eventos dessa sessão visíveis no Discover | PASS, 7 hits no recorte UTC 21:40–21:42 |
 | Limpeza e pós-check da sessão | PASS, arquivos do teste removidos, configuração preservada e serviço ativo |
 
 O motor usa timestamps de recebimento do Manager para os dois lados da
@@ -158,8 +158,8 @@ identificadores ou fabricar linhas sintéticas para esta evidência.
 
 Esses eventos representam um teste benigno autorizado, não um incidente.
 O resumo do correlacionador, originais selecionados e referências nativas
-permanecem privados. A conferência visual final do Discover é o último
-controle desta rodada ainda não atestado nesta atualização.
+permanecem privados. A visibilidade no Discover foi atestada na conferência
+final abaixo.
 
 ### Linha do tempo da rodada comprovada
 
@@ -180,3 +180,36 @@ dois caminhos foram reutilizados nas tentativas documentadas; uma busca
 histórica mais ampla pode produzir outros pares válidos dentro de 20 minutos.
 O teste não comprova precisão global, deduplicação por execução ou ausência
 de falsos positivos em um ambiente real.
+
+## Encerramento da validação H03
+
+Após o login manual do proprietário, a consulta pronta abriu no Firefox do
+Kali e foi conferida visualmente no Discover:
+
+```text
+agent.id:004 and (rule.id:110150 or syscheck.path:*probe.exe)
+```
+
+Padrão `wazuh-alerts-*`, intervalo absoluto **10/11/2026, 21:40–21:42 UTC**:
+**7 hits**, correspondentes aos cinco FIM e aos dois processos da rodada.
+A lista exibiu os objetos positivo e negativo, os horários das execuções
+e a alteração FIM. A interface renderiza outro fuso; as comparações usam UTC.
+A captura original foi preservada somente em `.lab/`.
+
+**Resultado: `H03_REAL_LAB_VALIDATION=PASS`**, com 1 par positivo, 0 no
+controle de outro objeto, identidade nativa/Manager/Indexer conferida e
+visibilidade no Discover. Não houve injeção de logs, alteração de evidências
+ou classificação do experimento como incidente.
+
+O pós-check do Manager confirmou os agentes **002/004/005 ativos e
+sincronizados**. A regra restrita 110150 permanece instalada no laboratório;
+nenhuma alteração adicional de FIM, archives, Indexer ou Dashboard foi feita.
+
+O [workflow de validação](https://github.com/raphaelguterres/threat-hunting-detection-lab/actions/runs/42909337145)
+terminou com **3/3 jobs aprovados**, incluindo os testes H03 em Windows e
+Linux. O teste de limpeza, ignorado pela política deste host, foi executado
+e aprovado no runner Windows após corrigir o caminho de módulos do teste.
+CI sintético e prova real continuam sendo verificações separadas.
+
+**M1 permanece 15/17:** H01/H02 completos e revisão independente final ainda
+precisam ser encerrados. A conclusão de H03 não concede aceite global.

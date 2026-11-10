@@ -126,3 +126,13 @@ Não houve repetição do teste nem alteração de configuração ou serviço.
 **Pendente: hipótese H03 completa**, que exige alteração v1→v2 e Sysmon
 EID1 de execução do mesmo binário, ordem temporal e controles negativos.
 `H03_REAL_PAIR=INCONCLUSIVE`; **M1 permanece 15/17**.
+
+## Atualização posterior: hipótese H03 validada
+
+O estado `INCONCLUSIVE` acima pertence ao checkpoint do arquivo texto.
+A [rodada posterior do binário benigno](m1-h03-controlled-binary-validation-20261110.md)
+comprovou FIM v1→v2, execução do mesmo objeto, identidades nativas e
+Manager/Indexer coincidentes e sete eventos no Discover. Resultado: um par
+positivo e zero no controle com outro objeto. H03 passou como experimento
+benigno do laboratório; H01/H02 e revisão independente continuam pendentes,
+com **M1 15/17**.

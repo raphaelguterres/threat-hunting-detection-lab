@@ -1,5 +1,7 @@
 # M1 — Três hipóteses de Threat Hunting com correlação offline
 
+> **Checkpoint H03 — 10/11/2026:** [validação real concluída no laboratório](m1-h03-controlled-binary-validation-20261110.md): FIM `modified` v1→v2 e execução Sysmon EID1 do mesmo binário, identidades nativas/Manager/Indexer coincidentes e sete eventos no Discover. Um candidato positivo em 7,159 s; zero para alteração de um objeto seguida da execução do outro, com mesmo hash. Teste benigno autorizado, limpeza conferida. H01/H02 e revisão final permanecem separados; M1 15/17. Os checkpoints anteriores abaixo mantêm suas datas originais.
+
 > **Checkpoint 05/11, H01:** a [auditoria de escopo da regra ativa](m1-h01-active-rule-scope-diagnosis-20261105.md) confirmou que `110100` só eleva PowerShell Sysmon EID1 quando `commandLine` contém `-enc`/`-EncodedCommand`; a regra-base `61603` está nível 0 e o limite de alertas é 3. Um ensaio real com PowerShell `-File` e Security `4698` criou um par benigno **nativo** dentro de 1,34 s, mas o EID1 específico não gerou alerta indexado. Não confundir o evento Sysmon nativo com um alerta `110100` validado; próximos testes precisam alinhar o comando à regra, sob nova janela aprovada. H02 e H03 continuam com lacunas próprias.
 
 **Início:** 02/11/2026. **Estado:** especificação e validação sintética; triagem de novos eventos reais **não executada**. Este incremento não comprova novos incidentes nem classifica as três hipóteses como detecções implantadas.
