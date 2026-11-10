@@ -31,3 +31,26 @@
 **M1 ainda 15/17 (88,2%); `DEPLOYMENT_GATE=BLOCKED`.** Para 16/17 falta comprovar as três correlações H01/H02/H03 em eventos reais e controles negativos, sem confundir provas locais/sintéticas com ingestão. O encerramento 17/17 continua exigindo revisão independente, não substituída por esta exceção de Change C.
 
 **Evidências privadas:** capturas do precheck, do cutover, do pós-check e do smoke test permanecem em `.lab/`, ignoradas pelo Git.
+
+## Auxiliares da sessão e comparação posterior
+
+Os launchers `VERIFICAR_BACKUP.cmd`, `VERIFICAR_H03.cmd`,
+`PREPARAR_H03.cmd`, `APLICAR_H03.cmd` e `COMPARAR_H03.cmd` foram preparados
+para execução manual pelo proprietário na VM Windows via pasta compartilhada.
+Eles conferem uma cópia local do script antes de executá-lo com a política
+PowerShell existente; não usam `ExecutionPolicy Bypass`.
+
+O launcher de backup depende do verificador privado preexistente em `.lab/`,
+que não é distribuído pelo Git. Os launchers de preparação/aplicação possuem
+janelas fixas históricas e devem parar fora delas. Não são instaladores
+genéricos e não autorizam nova mudança em outra máquina ou data.
+
+A tentativa posterior de `APLICAR_H03` parou em `live_config_hash`, sem
+substituição do arquivo ativo. A execução manual de `COMPARAR_H03` esclareceu
+a divergência: baseline de 9725 bytes, configuração atual de 9801 bytes,
+`CURRENT_EQUALS_PREPARED_PROPOSAL=True`, exatamente três campos XML novos
+(diretiva de diretório e atributos `check_all`/`realtime`), uma diretiva H03,
+ambos atributos `yes`, ACL do arquivo igual à baseline e serviço Running.
+O comparador não alterou arquivos ativos ou serviços. Esse resultado é
+coerente com a implantação documentada acima; não deve ser contado como
+segunda implantação nem como comprovação da cobertura efetivamente carregada.
